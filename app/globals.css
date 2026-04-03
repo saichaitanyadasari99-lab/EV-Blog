@@ -1,13 +1,15 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f4f6ef;
-  --foreground: #102015;
+  --background: #f5f7f3;
+  --foreground: #11231c;
   --surface: #ffffff;
-  --ink-soft: #55625b;
-  --accent: #1f7a4f;
-  --accent-strong: #155e3a;
-  --border: #d6dfd7;
+  --ink-soft: #5c6d64;
+  --accent: #0c8f5a;
+  --accent-strong: #06613d;
+  --border: #d3ddd6;
+  --highlight: #d2f4e4;
+  --surface-muted: #eef4f0;
 }
 
 @theme inline {
@@ -18,13 +20,55 @@
 }
 
 body {
-  background: var(--background);
+  background:
+    radial-gradient(1200px 420px at 10% -15%, #dff6e9 0%, transparent 70%),
+    radial-gradient(1000px 380px at 100% -10%, #dceefc 0%, transparent 65%),
+    var(--background);
   color: var(--foreground);
   font-family: var(--font-manrope), sans-serif;
 }
 
 a {
   color: inherit;
+}
+
+.shell {
+  margin: 0 auto;
+  width: min(1120px, calc(100% - 2rem));
+}
+
+.panel {
+  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--surface) 94%, #f2f7f4 6%);
+  border-radius: 1.25rem;
+  box-shadow: 0 10px 30px rgba(17, 35, 28, 0.06);
+}
+
+.chip {
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--accent) 30%, white 70%);
+  background: color-mix(in srgb, var(--highlight) 70%, white 30%);
+  color: var(--accent-strong);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.34rem 0.72rem;
+}
+
+.fade-up {
+  animation: fadeUp 560ms ease both;
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .prose {

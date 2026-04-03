@@ -7,8 +7,8 @@ type Props = {
 
 export function PostCard({ post }: Props) {
   return (
-    <article className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5 shadow-sm">
-      <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--accent)]">
+    <article className="panel fade-up p-5 transition hover:-translate-y-0.5 hover:shadow-md">
+      <p className="chip inline-flex">
         {post.category ?? "Uncategorized"}
       </p>
       <h2 className="mt-2 text-2xl font-bold leading-tight text-[var(--foreground)]">

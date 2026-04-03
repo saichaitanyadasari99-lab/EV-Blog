@@ -17,20 +17,20 @@ export default async function BlogPostPage({ params }: Params) {
   const html = renderTiptapHtml(post.content);
 
   return (
-    <article className="mx-auto w-full max-w-4xl px-4 py-10">
-      <header className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-7 shadow-sm">
-        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--accent)]">
+    <article className="shell py-10">
+      <header className="panel p-7 md:p-10">
+        <p className="chip inline-flex">
           {post.category ?? "Uncategorized"}
         </p>
-        <h1 className="mt-2 text-4xl font-black leading-tight">{post.title}</h1>
-        <p className="mt-2 text-sm text-[var(--ink-soft)]">
+        <h1 className="mt-4 text-4xl font-black leading-tight md:text-5xl">{post.title}</h1>
+        <p className="mt-3 text-sm text-[var(--ink-soft)]">
           {new Date(post.created_at).toLocaleDateString()} | {post.reading_time ?? 1} min
           read
         </p>
       </header>
 
       <section
-        className="prose mt-7 max-w-none rounded-2xl border border-[var(--border)] bg-white p-7"
+        className="prose panel mt-7 max-w-none p-7 md:p-10"
         dangerouslySetInnerHTML={{ __html: html }}
       />
     </article>
