@@ -1,22 +1,28 @@
 import type { Metadata } from "next";
-import { Manrope, Source_Code_Pro } from "next/font/google";
+import { DM_Sans, IBM_Plex_Mono, Syne } from "next/font/google";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import "./globals.css";
 
-const manrope = Manrope({
-  variable: "--font-manrope",
+const syne = Syne({
+  variable: "--font-syne",
   subsets: ["latin"],
 });
 
-const sourceCode = Source_Code_Pro({
-  variable: "--font-source-code",
+const dmSans = DM_Sans({
+  variable: "--font-dm-sans",
+  subsets: ["latin"],
+});
+
+const ibmMono = IBM_Plex_Mono({
+  variable: "--font-ibm-mono",
+  weight: ["400", "500"],
   subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
-  title: "EV Blog Post",
-  description: "Modern EV engineering blog for battery insights and benchmarks.",
+  title: "VoltPulse",
+  description: "Battery and EV technology newsroom.",
 };
 
 export default function RootLayout({
@@ -27,7 +33,9 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${manrope.variable} ${sourceCode.variable} h-full antialiased`}
+      data-theme="dark"
+      suppressHydrationWarning
+      className={`${syne.variable} ${dmSans.variable} ${ibmMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         <SiteHeader />

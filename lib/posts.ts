@@ -38,3 +38,29 @@ export async function getPublishedPostBySlug(slug: string) {
 
   return data as PostRecord;
 }
+
+export async function getPublishedPostsByCategory(category: string) {
+  const posts = await getPublishedPosts();
+  return posts.filter(
+    (post) => (post.category ?? "post").toLowerCase() === category.toLowerCase(),
+  );
+}
+
+export async function searchPublishedPosts(query: string) {
+  const keyword = query.trim().toLowerCase();
+  if (!keyword) return [] as PostRecord[];
+
+  const posts = await getPublishedPosts();
+  return posts.filter((post) => {
+    const hay = [
+      post.title,
+      post.excerpt ?? "",
+      post.content ?? "",
+      post.category ?? "",
+      (post.tags ?? []).join(" "),
+    ]
+      .join(" ")
+      .toLowerCase();
+    return hay.includes(keyword);
+  });
+}

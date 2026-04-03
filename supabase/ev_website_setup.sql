@@ -135,3 +135,66 @@ using (
   bucket_id = 'media'
   and auth.role() = 'authenticated'
 );
+
+-- Newsletter subscribers collected from public form
+create table if not exists public.newsletter_subscribers (
+  id uuid primary key default gen_random_uuid(),
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  email text not null unique,
+  full_name text,
+  source text,
+  opted_in boolean not null default true
+);
+
+alter table public.newsletter_subscribers enable row level security;
+
+drop policy if exists "Public insert subscribers" on public.newsletter_subscribers;
+create policy "Public insert subscribers"
+on public.newsletter_subscribers
+for insert
+with check (true);
+
+drop policy if exists "Public update own subscriber row" on public.newsletter_subscribers;
+create policy "Public update own subscriber row"
+on public.newsletter_subscribers
+for update
+using (true)
+with check (true);
+
+drop policy if exists "Authenticated read subscribers" on public.newsletter_subscribers;
+create policy "Authenticated read subscribers"
+on public.newsletter_subscribers
+for select
+using (auth.role() = 'authenticated');
+
+-- Contact submissions from public form
+create table if not exists public.contact_submissions (
+  id uuid primary key default gen_random_uuid(),
+  created_at timestamptz not null default now(),
+  full_name text not null,
+  email text not null,
+  subject text not null,
+  message text not null,
+  intent text
+);
+
+alter table public.contact_submissions enable row level security;
+
+drop policy if exists "Public insert contact submissions" on public.contact_submissions;
+create policy "Public insert contact submissions"
+on public.contact_submissions
+for insert
+with check (true);
+
+drop policy if exists "Authenticated read contact submissions" on public.contact_submissions;
+create policy "Authenticated read contact submissions"
+on public.contact_submissions
+for select
+using (auth.role() = 'authenticated');
+
+drop trigger if exists trg_newsletter_subscribers_updated_at on public.newsletter_subscribers;
+create trigger trg_newsletter_subscribers_updated_at
+before update on public.newsletter_subscribers
+for each row
+execute function public.set_updated_at();

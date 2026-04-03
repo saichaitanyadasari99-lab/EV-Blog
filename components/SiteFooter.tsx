@@ -1,50 +1,52 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 
 export function SiteFooter() {
   return (
-    <footer className="mt-16 border-t border-[var(--border)] bg-white/70">
-      <div className="shell grid gap-8 py-10 md:grid-cols-3">
-        <section>
-          <h3 className="text-sm font-black uppercase tracking-[0.12em] text-[var(--accent)]">
-            EV Blog Post
-          </h3>
-          <p className="mt-3 text-sm text-[var(--ink-soft)]">
-            Notes on battery chemistry, EV benchmarks, pack design, and compliance
-            standards.
-          </p>
-        </section>
-        <section>
-          <h3 className="text-sm font-black uppercase tracking-[0.12em] text-[var(--accent)]">
-            Explore
-          </h3>
-          <ul className="mt-3 space-y-2 text-sm text-[var(--ink-soft)]">
-            <li>
-              <Link href="/blogs" className="hover:text-[var(--foreground)]">
-                All Blogs
-              </Link>
-            </li>
-            <li>
-              <Link href="/contact" className="hover:text-[var(--foreground)]">
-                Contact
-              </Link>
-            </li>
-            <li>
-              <Link href="/admin" className="hover:text-[var(--foreground)]">
-                Admin
-              </Link>
-            </li>
-          </ul>
-        </section>
-        <section>
-          <h3 className="text-sm font-black uppercase tracking-[0.12em] text-[var(--accent)]">
-            Categories
-          </h3>
-          <p className="mt-3 text-sm text-[var(--ink-soft)]">
-            Cell Chemistry, BMS Design, EV Benchmarks, Vehicle Reviews, and
-            Standards.
-          </p>
-        </section>
+    <footer className="footer">
+      <div className="wrapper">
+        <div className="footer-inner">
+          <section>
+            <div className="footer-logo">
+              Volt<span>Pulse</span>
+            </div>
+            <p className="footer-p">
+              The most technically rigorous source for battery technology and EV engineering coverage.
+            </p>
+          </section>
+
+          <section className="footer-col">
+            <h4>Categories</h4>
+            <Link href="/category/post">Cell Chemistry</Link>
+            <Link href="/category/deep-dive">BMS Design</Link>
+            <Link href="/category/benchmark">Thermal Management</Link>
+            <Link href="/category/news">Charging Infrastructure</Link>
+          </section>
+
+          <section className="footer-col">
+            <h4>Resources</h4>
+            <Link href="/search">Search</Link>
+            <Link href="/blogs">All Blogs</Link>
+            <Link href="/about">About</Link>
+            <Link href="/contact">Contact</Link>
+          </section>
+
+          <section className="footer-col">
+            <h4>Site</h4>
+            <Link href="/admin">Admin</Link>
+            <Link href="/admin/new">New Post</Link>
+            <Link href="/blogs">Archive</Link>
+          </section>
+        </div>
+
+        <div className="footer-bottom">
+          <p>(c) 2026 VoltPulse. All rights reserved.</p>
+          <div>
+            <Link href="/about">About</Link>
+          </div>
+        </div>
       </div>
     </footer>
   );
 }
+
+

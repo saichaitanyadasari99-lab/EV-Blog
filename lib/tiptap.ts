@@ -38,7 +38,7 @@ export function renderTiptapHtml(content: string | null): string {
 
   const parsed = parseTiptapJson(content);
   if (!parsed) {
-    return `<p>${content}</p>`;
+    return renderPlainTextHtml(content);
   }
 
   const html = generateHTML(parsed, tiptapExtensions());
@@ -52,6 +52,53 @@ export function renderTiptapHtml(content: string | null): string {
       /\[\[VIDEO:(.*?)\]\]/g,
       '<video controls src="$1" style="max-height:520px;"></video>',
     );
+}
+
+function escapeHtml(input: string): string {
+  return input
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+}
+
+function renderPlainTextHtml(content: string): string {
+  const lines = content.split(/\r?\n/);
+  const html: string[] = [];
+  let listBuffer: string[] = [];
+
+  const flushList = () => {
+    if (!listBuffer.length) return;
+    html.push(`<ul>${listBuffer.join("")}</ul>`);
+    listBuffer = [];
+  };
+
+  for (const rawLine of lines) {
+    const line = rawLine.trim();
+
+    if (!line) {
+      flushList();
+      continue;
+    }
+
+    if (line.startsWith("- ")) {
+      listBuffer.push(`<li>${escapeHtml(line.slice(2))}</li>`);
+      continue;
+    }
+
+    flushList();
+
+    if (line.startsWith("## ")) {
+      html.push(`<h2>${escapeHtml(line.slice(3))}</h2>`);
+      continue;
+    }
+
+    html.push(`<p>${escapeHtml(line)}</p>`);
+  }
+
+  flushList();
+  return html.join("");
 }
 
 export function estimateReadingTime(text: string): number {

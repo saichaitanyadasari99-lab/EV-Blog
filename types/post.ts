@@ -19,6 +19,7 @@ export type PostRecord = {
   tags: string[] | null;
   published: boolean;
   reading_time: number | null;
+  references?: Array<{ title: string; url: string }> | null;
 };
 
 export type SavePostInput = {
