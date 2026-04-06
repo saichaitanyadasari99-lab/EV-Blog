@@ -2,6 +2,7 @@
 import { getPublishedPosts } from "@/lib/posts";
 import { PostCard } from "@/components/PostCard";
 import { getCategoryTone } from "@/lib/category-theme";
+import { NewsletterForm } from "@/components/NewsletterForm";
 
 export default async function HomePage() {
   const posts = await getPublishedPosts();
@@ -12,8 +13,8 @@ export default async function HomePage() {
   const trending = posts.slice(0, 5);
 
   const tickerItems = posts.length
-    ? posts.slice(0, 6).map((post) => post.title)
-    : ["Publish from admin to populate the live ticker."];
+    ? posts.slice(0, 6)
+    : [];
 
   return (
     <main className="page-main wrapper">
@@ -23,10 +24,10 @@ export default async function HomePage() {
         </div>
         <div className="ticker-track">
           <div className="ticker-inner">
-            {[...tickerItems, ...tickerItems].map((item, idx) => (
-              <div key={`${item}-${idx}`} className="ticker-item">
-                {item}
-              </div>
+            {[...tickerItems, ...tickerItems].map((post, idx) => (
+              <Link key={`${post.id}-${idx}`} href={`/blog/${post.slug}`} className="ticker-item">
+                {post.title}
+              </Link>
             ))}
           </div>
         </div>
@@ -158,12 +159,7 @@ export default async function HomePage() {
           </h3>
           <p className="nl-text">Deep-dive technical analysis every Thursday.</p>
         </div>
-        <form className="nl-form">
-          <input className="nl-input" placeholder="your@email.com" />
-          <button type="button" className="nl-btn">
-            SUBSCRIBE {"->"}
-          </button>
-        </form>
+        <NewsletterForm />
       </section>
 
       <section className="sec-head">

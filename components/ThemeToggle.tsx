@@ -5,7 +5,7 @@ import { useEffect } from "react";
 export function ThemeToggle() {
   useEffect(() => {
     const stored = localStorage.getItem("theme");
-    const initial = stored === "light" ? "light" : "dark";
+    const initial = stored === "dark" ? "dark" : "light";
     document.documentElement.setAttribute("data-theme", initial);
   }, []);
 

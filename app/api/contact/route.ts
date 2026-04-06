@@ -30,19 +30,21 @@ export async function POST(request: Request) {
 
   const supabase = await getServerSupabaseClient();
 
-  const { error: subError } = await supabase
-    .from("newsletter_subscribers")
-    .upsert(
-      {
-        email,
-        full_name: name,
-        source: intent === "subscribe" ? "header-subscribe" : "contact-form",
-        opted_in: true,
-      },
-      { onConflict: "email" },
-    );
+  const { error: subError } = await supabase.from("newsletter_subscribers").upsert(
+    {
+      email,
+      full_name: name,
+      source: intent === "subscribe" ? "header-subscribe" : "contact-form",
+      opted_in: true,
+    },
+    { onConflict: "email", ignoreDuplicates: true },
+  );
 
   if (subError) {
+    if (subError.message.toLowerCase().includes("duplicate key")) {
+      // Treat duplicate subscribe as success to keep UX smooth.
+      return NextResponse.json({ success: true, duplicate: true });
+    }
     return NextResponse.json(
       {
         error:
@@ -63,6 +65,9 @@ export async function POST(request: Request) {
   });
 
   if (inquiryError) {
+    if (inquiryError.message.toLowerCase().includes("duplicate key")) {
+      return NextResponse.json({ success: true, duplicate: true });
+    }
     return NextResponse.json(
       {
         error:

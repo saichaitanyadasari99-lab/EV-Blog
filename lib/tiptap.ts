@@ -51,6 +51,10 @@ export function renderTiptapHtml(content: string | null): string {
     .replaceAll(
       /\[\[VIDEO:(.*?)\]\]/g,
       '<video controls src="$1" style="max-height:520px;"></video>',
+    )
+    .replaceAll(
+      /\[\[DOC:(.*?)\]\]/g,
+      '<div class="doc-embed"><a href="$1" target="_blank" rel="noreferrer" class="doc-link"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>View Document</a></div>',
     );
 }
 
@@ -63,10 +67,24 @@ function escapeHtml(input: string): string {
     .replaceAll("'", "&#39;");
 }
 
+function formatInlineText(input: string): string {
+  let text = escapeHtml(input);
+  text = text.replace(
+    /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g,
+    '<a href="$2" target="_blank" rel="noreferrer">$1</a>',
+  );
+  text = text.replace(
+    /\b(https?:\/\/[^\s<]+)/g,
+    '<a href="$1" target="_blank" rel="noreferrer">$1</a>',
+  );
+  return text;
+}
+
 function renderPlainTextHtml(content: string): string {
   const lines = content.split(/\r?\n/);
   const html: string[] = [];
   let listBuffer: string[] = [];
+  let orderedBuffer: string[] = [];
 
   const flushList = () => {
     if (!listBuffer.length) return;
@@ -74,30 +92,57 @@ function renderPlainTextHtml(content: string): string {
     listBuffer = [];
   };
 
+  const flushOrdered = () => {
+    if (!orderedBuffer.length) return;
+    html.push(`<ol>${orderedBuffer.join("")}</ol>`);
+    orderedBuffer = [];
+  };
+
+  const addOrderedItems = (line: string) => {
+    const parts = line
+      .split(/(?=\d+\.\s)/)
+      .map((part) => part.trim())
+      .filter(Boolean);
+    for (const part of parts) {
+      const item = part.replace(/^\d+\.\s*/, "").trim();
+      if (item) orderedBuffer.push(`<li>${formatInlineText(item)}</li>`);
+    }
+  };
+
   for (const rawLine of lines) {
     const line = rawLine.trim();
 
     if (!line) {
       flushList();
+      flushOrdered();
       continue;
     }
 
     if (line.startsWith("- ")) {
+      flushOrdered();
       listBuffer.push(`<li>${escapeHtml(line.slice(2))}</li>`);
       continue;
     }
 
-    flushList();
-
-    if (line.startsWith("## ")) {
-      html.push(`<h2>${escapeHtml(line.slice(3))}</h2>`);
+    if (/^\d+\.\s+/.test(line)) {
+      flushList();
+      addOrderedItems(line);
       continue;
     }
 
-    html.push(`<p>${escapeHtml(line)}</p>`);
+    flushList();
+    flushOrdered();
+
+    if (line.startsWith("## ")) {
+      html.push(`<h2>${formatInlineText(line.slice(3))}</h2>`);
+      continue;
+    }
+
+    html.push(`<p>${formatInlineText(line)}</p>`);
   }
 
   flushList();
+  flushOrdered();
   return html.join("");
 }
 

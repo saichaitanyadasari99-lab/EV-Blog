@@ -5,12 +5,19 @@ import { useDropzone } from "react-dropzone";
 import { getBrowserSupabaseClient } from "@/lib/supabase/client";
 
 type Props = {
-  onUploaded: (url: string, type: "image" | "video" | "pdf") => void;
+  onUploaded: (url: string, type: "image" | "video" | "pdf" | "doc") => void;
 };
 
 export function MediaUpload({ onUploaded }: Props) {
   const [status, setStatus] = useState<string>("");
   const supabase = useMemo(() => getBrowserSupabaseClient(), []);
+
+  const getFileType = (file: File): "image" | "video" | "pdf" | "doc" => {
+    if (file.type.includes("pdf")) return "pdf";
+    if (file.type.startsWith("video/")) return "video";
+    if (file.type.startsWith("image/")) return "image";
+    return "doc";
+  };
 
   const onDrop = useCallback(
     async (files: File[]) => {
@@ -34,12 +41,7 @@ export function MediaUpload({ onUploaded }: Props) {
         data: { publicUrl },
       } = supabase.storage.from("media").getPublicUrl(path);
 
-      const type = file.type.includes("pdf")
-        ? "pdf"
-        : file.type.startsWith("video/")
-          ? "video"
-          : "image";
-
+      const type = getFileType(file);
       onUploaded(publicUrl, type);
       setStatus("Uploaded");
     },
@@ -57,7 +59,7 @@ export function MediaUpload({ onUploaded }: Props) {
       <p className="text-sm text-[var(--ink-soft)]">
         {isDragActive
           ? "Drop to upload into Supabase Storage/media"
-          : "Drag image/PDF/video or click to upload"}
+          : "Drag image/PDF/video/doc or click to upload"}
       </p>
       {status ? <p className="mt-2 text-xs text-[var(--accent)]">{status}</p> : null}
     </div>

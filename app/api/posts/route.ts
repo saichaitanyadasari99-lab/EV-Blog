@@ -9,6 +9,14 @@ function htmlToExcerpt(html: string) {
   return html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim().slice(0, 220);
 }
 
+function normalizeCategory(input?: string) {
+  const value = (input ?? "post").toLowerCase();
+  if (["post", "review", "deep-dive", "benchmark", "news", "standards"].includes(value)) {
+    return value;
+  }
+  return "post";
+}
+
 async function getAuthedAdmin() {
   const supabase = await getServerSupabaseClient();
   const {
@@ -91,7 +99,7 @@ export async function POST(request: Request) {
     content: contentJson,
     excerpt,
     cover_url: body.cover_url ?? null,
-    category: body.category ?? "post",
+    category: normalizeCategory(body.category),
     status: isPublished ? "published" : "draft",
     published_at: isPublished ? new Date().toISOString() : null,
     tags: body.tags ?? [],
@@ -99,17 +107,31 @@ export async function POST(request: Request) {
     reading_time: readingTime,
   };
 
-  const { data, error } = await auth.supabase
+  const primary = await auth.supabase.from("posts").upsert(payload).select("*").single();
+
+  if (!primary.error) {
+    return NextResponse.json({ post: primary.data }, { status: 200 });
+  }
+
+  if (!primary.error.message.includes("posts_category_check")) {
+    return NextResponse.json({ error: primary.error.message }, { status: 500 });
+  }
+
+  const fallback = await auth.supabase
     .from("posts")
-    .upsert(payload)
+    .upsert({
+      ...payload,
+      category: "post",
+      tags: [...(payload.tags ?? []), `mapped-category:${payload.category as string}`],
+    })
     .select("*")
     .single();
 
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  if (fallback.error) {
+    return NextResponse.json({ error: fallback.error.message }, { status: 500 });
   }
 
-  return NextResponse.json({ post: data }, { status: 200 });
+  return NextResponse.json({ post: fallback.data }, { status: 200 });
 }
 
 export async function DELETE(request: Request) {

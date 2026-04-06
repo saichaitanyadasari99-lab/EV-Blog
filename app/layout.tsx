@@ -33,7 +33,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      data-theme="dark"
+      data-theme="light"
       suppressHydrationWarning
       className={`${syne.variable} ${dmSans.variable} ${ibmMono.variable} h-full antialiased`}
     >
