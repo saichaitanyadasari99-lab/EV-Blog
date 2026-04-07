@@ -1,4 +1,6 @@
-﻿import Link from "next/link";
+﻿"use client";
+
+import Link from "next/link";
 import type { PostRecord } from "@/types/post";
 import { getCategoryTone } from "@/lib/category-theme";
 
@@ -15,10 +17,6 @@ export function PostCard({ post }: Props) {
           src={post.cover_url} 
           alt={post.title}
           className="a-card-img"
-          onError={(e) => {
-            const target = e.target as HTMLImageElement;
-            target.style.display = 'none';
-          }}
         />
       ) : (
         <div className="a-card-img" style={{
