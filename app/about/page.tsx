@@ -83,11 +83,7 @@ export default function AboutPage() {
         <div className="about-hero-right">
           <div className="about-avatar-box">
             <div className="about-avatar-circle">
-              <img 
-                src="https://cdn.pixabay.com/photo/2024/11/05/10/29/ai-generated-9176318_640.png" 
-                alt="Sai Chaitanya Dasari" 
-                className="about-avatar-img"
-              />
+              <span className="about-avatar-initials">SC</span>
             </div>
             <p className="about-avatar-name">Sai Chaitanya Dasari</p>
           </div>

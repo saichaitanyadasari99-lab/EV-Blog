@@ -23,6 +23,15 @@ const categories = [
   "standards",
 ] as const;
 
+const defaultSections = [
+  "Cell Chemistry",
+  "BMS Design", 
+  "Thermal Management",
+  "Charging",
+  "Market",
+  "News",
+];
+
 function escapeHtml(input: string) {
   return input
     .replaceAll("&", "&amp;")
@@ -433,19 +442,20 @@ export function Editor({ initialPost }: Props) {
               }}
             />
           </div>
-          <select
-            className="rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 py-2"
-            value={category}
-            onChange={(event) =>
-              setCategory(event.target.value as (typeof categories)[number])
-            }
-          >
-            {categories.map((item) => (
-              <option key={item} value={item}>
-                {item}
-              </option>
-            ))}
-          </select>
+          <div className="flex gap-2">
+            <input
+              className="flex-1 rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 py-2"
+              placeholder="Section (e.g., cell-chemistry, bms-design, thermal)"
+              value={category}
+              onChange={(event) => setCategory(event.target.value as any)}
+              list="sections"
+            />
+            <datalist id="sections">
+              {defaultSections.map((sec) => (
+                <option key={sec} value={sec.toLowerCase().replace(/\s+/g, "-")} />
+              ))}
+            </datalist>
+          </div>
           <input
             className="rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 py-2"
             placeholder="Tags (comma separated)"
