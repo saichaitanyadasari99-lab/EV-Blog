@@ -87,17 +87,6 @@ export default function AboutPage() {
                 src="https://cdn.pixabay.com/photo/2024/11/05/10/29/ai-generated-9176318_640.png" 
                 alt="Sai Chaitanya Dasari" 
                 className="about-avatar-img"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).style.display = 'none';
-                  const parent = (e.target as HTMLImageElement).parentElement;
-                  if (parent) {
-                    const fallback = document.createElement('span');
-                    fallback.className = 'about-avatar-fallback';
-                    fallback.textContent = 'SC';
-                    fallback.style.cssText = 'color: var(--green); font-weight: 700; font-size: 32px;';
-                    parent.appendChild(fallback);
-                  }
-                }}
               />
             </div>
             <p className="about-avatar-name">Sai Chaitanya Dasari</p>
