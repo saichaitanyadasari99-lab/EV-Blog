@@ -1423,14 +1423,14 @@ a {
   padding: 24px;
   text-align: center;
   width: 100%;
-  max-width: 200px;
+  max-width: 280px;
 }
 
 .about-avatar-circle {
   background: var(--green-dim);
   border-radius: 50%;
-  width: 120px;
-  height: 120px;
+  width: 250px;
+  height: 250px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1439,9 +1439,7 @@ a {
 }
 
 .about-avatar-circle span {
-  color: var(--green);
-  font-weight: 700;
-  font-size: 32px;
+  display: none;
 }
 
 .about-avatar-img {
