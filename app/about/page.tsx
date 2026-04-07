@@ -1,56 +1,113 @@
 import Link from "next/link";
 
+const marqueeTags = [
+  "BMS DESIGN", "LFP / Na-ION", "THERMAL ARCHITECTURE",
+  "CAN/J1939", "SIMULINK MBD", "PACK ENGINEERING", "AIS-156"
+];
+
+const topics = [
+  {
+    icon: "🔋",
+    title: "BMS & Algorithm Design",
+    description: "SOC/SOH estimation, CAN architecture, J1939, Simulink MBD",
+  },
+  {
+    icon: "⚡",
+    title: "Cell Chemistry & Degradation",
+    description: "LFP, NMC, Na-ion, ACIR analysis, cycle aging",
+  },
+  {
+    icon: "🌡️",
+    title: "Thermal & Pack Systems",
+    description: "Cooling strategies, heat recovery, pack-level safety",
+  },
+];
+
+const experience = [
+  {
+    role: "Deputy Manager — Battery Systems",
+    company: "VECV",
+    details: "96S LFP BMS development, Na-ion pack design, CAN/J1939, AIS-156 homologation",
+  },
+  {
+    role: "M.E. Design Engineering",
+    company: "BITS Pilani",
+    details: "GPA 8.35 · GATE 2021 Top 1%",
+  },
+  {
+    role: "B.Tech Mechanical Engineering",
+    company: "Andhra University",
+    details: "",
+  },
+];
+
 export default function AboutPage() {
   return (
     <main className="page-main wrapper">
-      <section className="page-hero">
-        <div className="hero-badge">ABOUT VOLTPULSE</div>
-        <h1 className="page-title">Technical EV journalism written by someone who builds the systems.</h1>
-        <p className="page-subtitle">
-          VoltPulse is an independent publication focused on battery technology, BMS design, EV powertrain architecture, and the real engineering behind electric mobility — written from inside the industry, not from a press room.
-        </p>
-      </section>
-
-      <section className="article-content">
-        <h3>Hi, I'm Dasari Sai Srinivasa Chaitanya.</h3>
-        <p>
-          I'm a battery systems engineer at Volvo Eicher Commercial Vehicles (VECV), where I work as a Deputy Manager in the EV engineering team. My day job involves designing and developing battery packs for commercial electric vehicles — buses, trucks, and LCVs — across chemistries like LFP and Na-ion, and voltage architectures ranging from 96V to 600V.
-        </p>
-        <p>
-          On the technical side, I work on BMS algorithm development in MATLAB/Simulink, CAN/J1939 communication architecture, thermal management systems, and homologation under AIS-156 and AIS-038 standards. I've been doing this for 3+ years, and I started VoltPulse because I kept running into EV content that was either too shallow for engineers or too jargon-heavy to be useful to anyone else.
-        </p>
-        <p>
-          So I write the content I'd want to read — technically honest, practically grounded, and without the PR gloss.
-        </p>
-        <p>
-          <a href="mailto:saichaitanyadasari99@gmail.com" style={{ color: "var(--accent)", textDecoration: "underline" }}>
-            📧 saichaitanyadasari99@gmail.com
-          </a>
-        </p>
-        <p>
-          <a href="https://www.linkedin.com/in/dasarisaisrinivasachaitanya" target="_blank" rel="noreferrer" style={{ color: "var(--accent)", textDecoration: "underline" }}>
-            🔗 LinkedIn
-          </a>
-        </p>
-      </section>
-
-      <section className="info-grid">
-        <article className="info-card">
-          <h2>What VoltPulse Covers</h2>
-          <ul style={{ marginTop: 10, paddingLeft: 20 }}>
-            <li><strong>Cell chemistry & degradation</strong> — LFP, NMC, Na-ion, ACIR analysis, cycle aging</li>
-            <li><strong>BMS design</strong> — SOC/SOH estimation, CAN architecture, algorithm benchmarks</li>
-            <li><strong>Thermal management</strong> — pack-level cooling strategies, safety margins, heat recovery</li>
-            <li><strong>Charging behavior</strong> — CC-CV dynamics, fast charging limits, protocol standards</li>
-            <li><strong>Commercial EV benchmarking</strong> — real-world range, powertrain sizing, India-market analysis</li>
-          </ul>
-        </article>
-        <article className="info-card">
-          <h2>Who It's For</h2>
-          <p>
-            Engineers in EV, battery, or power electronics. Founders building EV products. Researchers tracking battery behavior beyond lab papers. And anyone curious enough to want the real story behind electric mobility.
+      {/* Hero Section */}
+      <section className="about-hero">
+        <div className="about-hero-content">
+          <p className="about-greeting">👋 Hello! I'm Sai Chaitanya Dasari</p>
+          <h1 className="about-title">Battery Systems Engineer ✦</h1>
+          <p className="about-intro">
+            I'm a battery systems engineer at VECV, building the packs and BMS that power India's electric future.
+            I write here because most EV content doesn't go deep enough.
           </p>
-        </article>
+          <div className="about-checkmarks">
+            <span>✓ Engineering-first perspective</span>
+            <span>✓ Real systems, real tradeoffs</span>
+            <span>✓ No PR fluff, no paywalls</span>
+          </div>
+          <div className="about-hero-actions">
+            <Link href="/contact" className="about-btn-primary">Let's Talk →</Link>
+            <a href="https://www.linkedin.com/in/dasarisaisrinivasachaitanya" target="_blank" rel="noreferrer" className="about-btn-secondary">LinkedIn ↗</a>
+          </div>
+        </div>
+      </section>
+
+      {/* Social Links Bar */}
+      <section className="about-social-bar">
+        <a href="https://www.linkedin.com/in/dasarisaisrinivasachaitanya" target="_blank" rel="noreferrer">LinkedIn</a>
+        <a href="mailto:saichaitanyadasari99@gmail.com">Email</a>
+        <Link href="/blogs">VoltPulse Blogs</Link>
+      </section>
+
+      {/* Marquee Strip */}
+      <section className="about-marquee">
+        <div className="about-marquee-track">
+          {[...marqueeTags, ...marqueeTags].map((tag, idx) => (
+            <span key={idx} className="about-marquee-item">⟡ {tag}</span>
+          ))}
+        </div>
+      </section>
+
+      {/* What I Write About */}
+      <section className="about-section">
+        <h2 className="about-section-title">WHAT I WRITE ABOUT</h2>
+        <div className="about-cards">
+          {topics.map((topic, idx) => (
+            <article key={idx} className="about-card">
+              <span className="about-card-icon">{topic.icon}</span>
+              <h3 className="about-card-title">{topic.title}</h3>
+              <p className="about-card-desc">{topic.description}</p>
+              <Link href="/blogs" className="about-card-link">Read More →</Link>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      {/* Experience */}
+      <section className="about-section">
+        <h2 className="about-section-title">EXPERIENCE</h2>
+        <div className="about-timeline">
+          {experience.map((exp, idx) => (
+            <div key={idx} className="about-timeline-row">
+              <div className="about-timeline-role">{exp.role}</div>
+              <div className="about-timeline-company">{exp.company}</div>
+              {exp.details && <div className="about-timeline-details">{exp.details}</div>}
+            </div>
+          ))}
+        </div>
       </section>
     </main>
   );
