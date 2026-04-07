@@ -148,5 +148,6 @@ function renderPlainTextHtml(content: string): string {
 
 export function estimateReadingTime(text: string): number {
   const words = text.trim().split(/\s+/).filter(Boolean).length;
-  return Math.max(1, Math.ceil(words / 220));
+  const minutes = words / 250;
+  return Math.max(1, Math.ceil(minutes));
 }

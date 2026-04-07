@@ -64,7 +64,8 @@ export async function POST(request: Request) {
   );
   const html = renderTiptapHtml(contentJson);
   const excerpt = body.excerpt?.trim() || htmlToExcerpt(html) || "";
-  const readingTime = estimateReadingTime(excerpt);
+  const contentText = html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+  const readingTime = estimateReadingTime(contentText);
   const isPublished = body.published ?? false;
   const authorName =
     (auth.user.user_metadata?.full_name as string | undefined) ||
