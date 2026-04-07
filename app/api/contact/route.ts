@@ -21,14 +21,33 @@ export async function POST(request: Request) {
   const message = (body.message ?? "").trim();
   const intent = (body.intent ?? "contact").trim();
 
+  const supabase = await getServerSupabaseClient();
+
+  if (intent === "subscribe") {
+    if (!email || !isValidEmail(email)) {
+      return NextResponse.json({ error: "Valid email required." }, { status: 400 });
+    }
+    const { error } = await supabase.from("newsletter_subscribers").upsert(
+      {
+        email,
+        full_name: name || "Subscriber",
+        source: "website-subscribe",
+        opted_in: true,
+      },
+      { onConflict: "email", ignoreDuplicates: true },
+    );
+    if (error && !error.message.toLowerCase().includes("duplicate")) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+    return NextResponse.json({ success: true });
+  }
+
   if (!name || !email || !subject || !message) {
     return NextResponse.json({ error: "All fields are required." }, { status: 400 });
   }
   if (!isValidEmail(email)) {
     return NextResponse.json({ error: "Invalid email format." }, { status: 400 });
   }
-
-  const supabase = await getServerSupabaseClient();
 
   const { error: subError } = await supabase.from("newsletter_subscribers").upsert(
     {
