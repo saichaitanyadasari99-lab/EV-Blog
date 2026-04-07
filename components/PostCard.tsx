@@ -15,8 +15,9 @@ function mediaStyle(url?: string | null): CSSProperties {
   }
   return {
     backgroundImage: `url(${url})`,
-    backgroundSize: "cover",
+    backgroundSize: "contain",
     backgroundPosition: "center",
+    backgroundRepeat: "no-repeat",
   };
 }
 

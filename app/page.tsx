@@ -38,9 +38,12 @@ export default async function HomePage() {
           <div
             className="hero-media"
             style={{
-              background: hero?.cover_url
-                ? `url(${hero.cover_url}) center/cover`
+              backgroundImage: hero?.cover_url
+                ? `url(${hero.cover_url})`
                 : "linear-gradient(135deg,#0A1628 0%,#142040 40%,#0D2035 100%)",
+              backgroundSize: "contain",
+              backgroundPosition: "center",
+              backgroundRepeat: "no-repeat",
             }}
           />
           <div className="hero-overlay" />
@@ -61,9 +64,13 @@ export default async function HomePage() {
               <div
                 className="side-thumb"
                 style={{
-                  background: post?.cover_url
-                    ? `url(${post.cover_url}) center/cover`
-                    : "linear-gradient(135deg,#0A1A0A 0%,#0D2D15 40%,#071A0A 100%)",
+                  backgroundImage: post?.cover_url
+                    ? `url(${post.cover_url})`
+                    : undefined,
+                  backgroundSize: "contain",
+                  backgroundPosition: "center",
+                  backgroundRepeat: "no-repeat",
+                  backgroundColor: post?.cover_url ? "transparent" : "linear-gradient(135deg,#0A1A0A 0%,#0D2D15 40%,#071A0A 100%)",
                 }}
               />
               <div>
@@ -123,9 +130,12 @@ export default async function HomePage() {
           <div
             className="feat-img"
             style={{
-              background: hero?.cover_url
-                ? `url(${hero.cover_url}) center/cover`
+              backgroundImage: hero?.cover_url
+                ? `url(${hero.cover_url})`
                 : "linear-gradient(135deg,#091830 0%,#0F2A4A 40%,#072038 100%)",
+              backgroundSize: "contain",
+              backgroundPosition: "center",
+              backgroundRepeat: "no-repeat",
             }}
           />
           <div className="feat-body">
