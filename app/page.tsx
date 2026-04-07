@@ -152,7 +152,7 @@ export default async function HomePage() {
         </aside>
       </section>
 
-      <section className="nl-banner">
+      <section id="newsletter" className="nl-banner">
         <div>
           <h3 className="nl-title">
             The <span style={{ color: "var(--accent)" }}>VoltPulse</span> Weekly Briefing

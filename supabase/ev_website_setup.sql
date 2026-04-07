@@ -155,12 +155,26 @@ on public.newsletter_subscribers
 for insert
 with check (true);
 
+drop policy if exists "Public upsert subscribers" on public.newsletter_subscribers;
+create policy "Public upsert subscribers"
+on public.newsletter_subscribers
+for insert
+to anon, authenticated
+with check (true);
+
 drop policy if exists "Public update own subscriber row" on public.newsletter_subscribers;
 create policy "Public update own subscriber row"
 on public.newsletter_subscribers
 for update
 using (true)
 with check (true);
+
+drop policy if exists "Public read subscribers" on public.newsletter_subscribers;
+create policy "Public read subscribers"
+on public.newsletter_subscribers
+for select
+to anon, authenticated
+using (true);
 
 drop policy if exists "Authenticated read subscribers" on public.newsletter_subscribers;
 create policy "Authenticated read subscribers"

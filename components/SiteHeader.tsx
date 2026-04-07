@@ -45,7 +45,7 @@ export function SiteHeader() {
           </svg>
         </Link>
         <ThemeToggle />
-        <Link href="/contact?intent=subscribe#contact-form" className="nav-subscribe">
+        <Link href="/#newsletter" className="nav-subscribe">
           SUBSCRIBE
         </Link>
       </div>
