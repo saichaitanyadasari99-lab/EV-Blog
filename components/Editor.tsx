@@ -3,7 +3,6 @@
 import { useMemo, useRef, useState } from "react";
 import { EditorContent, useEditor } from "@tiptap/react";
 import slugify from "slugify";
-import JSZip from "jszip";
 import { tiptapExtensions, renderTiptapHtml } from "@/lib/tiptap";
 import { parseTiptapJson } from "@/lib/tiptap";
 import { MediaUpload } from "@/components/MediaUpload";
@@ -231,11 +230,6 @@ export function Editor({ initialPost }: Props) {
     initialPost?.category ?? ("post" as (typeof categories)[number]),
   );
   const [tags, setTags] = useState((initialPost?.tags ?? []).join(", "));
-  const [references, setReferences] = useState<Array<{ title: string; url: string }>>(
-    initialPost?.references ?? []
-  );
-  const [newRefTitle, setNewRefTitle] = useState("");
-  const [newRefUrl, setNewRefUrl] = useState("");
   const [published, setPublished] = useState(initialPost?.published ?? false);
   const [status, setStatus] = useState("");
   const [saving, setSaving] = useState(false);
@@ -294,7 +288,6 @@ export function Editor({ initialPost }: Props) {
         .filter(Boolean),
       published,
       content: editor.getJSON(),
-      references: references.length ? references : undefined,
     };
 
     setSaving(true);
@@ -465,63 +458,13 @@ export function Editor({ initialPost }: Props) {
         </div>
 
         <div className="mt-4 rounded-xl border border-[var(--border)] bg-[var(--surface2)] p-4">
-          <p className="text-sm font-semibold">References</p>
-          <p className="mt-1 text-xs text-[var(--ink-soft)]">
-            Add clickable reference links that appear at the end of your post.
-          </p>
-          <div className="mt-3 space-y-2">
-            {references.map((ref, idx) => (
-              <div key={idx} className="flex items-center gap-2">
-                <a href={ref.url} target="_blank" rel="noreferrer" className="flex-1 truncate text-sm text-[var(--accent)]">
-                  {ref.title}
-                </a>
-                <button
-                  type="button"
-                  className="text-xs text-[var(--red)]"
-                  onClick={() => setReferences((prev) => prev.filter((_, i) => i !== idx))}
-                >
-                  Remove
-                </button>
-              </div>
-            ))}
-            <div className="flex gap-2 mt-2">
-              <input
-                className="flex-1 rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 py-2 text-sm"
-                placeholder="Reference title"
-                value={newRefTitle}
-                onChange={(event) => setNewRefTitle(event.target.value)}
-              />
-              <input
-                className="flex-1 rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 py-2 text-sm"
-                placeholder="URL (https://...)"
-                value={newRefUrl}
-                onChange={(event) => setNewRefUrl(event.target.value)}
-              />
-              <button
-                type="button"
-                className="rounded-lg bg-[var(--accent)] px-3 py-2 text-sm font-semibold text-black"
-                onClick={() => {
-                  if (newRefTitle.trim() && newRefUrl.trim()) {
-                    setReferences((prev) => [...prev, { title: newRefTitle.trim(), url: newRefUrl.trim() }]);
-                    setNewRefTitle("");
-                    setNewRefUrl("");
-                  }
-                }}
-              >
-                Add
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-4 rounded-xl border border-[var(--border)] bg-[var(--surface2)] p-4">
           <p className="text-sm font-semibold">Import from .md</p>
           <p className="mt-1 text-xs text-[var(--ink-soft)]">
             Paste markdown or upload a local .md file to auto-fill the editor.
           </p>
           <textarea
             className="mt-3 min-h-[140px] w-full rounded-lg border border-[var(--border)] bg-[var(--surface)] p-3 text-sm"
-            placeholder="Paste markdown content here..."
+            placeholder="Paste markdown content here... Use ## References heading for links."
             value={markdownInput}
             onChange={(event) => setMarkdownInput(event.target.value)}
           />
@@ -564,73 +507,6 @@ export function Editor({ initialPost }: Props) {
               }}
             />
           </div>
-        </div>
-
-        <div className="mt-4 rounded-xl border border-[var(--border)] bg-[var(--surface2)] p-4">
-          <p className="text-sm font-semibold">Import from ZIP (MD + Images)</p>
-          <p className="mt-1 text-xs text-[var(--ink-soft)]">
-            Upload a ZIP with article.md and image1.png, image2.png, etc.
-          </p>
-          <input
-            type="file"
-            accept=".zip"
-            className="mt-3 text-sm"
-            onChange={async (event) => {
-              const file = event.target.files?.[0];
-              if (!file) return;
-              
-              setStatus("Processing ZIP...");
-              const supabase = getBrowserSupabaseClient();
-              
-              try {
-                const zip = await JSZip.loadAsync(file);
-                const mdFile = Object.keys(zip.files).find(n => n.endsWith('.md') || n.endsWith('.markdown'));
-                
-                if (!mdFile) {
-                  setStatus("No .md file found in ZIP.");
-                  return;
-                }
-                
-                const mdContent = await zip.file(mdFile)!.async('string');
-                
-                const imageMatches = [...mdContent.matchAll(/!\[([^\]]*)\]\((image\d+\.[a-z]+)\)/gi)];
-                const uploadedUrls: Record<string, string> = {};
-                
-                for (const match of imageMatches) {
-                  const imageName = match[2].toLowerCase();
-                  const zipImageFile = Object.keys(zip.files).find(n => 
-                    n.toLowerCase() === imageName || n.toLowerCase().endsWith('/' + imageName)
-                  );
-                  
-                  if (zipImageFile) {
-                    const imageData = await zip.file(zipImageFile)!.async('blob');
-                    const ext = imageName.split('.').pop();
-                    const path = `${Date.now()}-${imageName}`;
-                    
-                    const { error } = await supabase.storage.from("media").upload(path, imageData, { upsert: false });
-                    if (!error) {
-                      const { data: { publicUrl } } = supabase.storage.from("media").getPublicUrl(path);
-                      uploadedUrls[imageName] = publicUrl;
-                    }
-                  }
-                }
-                
-                let processedContent = mdContent;
-                for (const [imgName, url] of Object.entries(uploadedUrls)) {
-                  processedContent = processedContent.replace(
-                    new RegExp(`!\\[([^\\]]*)\\]\\(${imgName}\\)`, 'gi'),
-                    `![$1](${url})`
-                  );
-                }
-                
-                setMarkdownInput(processedContent);
-                importMarkdown(processedContent);
-                setStatus(`Imported with ${Object.keys(uploadedUrls).length} images.`);
-              } catch (err) {
-                setStatus("Error processing ZIP. Make sure it contains article.md");
-              }
-            }}
-          />
         </div>
 
         {coverUrl ? (
