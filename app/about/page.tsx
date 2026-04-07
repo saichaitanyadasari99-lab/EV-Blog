@@ -82,6 +82,8 @@ export default function AboutPage() {
         <div className="about-hero-right">
           <div className="about-avatar-box">
             <div className="about-avatar-circle">
+              {/* Replace with your photo by adding an <img> tag below */}
+              {/* <img src="/your-photo.jpg" alt="Sai Chaitanya" className="about-avatar-img" /> */}
               <span>SC</span>
             </div>
             <p className="about-avatar-name">Sai Chaitanya Dasari</p>
@@ -92,6 +94,8 @@ export default function AboutPage() {
       {/* Social Links Bar */}
       <section className="about-social-bar">
         <a href="https://www.linkedin.com/in/dasarisaisrinivasachaitanya" target="_blank" rel="noreferrer">LINKEDIN</a>
+        <span className="about-social-divider">|</span>
+        <a href="https://github.com/saichaitanyadasari99-lab" target="_blank" rel="noreferrer">GITHUB</a>
         <span className="about-social-divider">|</span>
         <a href="mailto:saichaitanyadasari99@gmail.com">saichaitanyadasari99@gmail.com</a>
         <span className="about-social-divider">|</span>
