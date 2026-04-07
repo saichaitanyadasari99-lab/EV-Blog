@@ -755,6 +755,9 @@ a {
 
 .a-card-img {
   aspect-ratio: 16 / 10;
+  width: 100%;
+  object-fit: contain;
+  background: var(--surface2);
 }
 
 .a-card-body {

@@ -1,5 +1,4 @@
 ﻿import Link from "next/link";
-import type { CSSProperties } from "react";
 import type { PostRecord } from "@/types/post";
 import { getCategoryTone } from "@/lib/category-theme";
 
@@ -7,25 +6,25 @@ type Props = {
   post: PostRecord;
 };
 
-function mediaStyle(url?: string | null): CSSProperties {
-  if (!url) {
-    return {
-      background: "linear-gradient(135deg,#091830 0%,#0F2A4A 40%,#072038 100%)",
-    };
-  }
-  return {
-    backgroundImage: `url(${url})`,
-    backgroundSize: "contain",
-    backgroundPosition: "center",
-    backgroundRepeat: "no-repeat",
-  };
-}
-
 export function PostCard({ post }: Props) {
   const tone = getCategoryTone(post.category);
   return (
     <article className="a-card">
-      <div className="a-card-img" style={mediaStyle(post.cover_url)} />
+      {post.cover_url ? (
+        <img 
+          src={post.cover_url} 
+          alt={post.title}
+          className="a-card-img"
+          onError={(e) => {
+            const target = e.target as HTMLImageElement;
+            target.style.display = 'none';
+          }}
+        />
+      ) : (
+        <div className="a-card-img" style={{
+          background: "linear-gradient(135deg,#091830 0%,#0F2A4A 40%,#072038 100%)"
+        }} />
+      )}
       <div className="a-card-body">
         <span className="a-badge" style={{ background: `${tone}22`, color: tone }}>
           {post.category ?? "article"}
