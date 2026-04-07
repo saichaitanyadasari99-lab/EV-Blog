@@ -1412,7 +1412,7 @@ a {
 }
 
 .about-marquee {
-  background: #000;
+  background: var(--surface);
   border: 1px solid var(--border);
   margin-top: 16px;
   overflow: hidden;
@@ -1426,7 +1426,7 @@ a {
 }
 
 .about-marquee-item {
-  color: var(--text2);
+  color: var(--accent);
   font-family: var(--font-ibm-mono), monospace;
   font-size: 12px;
   letter-spacing: 1px;
