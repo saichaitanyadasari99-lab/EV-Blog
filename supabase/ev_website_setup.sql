@@ -63,9 +63,11 @@ end $$;
 alter table public.posts enable row level security;
 
 drop policy if exists "Public read published posts" on public.posts;
-create policy "Public read published posts"
+drop policy if exists "Anyone can read published posts" on public.posts;
+create policy "Anyone can read published posts"
 on public.posts
 for select
+to anon, authenticated
 using (published = true);
 
 drop policy if exists "Admin full access by email" on public.posts;
@@ -149,14 +151,10 @@ create table if not exists public.newsletter_subscribers (
 
 alter table public.newsletter_subscribers enable row level security;
 
+-- Allow anyone (anon/authenticated) to insert/upsert
 drop policy if exists "Public insert subscribers" on public.newsletter_subscribers;
-create policy "Public insert subscribers"
-on public.newsletter_subscribers
-for insert
-with check (true);
-
 drop policy if exists "Public upsert subscribers" on public.newsletter_subscribers;
-create policy "Public upsert subscribers"
+create policy "Allow public insert"
 on public.newsletter_subscribers
 for insert
 to anon, authenticated
@@ -166,11 +164,16 @@ drop policy if exists "Public update own subscriber row" on public.newsletter_su
 create policy "Public update own subscriber row"
 on public.newsletter_subscribers
 for update
+to anon, authenticated
 using (true)
 with check (true);
 
 drop policy if exists "Public read subscribers" on public.newsletter_subscribers;
 create policy "Public read subscribers"
+on public.newsletter_subscribers
+for select
+to anon, authenticated
+using (true);
 on public.newsletter_subscribers
 for select
 to anon, authenticated
@@ -196,9 +199,10 @@ create table if not exists public.contact_submissions (
 alter table public.contact_submissions enable row level security;
 
 drop policy if exists "Public insert contact submissions" on public.contact_submissions;
-create policy "Public insert contact submissions"
+create policy "Allow public insert contact"
 on public.contact_submissions
 for insert
+to anon, authenticated
 with check (true);
 
 drop policy if exists "Authenticated read contact submissions" on public.contact_submissions;
