@@ -14,20 +14,20 @@ type Props = {
 };
 
 const categories = [
-  "post",
-  "review",
-  "deep-dive",
-  "benchmark",
-  "news",
+  "cell-chemistry",
+  "bms-design",
+  "ev-benchmarks",
+  "vehicle-reviews",
   "standards",
+  "news",
 ] as const;
 
 const defaultSections = [
   "Cell Chemistry",
-  "BMS Design", 
-  "Thermal Management",
-  "Charging",
-  "Market",
+  "BMS Design",
+  "EV Benchmarks",
+  "Vehicle Reviews",
+  "Standards",
   "News",
 ];
 
@@ -365,16 +365,18 @@ export function Editor({ initialPost }: Props) {
     if (meta.excerpt) setExcerpt(meta.excerpt);
     if (meta.coverUrl) setCoverUrl(meta.coverUrl);
 
-    const mappedCategory: (typeof categories)[number] =
-      meta.category === "bms design"
-        ? "deep-dive"
-        : meta.category.includes("benchmark")
-          ? "benchmark"
-          : meta.category.includes("review")
-            ? "review"
-            : meta.category.includes("standard")
+    const mappedCategory = 
+      meta.category === "bms design" || meta.category?.includes("bms")
+        ? "bms-design"
+        : meta.category?.includes("benchmark")
+          ? "ev-benchmarks"
+          : meta.category?.includes("review")
+            ? "vehicle-reviews"
+            : meta.category?.includes("standard")
               ? "standards"
-              : "post";
+              : meta.category?.includes("news")
+                ? "news"
+                : "cell-chemistry";
     setCategory(mappedCategory);
 
     editor.commands.setContent(markdownToHtml(meta.body));
