@@ -1,18 +1,17 @@
 -- ============================================
--- VOLTPULSE SUPABASE SETUP
+-- FULL SUPABASE SETUP
 -- Run this in Supabase SQL Editor
 -- ============================================
 
--- Enable UUID extension
+-- Enable extensions
 create extension if not exists pgcrypto;
 
--- Drop any existing posts table to start fresh (backup data first if needed)
+-- Create posts table with all required columns
 DROP TABLE IF EXISTS public.posts;
 
--- Posts table - NO INDEX on content column to avoid size issues
-create table public.posts (
+CREATE TABLE public.posts (
   id uuid primary key default gen_random_uuid(),
-  author_id uuid references auth.users(id) default auth.uid(),
+  author_id uuid references auth.users(id),
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
   title text not null,
@@ -26,32 +25,40 @@ create table public.posts (
   reading_time int
 );
 
--- Add unique constraint on slug separately (not during table creation)
-alter table public.posts add constraint posts_slug_key unique (slug);
+-- Add unique constraint on slug
+ALTER TABLE public.posts ADD CONSTRAINT posts_slug_key UNIQUE (slug);
 
--- Media storage bucket
-insert into storage.buckets (id, name, public)
-values ('media', 'media', true)
-on conflict (id) do nothing;
+-- Enable RLS
+ALTER TABLE public.posts ENABLE ROW LEVEL SECURITY;
 
--- Storage policies
-drop policy if exists "Public media read" on storage.objects;
-create policy "Public media read" on storage.objects for select using (bucket_id = 'media');
+-- RLS Policies for posts
+DROP POLICY IF EXISTS "public_read_published" ON public.posts;
+CREATE POLICY "public_read_published" ON public.posts 
+FOR SELECT TO anon, authenticated 
+USING (published = true);
 
-drop policy if exists "Authenticated media insert" on storage.objects;
-create policy "Authenticated media insert" on storage.objects for insert with check (bucket_id = 'media' and auth.role() = 'authenticated');
+DROP POLICY IF EXISTS "auth_all_posts" ON public.posts;
+CREATE POLICY "auth_all_posts" ON public.posts 
+FOR ALL TO authenticated 
+USING (true) 
+WITH CHECK (true);
 
-drop policy if exists "Authenticated media update" on storage.objects;
-create policy "Authenticated media update" on storage.objects for update using (bucket_id = 'media' and auth.role() = 'authenticated') with check (bucket_id = 'media' and auth.role() = 'authenticated');
+-- Media storage
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('media', 'media', true)
+ON CONFLICT (id) DO NOTHING;
 
-drop policy if exists "Authenticated media delete" on storage.objects;
-create policy "Authenticated media delete" on storage.objects for delete using (bucket_id = 'media' and auth.role() = 'authenticated');
+DROP POLICY IF EXISTS "Public media read" ON storage.objects;
+CREATE POLICY "Public media read" ON storage.objects FOR SELECT USING (bucket_id = 'media');
 
--- ============================================
--- NEWSLETTER SUBSCRIBERS
--- ============================================
+DROP POLICY IF EXISTS "Authenticated media insert" ON storage.objects;
+CREATE POLICY "Authenticated media insert" ON storage.objects FOR INSERT WITH CHECK (bucket_id = 'media' AND auth.role() = 'authenticated');
 
-create table if not exists public.newsletter_subscribers (
+DROP POLICY IF EXISTS "Authenticated media update" ON storage.objects;
+CREATE POLICY "Authenticated media update" ON storage.objects FOR UPDATE USING (bucket_id = 'media' AND auth.role() = 'authenticated') WITH CHECK (bucket_id = 'media' AND auth.role() = 'authenticated');
+
+-- Newsletter
+CREATE TABLE IF NOT EXISTS public.newsletter_subscribers (
   id uuid primary key default gen_random_uuid(),
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
@@ -61,29 +68,16 @@ create table if not exists public.newsletter_subscribers (
   opted_in boolean not null default true
 );
 
--- DISABLE RLS TEMPORARILY FOR TESTING
-alter table public.newsletter_subscribers disable row level security;
+ALTER TABLE public.newsletter_subscribers ENABLE ROW LEVEL SECURITY;
 
--- Re-enable RLS with permissive policies
-alter table public.newsletter_subscribers enable row level security;
+DROP POLICY IF EXISTS "anon_insert" ON public.newsletter_subscribers;
+CREATE POLICY "anon_insert" ON public.newsletter_subscribers FOR INSERT WITH CHECK (true);
 
--- Allow all inserts
-drop policy if exists "anon_insert" on public.newsletter_subscribers;
-create policy "anon_insert" on public.newsletter_subscribers for insert with check (true);
+DROP POLICY IF EXISTS "anon_read" ON public.newsletter_subscribers;
+CREATE POLICY "anon_read" ON public.newsletter_subscribers FOR SELECT USING (true);
 
--- Allow all reads
-drop policy if exists "anon_read" on public.newsletter_subscribers;
-create policy "anon_read" on public.newsletter_subscribers for select using (true);
-
--- Allow all updates
-drop policy if exists "anon_update" on public.newsletter_subscribers;
-create policy "anon_update" on public.newsletter_subscribers for update using (true) with check (true);
-
--- ============================================
--- CONTACT SUBMISSIONS
--- ============================================
-
-create table if not exists public.contact_submissions (
+-- Contact
+CREATE TABLE IF NOT EXISTS public.contact_submissions (
   id uuid primary key default gen_random_uuid(),
   created_at timestamptz not null default now(),
   full_name text not null,
@@ -93,46 +87,26 @@ create table if not exists public.contact_submissions (
   intent text
 );
 
--- Disable RLS
-alter table public.contact_submissions disable row level security;
+ALTER TABLE public.contact_submissions ENABLE ROW LEVEL SECURITY;
 
--- Re-enable with permissive policies
-alter table public.contact_submissions enable row level security;
+DROP POLICY IF EXISTS "anon_insert_contact" ON public.contact_submissions;
+CREATE POLICY "anon_insert_contact" ON public.contact_submissions FOR INSERT WITH CHECK (true);
 
-drop policy if exists "anon_insert_contact" on public.contact_submissions;
-create policy "anon_insert_contact" on public.contact_submissions for insert with check (true);
+DROP POLICY IF EXISTS "auth_read_contact" ON public.contact_submissions;
+CREATE POLICY "auth_read_contact" ON public.contact_submissions FOR SELECT USING (auth.role() = 'authenticated');
 
-drop policy if exists "auth_read_contact" on public.contact_submissions;
-create policy "auth_read_contact" on public.contact_submissions for select using (auth.role() = 'authenticated');
-
--- ============================================
--- POSTS RLS
--- ============================================
-
-alter table public.posts enable row level security;
-
--- Anyone can read published posts
-drop policy if exists "public_read_published" on public.posts;
-create policy "public_read_published" on public.posts for select using (published = true);
-
--- Authenticated users can manage posts
-drop policy if exists "auth_all_posts" on public.posts;
-create policy "auth_all_posts" on public.posts for all using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');
-
--- ============================================
--- TRIGGERS
--- ============================================
-
-create or replace function public.set_updated_at()
-returns trigger language plpgsql as $$
-begin
-  new.updated_at = now();
-  return new;
-end;
+-- Trigger function
+CREATE OR REPLACE FUNCTION public.set_updated_at()
+RETURNS TRIGGER LANGUAGE PLPGSQL AS $$
+BEGIN
+  NEW.updated_at = now();
+  RETURN NEW;
+END;
 $$;
 
-drop trigger if exists trg_posts_updated_at on public.posts;
-create trigger trg_posts_updated_at before update on public.posts for each row execute function public.set_updated_at();
+-- Triggers
+DROP TRIGGER IF EXISTS trg_posts_updated_at ON public.posts;
+CREATE TRIGGER trg_posts_updated_at BEFORE UPDATE ON public.posts FOR EACH ROW EXECUTE FUNCTION public.set_updated_at();
 
-drop trigger if exists trg_newsletter_updated_at on public.newsletter_subscribers;
-create trigger trg_newsletter_updated_at before update on public.newsletter_subscribers for each row execute function public.set_updated_at();
+DROP TRIGGER IF EXISTS trg_newsletter_updated_at ON public.newsletter_subscribers;
+CREATE TRIGGER trg_newsletter_updated_at BEFORE UPDATE ON public.newsletter_subscribers FOR EACH ROW EXECUTE FUNCTION public.set_updated_at();

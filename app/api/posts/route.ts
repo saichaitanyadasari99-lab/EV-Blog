@@ -82,11 +82,10 @@ export async function POST(request: Request) {
     excerpt,
     cover_url: body.cover_url ?? null,
     category: normalizeCategory(body.category),
-    status: isPublished ? "published" : "draft",
-    published_at: isPublished ? new Date().toISOString() : null,
     tags: body.tags ?? [],
     published: isPublished,
     reading_time: readingTime,
+    created_at: isPublished ? new Date().toISOString() : undefined,
   };
 
   const primary = await auth.supabase.from("posts").upsert(payload).select("*").single();
@@ -95,25 +94,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ post: primary.data }, { status: 200 });
   }
 
-  if (!primary.error.message.includes("posts_category_check")) {
-    return NextResponse.json({ error: primary.error.message }, { status: 500 });
-  }
-
-  const fallback = await auth.supabase
-    .from("posts")
-    .upsert({
-      ...payload,
-      category: "post",
-      tags: [...(payload.tags ?? []), `mapped-category:${payload.category as string}`],
-    })
-    .select("*")
-    .single();
-
-  if (fallback.error) {
-    return NextResponse.json({ error: fallback.error.message }, { status: 500 });
-  }
-
-  return NextResponse.json({ post: fallback.data }, { status: 200 });
+  return NextResponse.json({ error: primary.error.message }, { status: 500 });
 }
 
 export async function DELETE(request: Request) {
