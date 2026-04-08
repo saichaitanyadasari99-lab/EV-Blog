@@ -10,11 +10,23 @@ function htmlToExcerpt(html: string) {
 }
 
 function normalizeCategory(input?: string) {
-  const value = (input ?? "post").toLowerCase();
-  if (["post", "review", "deep-dive", "benchmark", "news", "standards"].includes(value)) {
-    return value;
+  const value = (input ?? "cell-chemistry").toLowerCase().trim();
+  
+  const categoryMap: Record<string, string> = {
+    "benchmark": "ev-benchmarks",
+    "benchmarks": "ev-benchmarks",
+    "review": "vehicle-reviews",
+    "deep-dive": "bms-design",
+    "post": "cell-chemistry",
+    "standards": "standards",
+    "news": "news",
+  };
+  
+  if (categoryMap[value]) {
+    return categoryMap[value];
   }
-  return "post";
+  
+  return value.replace(/\s+/g, "-");
 }
 
 async function getAuthedAdmin() {
