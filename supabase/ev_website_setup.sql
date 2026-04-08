@@ -1,5 +1,7 @@
+-- Enable UUID extension
 create extension if not exists pgcrypto;
 
+-- Posts table
 create table if not exists public.posts (
   id uuid primary key default gen_random_uuid(),
   author_id uuid references auth.users(id) default auth.uid(),
@@ -16,53 +18,9 @@ create table if not exists public.posts (
   reading_time int
 );
 
-alter table public.posts
-  add column if not exists author_id uuid references auth.users(id),
-  add column if not exists created_at timestamptz not null default now(),
-  add column if not exists updated_at timestamptz not null default now(),
-  add column if not exists title text,
-  add column if not exists slug text,
-  add column if not exists content jsonb,
-  add column if not exists excerpt text,
-  add column if not exists cover_url text,
-  add column if not exists category text,
-  add column if not exists tags text[],
-  add column if not exists published boolean not null default false,
-  add column if not exists reading_time int;
-
-alter table public.posts
-  alter column author_id set default auth.uid();
-
-update public.posts
-set author_id = auth.uid()
-where author_id is null
-  and auth.uid() is not null;
-
-do $$
-begin
-  begin
-    alter table public.posts alter column author_id set not null;
-  exception
-    when others then
-      -- If null author rows remain for historical data, keep table usable.
-      null;
-  end;
-end $$;
-
-do $$
-begin
-  if not exists (
-    select 1
-    from pg_constraint
-    where conname = 'posts_slug_key'
-  ) then
-    alter table public.posts add constraint posts_slug_key unique (slug);
-  end if;
-end $$;
-
 alter table public.posts enable row level security;
 
-drop policy if exists "Public read published posts" on public.posts;
+-- Posts RLS - anyone can read published
 drop policy if exists "Anyone can read published posts" on public.posts;
 create policy "Anyone can read published posts"
 on public.posts
@@ -70,7 +28,7 @@ for select
 to anon, authenticated
 using (published = true);
 
-drop policy if exists "Admin full access by email" on public.posts;
+-- Posts RLS - authenticated can write
 drop policy if exists "Authenticated write posts" on public.posts;
 create policy "Authenticated write posts"
 on public.posts
@@ -78,6 +36,7 @@ for all
 using (auth.role() = 'authenticated')
 with check (auth.role() = 'authenticated');
 
+-- Updated_at trigger
 create or replace function public.set_updated_at()
 returns trigger
 language plpgsql
@@ -94,6 +53,7 @@ before update on public.posts
 for each row
 execute function public.set_updated_at();
 
+-- Storage bucket for media
 insert into storage.buckets (id, name, public)
 values ('media', 'media', true)
 on conflict (id) do nothing;
@@ -104,41 +64,26 @@ on storage.objects
 for select
 using (bucket_id = 'media');
 
-drop policy if exists "Admin media insert" on storage.objects;
 drop policy if exists "Authenticated media insert" on storage.objects;
 create policy "Authenticated media insert"
 on storage.objects
 for insert
-with check (
-  bucket_id = 'media'
-  and auth.role() = 'authenticated'
-);
+with check (bucket_id = 'media' and auth.role() = 'authenticated');
 
-drop policy if exists "Admin media update" on storage.objects;
 drop policy if exists "Authenticated media update" on storage.objects;
 create policy "Authenticated media update"
 on storage.objects
 for update
-using (
-  bucket_id = 'media'
-  and auth.role() = 'authenticated'
-)
-with check (
-  bucket_id = 'media'
-  and auth.role() = 'authenticated'
-);
+using (bucket_id = 'media' and auth.role() = 'authenticated')
+with check (bucket_id = 'media' and auth.role() = 'authenticated');
 
-drop policy if exists "Admin media delete" on storage.objects;
 drop policy if exists "Authenticated media delete" on storage.objects;
 create policy "Authenticated media delete"
 on storage.objects
 for delete
-using (
-  bucket_id = 'media'
-  and auth.role() = 'authenticated'
-);
+using (bucket_id = 'media' and auth.role() = 'authenticated');
 
--- Newsletter subscribers collected from public form
+-- Newsletter subscribers table
 create table if not exists public.newsletter_subscribers (
   id uuid primary key default gen_random_uuid(),
   created_at timestamptz not null default now(),
@@ -151,41 +96,33 @@ create table if not exists public.newsletter_subscribers (
 
 alter table public.newsletter_subscribers enable row level security;
 
--- Allow anyone (anon/authenticated) to insert/upsert
-drop policy if exists "Public insert subscribers" on public.newsletter_subscribers;
-drop policy if exists "Public upsert subscribers" on public.newsletter_subscribers;
+-- Allow anyone to insert
+drop policy if exists "Allow public insert" on public.newsletter_subscribers;
 create policy "Allow public insert"
 on public.newsletter_subscribers
 for insert
 to anon, authenticated
 with check (true);
 
+-- Allow anyone to update
 drop policy if exists "Public update own subscriber row" on public.newsletter_subscribers;
-create policy "Public update own subscriber row"
+create policy "Allow public update"
 on public.newsletter_subscribers
 for update
 to anon, authenticated
 using (true)
 with check (true);
 
+-- Allow anyone to read
 drop policy if exists "Public read subscribers" on public.newsletter_subscribers;
-create policy "Public read subscribers"
-on public.newsletter_subscribers
-for select
-to anon, authenticated
-using (true);
-on public.newsletter_subscribers
-for select
-to anon, authenticated
-using (true);
-
 drop policy if exists "Authenticated read subscribers" on public.newsletter_subscribers;
-create policy "Authenticated read subscribers"
+create policy "Allow public read"
 on public.newsletter_subscribers
 for select
-using (auth.role() = 'authenticated');
+to anon, authenticated
+using (true);
 
--- Contact submissions from public form
+-- Contact submissions table
 create table if not exists public.contact_submissions (
   id uuid primary key default gen_random_uuid(),
   created_at timestamptz not null default now(),
@@ -198,19 +135,22 @@ create table if not exists public.contact_submissions (
 
 alter table public.contact_submissions enable row level security;
 
-drop policy if exists "Public insert contact submissions" on public.contact_submissions;
+-- Allow anyone to insert
+drop policy if exists "Allow public insert contact" on public.contact_submissions;
 create policy "Allow public insert contact"
 on public.contact_submissions
 for insert
 to anon, authenticated
 with check (true);
 
-drop policy if exists "Authenticated read contact submissions" on public.contact_submissions;
-create policy "Authenticated read contact submissions"
+-- Allow authenticated to read
+drop policy if exists "Authenticated read contact" on public.contact_submissions;
+create policy "Authenticated read contact"
 on public.contact_submissions
 for select
 using (auth.role() = 'authenticated');
 
+-- Newsletter updated_at trigger
 drop trigger if exists trg_newsletter_subscribers_updated_at on public.newsletter_subscribers;
 create trigger trg_newsletter_subscribers_updated_at
 before update on public.newsletter_subscribers
