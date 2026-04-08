@@ -1,5 +1,12 @@
 import { NextResponse } from "next/server";
-import { getServerSupabaseClient } from "@/lib/supabase/server";
+import { createClient } from "@supabase/supabase-js";
+
+function getPublicSupabase() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+}
 
 type Payload = {
   name?: string;
@@ -21,7 +28,7 @@ export async function POST(request: Request) {
   const message = (body.message ?? "").trim();
   const intent = (body.intent ?? "contact").trim();
 
-  const supabase = await getServerSupabaseClient();
+  const supabase = getPublicSupabase();
 
   if (intent === "subscribe") {
     if (!email || !isValidEmail(email)) {
@@ -61,7 +68,6 @@ export async function POST(request: Request) {
 
   if (subError) {
     if (subError.message.toLowerCase().includes("duplicate key")) {
-      // Treat duplicate subscribe as success to keep UX smooth.
       return NextResponse.json({ success: true, duplicate: true });
     }
     return NextResponse.json(
