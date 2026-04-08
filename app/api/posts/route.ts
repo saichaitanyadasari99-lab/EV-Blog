@@ -68,40 +68,26 @@ export async function POST(request: Request) {
   const readingTime = estimateReadingTime(contentText);
   const isPublished = body.published ?? false;
 
-  const payload = {
-    id: body.id,
+  // Use INSERT instead of UPSERT to avoid index issues
+  const { data, error } = await auth.supabase.from("posts").insert({
+    id: body.id || undefined,
     author_id: auth.user.id,
     title: body.title.trim(),
     slug,
+    content: contentJson,
     excerpt,
     cover_url: body.cover_url ?? null,
     category: normalizeCategory(body.category),
     tags: body.tags ?? [],
     published: isPublished,
     reading_time: readingTime,
-  };
+  }).select().single();
 
-  // Insert without content first (avoids index issue)
-  const primary = await auth.supabase.from("posts").upsert(payload).select("*").single();
-
-  if (primary.error) {
-    return NextResponse.json({ error: primary.error.message }, { status: 500 });
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  // Now update with content separately
-  if (contentJson && contentJson.length > 10) {
-    const { error: contentError } = await auth.supabase
-      .from("posts")
-      .update({ content: contentJson })
-      .eq("id", primary.data.id);
-
-    if (contentError) {
-      // Content failed but post was created, return success anyway
-      console.error("Content update failed:", contentError.message);
-    }
-  }
-
-  return NextResponse.json({ post: primary.data }, { status: 200 });
+  return NextResponse.json({ post: data }, { status: 200 });
 }
 
 export async function DELETE(request: Request) {

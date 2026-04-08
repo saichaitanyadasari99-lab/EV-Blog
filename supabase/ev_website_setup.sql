@@ -1,12 +1,12 @@
 -- ============================================
--- MINIMAL SUPABASE SETUP (No indexes on content)
+-- SIMPLE SUPABASE SETUP (No problematic indexes)
 -- Run this in Supabase SQL Editor
 -- ============================================
 
--- Drop existing table
+-- Drop existing table completely
 DROP TABLE IF EXISTS public.posts CASCADE;
 
--- Create table WITHOUT any constraints that might index content
+-- Create simple table
 CREATE TABLE public.posts (
   id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
   author_id uuid,
@@ -23,11 +23,8 @@ CREATE TABLE public.posts (
   reading_time int
 );
 
--- Add unique constraint on slug (using INDEX to avoid unique constraint on table)
-CREATE UNIQUE INDEX posts_slug_idx ON public.posts (slug) WHERE slug IS NOT NULL;
-
--- Disable RLS temporarily
-ALTER TABLE public.posts DISABLE ROW LEVEL SECURITY;
+-- Add simple unique index on slug only
+CREATE UNIQUE INDEX posts_slug_unique ON public.posts (slug);
 
 -- Enable RLS
 ALTER TABLE public.posts ENABLE ROW LEVEL SECURITY;
@@ -41,6 +38,3 @@ DROP POLICY IF EXISTS "auth_all_posts" ON public.posts;
 CREATE POLICY "auth_all_posts" ON public.posts 
 FOR ALL USING (auth.role() = 'authenticated') 
 WITH CHECK (auth.role() = 'authenticated');
-
--- Test it
-SELECT 'Posts table created successfully' as result;
