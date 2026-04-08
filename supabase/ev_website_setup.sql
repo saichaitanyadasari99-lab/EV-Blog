@@ -6,14 +6,17 @@
 -- Enable UUID extension
 create extension if not exists pgcrypto;
 
--- Posts table
-create table if not exists public.posts (
+-- Drop any existing posts table to start fresh (backup data first if needed)
+DROP TABLE IF EXISTS public.posts;
+
+-- Posts table - NO INDEX on content column to avoid size issues
+create table public.posts (
   id uuid primary key default gen_random_uuid(),
   author_id uuid references auth.users(id) default auth.uid(),
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
   title text not null,
-  slug text not null unique,
+  slug text not null,
   content jsonb,
   excerpt text,
   cover_url text,
@@ -22,6 +25,9 @@ create table if not exists public.posts (
   published boolean not null default false,
   reading_time int
 );
+
+-- Add unique constraint on slug separately (not during table creation)
+alter table public.posts add constraint posts_slug_key unique (slug);
 
 -- Media storage bucket
 insert into storage.buckets (id, name, public)

@@ -73,28 +73,9 @@ export async function POST(request: Request) {
     auth.user.email?.split("@")[0] ||
     "admin";
 
-  // Some schemas keep posts.author_id as FK to public.profiles(id).
-  // Best-effort upsert ensures FK target exists before saving a post.
-  const { error: profileError } = await auth.supabase.from("profiles").upsert(
-    {
-      id: auth.user.id,
-      display_name: authorName,
-      role: "admin",
-    },
-    { onConflict: "id" },
-  );
-
-  if (profileError && !profileError.message.toLowerCase().includes("relation")) {
-    return NextResponse.json(
-      { error: `Profile bootstrap failed: ${profileError.message}` },
-      { status: 500 },
-    );
-  }
-
   const payload = {
     id: body.id,
     author_id: auth.user.id,
-    author_name: authorName,
     title: body.title.trim(),
     slug,
     content: contentJson,
