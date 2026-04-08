@@ -34,18 +34,23 @@ export async function POST(request: Request) {
     if (!email || !isValidEmail(email)) {
       return NextResponse.json({ error: "Valid email required." }, { status: 400 });
     }
-    const { error } = await supabase.from("newsletter_subscribers").upsert(
-      {
-        email,
-        full_name: name || "Subscriber",
-        source: "website-subscribe",
-        opted_in: true,
-      },
-      { onConflict: "email", ignoreDuplicates: true },
-    );
-    if (error && !error.message.toLowerCase().includes("duplicate")) {
+    
+    // Try INSERT first
+    const { error } = await supabase.from("newsletter_subscribers").insert({
+      email,
+      full_name: name || "Subscriber",
+      source: "website-subscribe",
+      opted_in: true,
+    });
+    
+    if (error) {
+      // Check if it's a duplicate key error
+      if (error.message.includes("duplicate key") || error.code === "23505") {
+        return NextResponse.json({ error: "This email has already been registered." }, { status: 409 });
+      }
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
+    
     return NextResponse.json({ success: true });
   }
 
@@ -56,19 +61,16 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid email format." }, { status: 400 });
   }
 
-  const { error: subError } = await supabase.from("newsletter_subscribers").upsert(
-    {
-      email,
-      full_name: name,
-      source: intent === "subscribe" ? "header-subscribe" : "contact-form",
-      opted_in: true,
-    },
-    { onConflict: "email", ignoreDuplicates: true },
-  );
+  const { error: subError } = await supabase.from("newsletter_subscribers").insert({
+    email,
+    full_name: name,
+    source: "contact-form",
+    opted_in: true,
+  });
 
   if (subError) {
-    if (subError.message.toLowerCase().includes("duplicate key")) {
-      return NextResponse.json({ success: true, duplicate: true });
+    if (subError.message.includes("duplicate key") || subError.code === "23505") {
+      return NextResponse.json({ error: "This email has already been registered." }, { status: 409 });
     }
     return NextResponse.json(
       {
@@ -90,9 +92,6 @@ export async function POST(request: Request) {
   });
 
   if (inquiryError) {
-    if (inquiryError.message.toLowerCase().includes("duplicate key")) {
-      return NextResponse.json({ success: true, duplicate: true });
-    }
     return NextResponse.json(
       {
         error:

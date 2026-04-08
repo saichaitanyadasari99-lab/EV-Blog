@@ -36,12 +36,18 @@ export function NewsletterForm({ compact = false }: { compact?: boolean }) {
 
       if (res.ok) {
         setStatus("success");
-        setMessage(data.duplicate ? "You're already subscribed!" : "Thanks for subscribing!");
+        setMessage("Thanks for subscribing!");
         setEmail("");
         setName("");
       } else {
-        setStatus("error");
-        setMessage(data.error || "Something went wrong. Please try again.");
+        // Handle duplicate email error specifically
+        if (res.status === 409) {
+          setStatus("error");
+          setMessage(data.error || "This email has already been registered.");
+        } else {
+          setStatus("error");
+          setMessage(data.error || "Something went wrong. Please try again.");
+        }
       }
     } catch {
       setStatus("error");
