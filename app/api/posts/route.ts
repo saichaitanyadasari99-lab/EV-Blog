@@ -15,9 +15,13 @@ function normalizeCategory(input?: string) {
   const categoryMap: Record<string, string> = {
     "benchmark": "ev-benchmarks",
     "benchmarks": "ev-benchmarks",
+    "benchmarking": "ev-benchmarks",
     "review": "vehicle-reviews",
+    "reviews": "vehicle-reviews",
     "deep-dive": "bms-design",
+    "deep dives": "bms-design",
     "post": "cell-chemistry",
+    "posts": "cell-chemistry",
     "standards": "standards",
     "news": "news",
   };
