@@ -72,9 +72,30 @@ export async function POST(request: Request) {
   const readingTime = estimateReadingTime(contentText);
   const isPublished = body.published ?? false;
 
-  // Use INSERT instead of UPSERT to avoid index issues
+  // If body.id exists, it's an update - use upsert. Otherwise, insert new
+  if (body.id) {
+    // Update existing post
+    const { data, error } = await auth.supabase.from("posts").update({
+      title: body.title.trim(),
+      slug,
+      content: contentJson,
+      excerpt,
+      cover_url: body.cover_url ?? null,
+      category: normalizeCategory(body.category),
+      tags: body.tags ?? [],
+      published: isPublished,
+      reading_time: readingTime,
+      updated_at: new Date().toISOString(),
+    }).eq("id", body.id).select().single();
+
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+    return NextResponse.json({ post: data }, { status: 200 });
+  }
+
+  // Create new post
   const { data, error } = await auth.supabase.from("posts").insert({
-    id: body.id || undefined,
     author_id: auth.user.id,
     title: body.title.trim(),
     slug,
@@ -91,7 +112,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  return NextResponse.json({ post: data }, { status: 200 });
+  return NextResponse.json({ post: data }, { status: 201 });
 }
 
 export async function DELETE(request: Request) {
