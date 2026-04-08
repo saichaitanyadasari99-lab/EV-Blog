@@ -9,7 +9,7 @@ function htmlToExcerpt(html: string) {
   return html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim().slice(0, 220);
 }
 
-function normalizeCategory(input?: string) {
+async function normalizeCategory(supabase: Awaited<ReturnType<typeof getServerSupabaseClient>>, input?: string) {
   const value = (input ?? "cell-chemistry").toLowerCase().trim();
   
   const categoryMap: Record<string, string> = {
@@ -26,11 +26,15 @@ function normalizeCategory(input?: string) {
     "news": "news",
   };
   
-  if (categoryMap[value]) {
-    return categoryMap[value];
+  let slug = categoryMap[value] || value.replace(/\s+/g, "-");
+  
+  const { data: existing } = await supabase.from("categories").select("slug").eq("slug", slug).single();
+  if (!existing) {
+    const name = input?.trim() || slug;
+    await supabase.from("categories").upsert({ slug, name }, { onConflict: "slug" });
   }
   
-  return value.replace(/\s+/g, "-");
+  return slug;
 }
 
 async function getAuthedAdmin() {
@@ -97,7 +101,7 @@ export async function POST(request: Request) {
       content: contentJson,
       excerpt,
       cover_url: body.cover_url ?? null,
-      category: normalizeCategory(body.category),
+      category: await normalizeCategory(auth.supabase, body.category),
       tags: body.tags ?? [],
       published: isPublished,
       reading_time: readingTime,
@@ -118,7 +122,7 @@ export async function POST(request: Request) {
     content: contentJson,
     excerpt,
     cover_url: body.cover_url ?? null,
-    category: normalizeCategory(body.category),
+      category: await normalizeCategory(auth.supabase, body.category),
     tags: body.tags ?? [],
     published: isPublished,
     reading_time: readingTime,

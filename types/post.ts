@@ -1,11 +1,3 @@
-export type PostCategory =
-  | "post"
-  | "review"
-  | "deep-dive"
-  | "benchmark"
-  | "news"
-  | "standards";
-
 export type PostRecord = {
   id: string;
   created_at: string;
@@ -15,7 +7,7 @@ export type PostRecord = {
   content: string | null;
   excerpt: string | null;
   cover_url: string | null;
-  category: PostCategory | null;
+  category: string | null;
   tags: string[] | null;
   published: boolean;
   reading_time: number | null;
@@ -29,7 +21,7 @@ export type SavePostInput = {
   content: Record<string, unknown> | null;
   excerpt?: string;
   cover_url?: string;
-  category?: PostCategory;
+  category?: string;
   tags?: string[];
   published?: boolean;
 };

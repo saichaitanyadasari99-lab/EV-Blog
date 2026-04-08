@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState, useEffect } from "react";
 import { EditorContent, useEditor } from "@tiptap/react";
 import slugify from "slugify";
 import { tiptapExtensions } from "@/lib/tiptap";
@@ -12,24 +12,6 @@ import type { PostRecord } from "@/types/post";
 type Props = {
   initialPost?: PostRecord | null;
 };
-
-const categories = [
-  "cell-chemistry",
-  "bms-design",
-  "ev-benchmarks",
-  "vehicle-reviews",
-  "standards",
-  "news",
-];
-
-const defaultSections = [
-  "Cell Chemistry",
-  "BMS Design",
-  "EV Benchmarks",
-  "Vehicle Reviews",
-  "Standards",
-  "News",
-];
 
 function escapeHtml(input: string) {
   return input
@@ -226,17 +208,23 @@ export function Editor({ initialPost }: Props) {
   const [slug, setSlug] = useState(initialPost?.slug ?? "");
   const [excerpt, setExcerpt] = useState(initialPost?.excerpt ?? "");
   const [coverUrl, setCoverUrl] = useState(initialPost?.cover_url ?? "");
-  const [category, setCategory] = useState(
-    initialPost?.category ?? ("post" as (typeof categories)[number]),
-  );
+  const [category, setCategory] = useState(initialPost?.category ?? "cell-chemistry");
   const [tags, setTags] = useState((initialPost?.tags ?? []).join(", "));
   const [published, setPublished] = useState(initialPost?.published ?? false);
   const [status, setStatus] = useState("");
   const [saving, setSaving] = useState(false);
   const [uploadingCover, setUploadingCover] = useState(false);
   const [markdownInput, setMarkdownInput] = useState("");
+  const [categories, setCategories] = useState<Array<{ slug: string; name: string }>>([]);
   const coverFileRef = useRef<HTMLInputElement | null>(null);
   const markdownFileRef = useRef<HTMLInputElement | null>(null);
+
+  useEffect(() => {
+    fetch("/api/categories")
+      .then((res) => res.json())
+      .then((data) => setCategories(data.categories || []))
+      .catch(console.error);
+  }, []);
 
   const editor = useEditor({
     extensions: tiptapExtensions(),
@@ -427,14 +415,14 @@ export function Editor({ initialPost }: Props) {
           <div className="flex gap-2">
             <input
               className="flex-1 rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 py-2"
-              placeholder="Section (e.g., cell-chemistry, bms-design, thermal)"
+              placeholder="Category (type to search or enter new)"
               value={category}
-              onChange={(event) => setCategory(event.target.value as any)}
-              list="sections"
+              onChange={(event) => setCategory(event.target.value)}
+              list="categories"
             />
-            <datalist id="sections">
-              {defaultSections.map((sec) => (
-                <option key={sec} value={sec.toLowerCase().replace(/\s+/g, "-")} />
+            <datalist id="categories">
+              {categories.map((cat) => (
+                <option key={cat.slug} value={cat.slug} />
               ))}
             </datalist>
           </div>
