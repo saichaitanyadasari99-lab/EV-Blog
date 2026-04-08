@@ -3,7 +3,7 @@
 import { useMemo, useRef, useState } from "react";
 import { EditorContent, useEditor } from "@tiptap/react";
 import slugify from "slugify";
-import { tiptapExtensions, renderTiptapHtml } from "@/lib/tiptap";
+import { tiptapExtensions } from "@/lib/tiptap";
 import { parseTiptapJson } from "@/lib/tiptap";
 import { MediaUpload } from "@/components/MediaUpload";
 import { getBrowserSupabaseClient } from "@/lib/supabase/client";
@@ -20,7 +20,7 @@ const categories = [
   "vehicle-reviews",
   "standards",
   "news",
-] as const;
+];
 
 const defaultSections = [
   "Cell Chemistry",
@@ -234,10 +234,7 @@ export function Editor({ initialPost }: Props) {
   const [status, setStatus] = useState("");
   const [saving, setSaving] = useState(false);
   const [uploadingCover, setUploadingCover] = useState(false);
-  const [bodyPreview, setBodyPreview] = useState("");
   const [markdownInput, setMarkdownInput] = useState("");
-  const [showFullPreview, setShowFullPreview] = useState(false);
-  const [previewKey, setPreviewKey] = useState(0);
   const coverFileRef = useRef<HTMLInputElement | null>(null);
   const markdownFileRef = useRef<HTMLInputElement | null>(null);
 
@@ -245,10 +242,6 @@ export function Editor({ initialPost }: Props) {
     extensions: tiptapExtensions(),
     content: parseTiptapJson(initialPost?.content ?? null) ?? undefined,
     immediatelyRender: false,
-    onUpdate({ editor: current }) {
-      const text = current.getText().trim();
-      setBodyPreview(text.slice(0, 280));
-    },
     editorProps: {
       attributes: {
         class:
@@ -256,11 +249,6 @@ export function Editor({ initialPost }: Props) {
       },
     },
   });
-
-  const fullPreviewHtml = useMemo(() => {
-    if (!editor) return "";
-    return renderTiptapHtml(JSON.stringify(editor.getJSON()));
-  }, [editor, previewKey]);
 
   const derivedSlug = useMemo(() => {
     if (slug.trim()) return slug.trim();
@@ -380,8 +368,7 @@ export function Editor({ initialPost }: Props) {
     setCategory(mappedCategory);
 
     editor.commands.setContent(markdownToHtml(meta.body));
-    setBodyPreview(meta.excerpt);
-    setStatus("Markdown imported into editor. Review and click Save Post.");
+    setStatus("Markdown imported. Review and click Save Post.");
   };
 
   return (
@@ -643,35 +630,6 @@ export function Editor({ initialPost }: Props) {
         <div className="mt-4 overflow-x-auto">
           <EditorContent editor={editor} />
         </div>
-
-        <div className="editor-preview">
-          <div className="flex items-center justify-between">
-            <p className="text-xs uppercase tracking-[0.12em] text-[var(--ink-soft)]">Quick Preview</p>
-            <button
-              type="button"
-              className="text-xs text-[var(--accent)] underline"
-              onClick={() => {
-                setShowFullPreview(!showFullPreview);
-                setPreviewKey((k) => k + 1);
-              }}
-            >
-              {showFullPreview ? "Hide Full Preview" : "Show Full Preview"}
-            </button>
-          </div>
-          <h3 className="mt-2 text-xl font-bold">{title || "Post title preview"}</h3>
-          <p className="mt-2 text-sm text-[var(--ink-soft)]">{excerpt || bodyPreview || "Content preview will appear here."}</p>
-          <p className="mt-2 text-xs text-[var(--ink-soft)]">Slug: {derivedSlug || "(auto)"}</p>
-        </div>
-
-        {showFullPreview && (
-          <div className="editor-full-preview">
-            <p className="text-xs uppercase tracking-[0.12em] text-[var(--ink-soft)] mb-3">Full Preview</p>
-            {coverUrl && (
-              <div className="full-preview-cover" style={{ background: `url(${coverUrl}) center/cover` }} />
-            )}
-            <div className="full-preview-content prose" dangerouslySetInnerHTML={{ __html: fullPreviewHtml }} />
-          </div>
-        )}
 
         <div className="mt-4 flex flex-wrap items-center gap-3">
           <label className="inline-flex items-center gap-2 text-sm">
