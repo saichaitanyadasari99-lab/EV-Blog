@@ -1,15 +1,8 @@
-import { createClient } from "@supabase/supabase-js";
+import { getServerSupabaseClient } from "@/lib/supabase/server";
 import type { PostRecord } from "@/types/post";
 
-export function getPublicSupabase() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-  );
-}
-
 export async function getPublishedPosts() {
-  const supabase = getPublicSupabase();
+  const supabase = await getServerSupabaseClient();
   const { data, error } = await supabase
     .from("posts")
     .select("*")
@@ -17,14 +10,15 @@ export async function getPublishedPosts() {
     .order("created_at", { ascending: false });
 
   if (error) {
-    throw error;
+    console.error("getPublishedPosts error:", error);
+    return [] as PostRecord[];
   }
 
   return (data ?? []) as PostRecord[];
 }
 
 export async function getPublishedPostBySlug(slug: string) {
-  const supabase = getPublicSupabase();
+  const supabase = await getServerSupabaseClient();
   const { data, error } = await supabase
     .from("posts")
     .select("*")
