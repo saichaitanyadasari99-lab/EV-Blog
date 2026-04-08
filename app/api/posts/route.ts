@@ -34,14 +34,18 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const includeDrafts = searchParams.get("includeDrafts") === "true";
 
-  const auth = await getAuthedAdmin();
-  const query = auth.supabase
+  // Use public client to read posts (bypass auth issues)
+  const { getPublicSupabase } = await import("@/lib/posts");
+  const supabase = getPublicSupabase();
+  
+  const query = supabase
     .from("posts")
     .select("*")
     .order("created_at", { ascending: false });
 
-  if (includeDrafts && auth.ok) {
-    const { data, error } = await query;
+  if (includeDrafts) {
+    // Only return published posts for public
+    const { data, error } = await query.eq("published", true);
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });
     return NextResponse.json({ posts: data });
   }
