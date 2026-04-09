@@ -22,6 +22,12 @@ function renderMath(content: string): string {
     } catch { return math; }
   });
   
+  content = content.replace(/<p class="math-block" data-formula="([^"]+)">/g, (_, formula) => {
+    try {
+      return katex.renderToString(formula, { displayMode: true, throwOnError: false });
+    } catch { return `<p>${formula}</p>`; }
+  });
+  
   content = content.replace(/!\[([^\]]*)\]\(https:\/\/latex\.codecogs\.com\/png\.image\?.*?\\bg\{white\}([^)]+)\)/g, (_, alt, latex) => {
     try {
       const displayMode = latex.includes("\\dpi{120}") || latex.includes("\\displaystyle");

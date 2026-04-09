@@ -33,13 +33,31 @@ function normalizeEncoding(input: string) {
 }
 
 function formatInline(text: string) {
-  let value = escapeHtml(text);
+  // Extract images and links BEFORE HTML escaping so URLs are never mangled.
+  // Replace each match with a null-byte-delimited index placeholder, then
+  // restore after escaping the remaining text content.
+  const tokens: string[] = [];
+
+  let value = text
+    .replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (_, alt, src) => {
+      tokens.push(`<img alt="${escapeHtml(alt)}" src="${src}" />`);
+      return `\x00${tokens.length - 1}\x00`;
+    })
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_, label, href) => {
+      tokens.push(`<a href="${href}">${escapeHtml(label)}</a>`);
+      return `\x00${tokens.length - 1}\x00`;
+    });
+
+  // Now it is safe to HTML-escape — no URLs remain in the string.
+  value = escapeHtml(value);
+
+  // Apply inline markdown formatting to the escaped text.
   value = value.replace(/`([^`]+)`/g, "<code>$1</code>");
   value = value.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
   value = value.replace(/\*([^*]+)\*/g, "<em>$1</em>");
-  value = value.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img alt="$1" src="$2" />');
-  value = value.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
-  return value;
+
+  // Restore URL tokens.
+  return value.replace(/\x00(\d+)\x00/g, (_, i) => tokens[Number(i)]);
 }
 
 function isTableLine(line: string) {
@@ -104,6 +122,21 @@ function markdownToHtml(markdown: string) {
     if (!line) {
       flushParagraph();
       flushList();
+      continue;
+    }
+
+    // Block math: fenced $$ ... $$
+    if (line === "$$") {
+      flushParagraph();
+      flushList();
+      const formulaLines: string[] = [];
+      i += 1;
+      while (i < lines.length && lines[i].trim() !== "$$") {
+        formulaLines.push(lines[i]);
+        i += 1;
+      }
+      const formula = formulaLines.join("\n").trim();
+      blocks.push(`<p class="math-block" data-formula="${escapeHtml(formula)}">${escapeHtml(formula)}</p>`);
       continue;
     }
 
