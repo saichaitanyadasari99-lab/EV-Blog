@@ -389,13 +389,16 @@ export function Editor({ initialPost }: Props) {
             value={excerpt}
             onChange={(event) => setExcerpt(event.target.value)}
           />
-          <div className="flex gap-2">
+          <div className="flex gap-2 items-center">
             <input
               className="w-full rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 py-2"
-              placeholder="Cover URL"
+              placeholder="Cover URL (paste image URL)"
               value={coverUrl}
               onChange={(event) => setCoverUrl(event.target.value)}
             />
+            {coverUrl && (
+              <img src={coverUrl} alt="Cover preview" className="w-16 h-16 object-cover rounded border" />
+            )}
             <button
               type="button"
               className="rounded-lg border border-[var(--border)] px-3 py-2 text-sm"
