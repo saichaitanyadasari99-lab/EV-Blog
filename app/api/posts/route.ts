@@ -79,6 +79,7 @@ export async function POST(request: Request) {
   }
 
   const body = (await request.json()) as SavePostInput;
+  console.log("POST /api/posts - body.id:", body.id);
   const slug = body.slug?.trim() || slugify(body.title, { lower: true, strict: true });
   const contentJson = JSON.stringify(
     body.content ?? { type: "doc", content: [{ type: "paragraph" }] },

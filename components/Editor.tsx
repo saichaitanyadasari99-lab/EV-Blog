@@ -251,8 +251,11 @@ export function Editor({ initialPost }: Props) {
       return;
     }
 
+    const postId = initialPost?.id;
+    console.log("Saving post with id:", postId);
+
     const payload = {
-      id: initialPost?.id,
+      id: postId,
       title,
       slug: derivedSlug,
       excerpt,
