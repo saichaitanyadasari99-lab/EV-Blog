@@ -88,9 +88,33 @@ export default async function HomePage() {
 
       <section className="cat-tabs">
         {["All", "Cell Chemistry", "BMS Design", "Thermal", "Charging", "Market"].map((item, idx) => (
-          <span key={item} className={`cat-tab ${idx === 0 ? "active" : ""}`}>
+          <Link 
+            key={item} 
+            href={item === "All" ? "/blogs" : `/category/${item.toLowerCase().replace(/\s+/g, "-")}`} 
+            className={`cat-tab ${idx === 0 ? "active" : ""}`}
+          >
             {item}
-          </span>
+          </Link>
+        ))}
+      </section>
+
+      <section className="sec-head">
+        <h2 className="sec-title">Calculators</h2>
+        <Link href="/calculators" className="sec-link">
+          View all {"->"}
+        </Link>
+      </section>
+      <section className="calc-grid-home">
+        {[
+          { name: "Cooling Plate", slug: "cooling-plate" },
+          { name: "Heat Generation", slug: "heat-generation" },
+          { name: "Bus Bar", slug: "bus-bar" },
+          { name: "Pack Size", slug: "pack-size" },
+        ].map((calc) => (
+          <Link key={calc.slug} href={`/calculators/${calc.slug}`} className="calc-card-home">
+            <span className="calc-icon">⚡</span>
+            <span className="calc-name">{calc.name}</span>
+          </Link>
         ))}
       </section>
 
