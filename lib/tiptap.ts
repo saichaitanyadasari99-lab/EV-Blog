@@ -21,6 +21,15 @@ function renderMath(content: string): string {
       return katex.renderToString(math.trim(), { displayMode: false, throwOnError: false });
     } catch { return math; }
   });
+  
+  content = content.replace(/!\[([^\]]*)\]\(https:\/\/latex\.codecogs\.com\/png\.image\?.*?\\bg\{white\}([^)]+)\)/g, (_, alt, latex) => {
+    try {
+      const displayMode = latex.includes("\\dpi{120}") || latex.includes("\\displaystyle");
+      const cleanLatex = latex.replace(/\\dpi\{\d+\}/g, "").replace(/\\bg\{white\}/g, "").trim();
+      return katex.renderToString(cleanLatex, { displayMode, throwOnError: false });
+    } catch { return alt || ""; }
+  });
+  
   return content;
 }
 
