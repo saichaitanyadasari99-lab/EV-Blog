@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useMemo, useRef, useState, useEffect } from "react";
 import { EditorContent, useEditor } from "@tiptap/react";
@@ -7,7 +7,11 @@ import { tiptapExtensions } from "@/lib/tiptap";
 import { parseTiptapJson } from "@/lib/tiptap";
 import { MediaUpload } from "@/components/MediaUpload";
 import { getBrowserSupabaseClient } from "@/lib/supabase/client";
+import { generateReactHelpers } from "@uploadthing/react";
+import type { UploadRouter } from "@/app/api/uploadthing/core";
 import type { PostRecord } from "@/types/post";
+
+const { useUploadThing } = generateReactHelpers<UploadRouter>();
 
 type Props = {
   initialPost?: PostRecord | null;
@@ -219,6 +223,18 @@ export function Editor({ initialPost }: Props) {
   const coverFileRef = useRef<HTMLInputElement | null>(null);
   const markdownFileRef = useRef<HTMLInputElement | null>(null);
 
+  const { startUpload: uploadEditorImage } = useUploadThing("media", {
+    onClientUploadComplete: (res) => {
+      if (res && res[0] && editor) {
+        editor.chain().focus().setImage({ src: res[0].url }).run();
+        setStatus("Image added.");
+      }
+    },
+    onUploadError: (error) => {
+      setStatus(`Error: ${error.message}`);
+    },
+  });
+
   useEffect(() => {
     fetch("/api/categories")
       .then((res) => res.json())
@@ -308,31 +324,25 @@ export function Editor({ initialPost }: Props) {
     editor.chain().focus().insertContent(`[[DOC:${url}]]`).run();
   };
 
-  const uploadCover = async (file: File) => {
-    const supabase = getBrowserSupabaseClient();
-    const ext = file.name.split(".").pop();
-    const path = `cover-${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+  const [coverUploader, setCoverUploader] = useState<ReturnType<typeof useUploadThing> | null>(null);
+  const { startUpload: uploadCoverToUt } = useUploadThing("media", {
+    onClientUploadComplete: (res) => {
+      if (res && res[0]) {
+        setCoverUrl(res[0].url);
+        setStatus("Cover image uploaded.");
+      }
+      setUploadingCover(false);
+    },
+    onUploadError: (error) => {
+      setStatus(`Error: ${error.message}`);
+      setUploadingCover(false);
+    },
+  });
 
+  const uploadCover = async (file: File) => {
     setUploadingCover(true);
     setStatus("Uploading cover image...");
-
-    const { error } = await supabase.storage.from("media").upload(path, file, {
-      upsert: false,
-    });
-
-    if (error) {
-      setStatus(error.message);
-      setUploadingCover(false);
-      return;
-    }
-
-    const {
-      data: { publicUrl },
-    } = supabase.storage.from("media").getPublicUrl(path);
-
-    setCoverUrl(publicUrl);
-    setStatus("Cover image uploaded.");
-    setUploadingCover(false);
+    await uploadCoverToUt([file]);
   };
 
   const importMarkdown = (markdown: string) => {
@@ -542,22 +552,8 @@ export function Editor({ initialPost }: Props) {
               onChange={async (event) => {
                 const file = event.target.files?.[0];
                 if (!file) return;
-                
-                const ext = file.name.split(".").pop();
-                const path = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
                 setStatus("Uploading image...");
-                
-                const supabase = getBrowserSupabaseClient();
-                const { error } = await supabase.storage.from("media").upload(path, file, { upsert: false });
-                
-                if (error) {
-                  setStatus(error.message);
-                  return;
-                }
-                
-                const { data: { publicUrl } } = supabase.storage.from("media").getPublicUrl(path);
-                editor.chain().focus().setImage({ src: publicUrl }).run();
-                setStatus("Image added.");
+                await uploadEditorImage([file]);
               }}
             />
           </label>
