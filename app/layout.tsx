@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { DM_Sans, IBM_Plex_Mono, Syne } from "next/font/google";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
+import "katex/dist/katex.min.css";
 import "./globals.css";
 
 const syne = Syne({

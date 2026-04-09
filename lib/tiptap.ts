@@ -6,8 +6,23 @@ import Youtube from "@tiptap/extension-youtube";
 import { TableKit } from "@tiptap/extension-table";
 import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
 import { common, createLowlight } from "lowlight";
+import katex from "katex";
 
 const lowlight = createLowlight(common);
+
+function renderMath(content: string): string {
+  content = content.replace(/\$\$([\s\S]*?)\$\$/g, (_, math) => {
+    try {
+      return katex.renderToString(math.trim(), { displayMode: true, throwOnError: false });
+    } catch { return math; }
+  });
+  content = content.replace(/\$([^$\n]+?)\$/g, (_, math) => {
+    try {
+      return katex.renderToString(math.trim(), { displayMode: false, throwOnError: false });
+    } catch { return math; }
+  });
+  return content;
+}
 
 export function tiptapExtensions() {
   return [
@@ -43,7 +58,7 @@ export function renderTiptapHtml(content: string | null): string {
 
   const html = generateHTML(parsed, tiptapExtensions());
 
-  return html
+  return renderMath(html)
     .replaceAll(
       /\[\[PDF:(.*?)\]\]/g,
       '<iframe src="$1" title="PDF document" style="min-height:450px;border:none;"></iframe>',
@@ -69,6 +84,7 @@ function escapeHtml(input: string): string {
 
 function formatInlineText(input: string): string {
   let text = escapeHtml(input);
+  text = renderMath(text);
   text = text.replace(
     /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g,
     '<a href="$2" target="_blank" rel="noreferrer">$1</a>',
