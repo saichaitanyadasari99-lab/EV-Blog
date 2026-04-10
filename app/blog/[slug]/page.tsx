@@ -27,6 +27,7 @@ function extractHeadings(html: string) {
 
 export default async function BlogPostPage({ params }: Params) {
   const { slug } = await params;
+  
   const [post, allPosts] = await Promise.all([
     getPublishedPostBySlug(slug),
     getPublishedPosts(),

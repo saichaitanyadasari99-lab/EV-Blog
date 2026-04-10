@@ -22,11 +22,12 @@ export async function getPublishedPostBySlug(slug: string) {
   const { data, error } = await supabase
     .from("posts")
     .select("*")
-    .eq("slug", slug)
+    .eq("slug", slug.trim().toLowerCase())
     .eq("published", true)
     .single();
 
   if (error) {
+    console.error("getPublishedPostBySlug error:", error.message, "slug:", slug);
     return null;
   }
 
