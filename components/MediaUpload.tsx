@@ -25,7 +25,7 @@ export function MediaUpload({ onUploaded }: Props) {
       if (!file) return;
 
       const ext = file.name.split(".").pop();
-      const path = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+      const path = `${crypto.randomUUID()}.${ext || "bin"}`;
       setStatus("Uploading...");
 
       const { error } = await supabase.storage.from("media").upload(path, file, {

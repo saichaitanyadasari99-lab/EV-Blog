@@ -26,7 +26,7 @@ async function normalizeCategory(supabase: Awaited<ReturnType<typeof getServerSu
     "news": "news",
   };
   
-  let slug = categoryMap[value] || value.replace(/\s+/g, "-");
+  const slug = categoryMap[value] || value.replace(/\s+/g, "-");
   
   const { data: existing } = await supabase.from("categories").select("slug").eq("slug", slug).single();
   if (!existing) {
@@ -55,19 +55,25 @@ export async function GET(request: Request) {
   const includeDrafts = searchParams.get("includeDrafts") === "true";
 
   const supabase = await getServerSupabaseClient();
-  
-  const query = supabase
+  const baseQuery = supabase
     .from("posts")
     .select("*")
     .order("created_at", { ascending: false });
 
   if (includeDrafts) {
-    const { data, error } = await query.eq("published", true);
+    const auth = await getAuthedAdmin();
+    if (!auth.ok) {
+      const { data, error } = await baseQuery.eq("published", true);
+      if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json({ posts: data });
+    }
+
+    const { data, error } = await baseQuery;
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });
     return NextResponse.json({ posts: data });
   }
 
-  const { data, error } = await query.eq("published", true);
+  const { data, error } = await baseQuery.eq("published", true);
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   return NextResponse.json({ posts: data });
 }

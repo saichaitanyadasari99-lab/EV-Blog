@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import type { ComponentType } from "react";
 import { CoolingPlateCalculator } from "@/components/calculators/CoolingPlateCalculator";
 import { HeatGenerationCalculator } from "@/components/calculators/HeatGenerationCalculator";
 import { BusBarCalculator } from "@/components/calculators/BusBarCalculator";
@@ -8,7 +9,7 @@ type Props = {
   params: Promise<{ slug: string }>;
 };
 
-const calculators: Record<string, { title: string; component: React.ComponentType<any> }> = {
+const calculators: Record<string, { title: string; component: ComponentType }> = {
   "cooling-plate": { title: "Cooling Plate Calculator", component: CoolingPlateCalculator },
   "heat-generation": { title: "Heat Generation Calculator", component: HeatGenerationCalculator },
   "bus-bar": { title: "Bus Bar Calculator", component: BusBarCalculator },

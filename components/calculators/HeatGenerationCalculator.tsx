@@ -2,6 +2,13 @@
 
 import { useState } from "react";
 
+type HeatGenerationResults = {
+  powerLoss: string;
+  energy: string;
+  voltageDrop: string;
+  efficiency: string;
+};
+
 export function HeatGenerationCalculator() {
   const [inputs, setInputs] = useState({
     current: 100,
@@ -10,7 +17,7 @@ export function HeatGenerationCalculator() {
     duration: 3600,
   });
 
-  const [results, setResults] = useState<any>(null);
+  const [results, setResults] = useState<HeatGenerationResults | null>(null);
 
   const calculate = () => {
     const { current, internalResistance, duration } = inputs;

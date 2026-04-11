@@ -2,6 +2,14 @@
 
 import { useState } from "react";
 
+type BusBarResults = {
+  resistance: string;
+  voltageDrop: string;
+  powerLoss: string;
+  currentDensity: string;
+  maxCurrentCapacity: string;
+};
+
 export function BusBarCalculator() {
   const [inputs, setInputs] = useState({
     current: 200,
@@ -12,13 +20,12 @@ export function BusBarCalculator() {
     tempRise: 30,
   });
 
-  const [results, setResults] = useState<any>(null);
+  const [results, setResults] = useState<BusBarResults | null>(null);
 
   const calculate = () => {
     const { current, length, width, thickness, material, tempRise } = inputs;
     
     const resistivity = material === "copper" ? 1.68e-8 : 2.82e-8;
-    const density = material === "copper" ? 8960 : 2700;
     const conductivity = material === "copper" ? 380 : 230;
     
     const crossSection = (width * thickness) / 1000000;
@@ -26,8 +33,6 @@ export function BusBarCalculator() {
     const voltageDrop = resistance * current;
     const powerLoss = voltageDrop * current;
     
-    const surfaceArea = (2 * (length / 1000) * (width / 1000) + 2 * (length / 1000) * (thickness / 1000)) * 1000000;
-    const powerDensity = powerLoss / surfaceArea;
     const maxCurrentDensity = conductivity * Math.sqrt(tempRise / (resistivity * length));
     
     setResults({

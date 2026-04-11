@@ -2,6 +2,18 @@
 
 import { useState } from "react";
 
+type PackSizeResults = {
+  totalCells: number;
+  numModules: number;
+  cellsPerModule: number;
+  packLength: string;
+  packWidth: string;
+  packHeight: string;
+  packVolume: string;
+  packEnergy: string;
+  moduleDimensions: string;
+};
+
 export function PackSizeCalculator() {
   const [inputs, setInputs] = useState({
     cellLength: 148,
@@ -12,7 +24,7 @@ export function PackSizeCalculator() {
     moduleSize: 24,
   });
 
-  const [results, setResults] = useState<any>(null);
+  const [results, setResults] = useState<PackSizeResults | null>(null);
 
   const calculate = () => {
     const { cellLength, cellWidth, cellHeight, cellsParallel, cellsSeries, moduleSize } = inputs;
@@ -32,7 +44,6 @@ export function PackSizeCalculator() {
     const packHeight = moduleHeight + 50;
     
     const packVolume = (packLength * packWidth * packHeight) / 1000000000;
-    const energyDensity = 300;
     const packEnergy = (totalCells * 3.7 * 200) / 1000;
     
     setResults({

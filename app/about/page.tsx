@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 
 const marqueeTags = [
   "BMS DESIGN", "LFP / NA-ION", "IMMERSION COOLING", "SWAPPABLE BATTERY",
@@ -7,17 +7,17 @@ const marqueeTags = [
 
 const topics = [
   {
-    icon: "🔋",
+    icon: "ðŸ”‹",
     title: "BMS & Algorithm Design",
     description: "SOC/SOH estimation, CAN architecture, J1939 protocol, Simulink MBD",
   },
   {
-    icon: "⚡",
+    icon: "âš¡",
     title: "Cell Chemistry & Degradation",
     description: "LFP, NMC, Na-ion, ACIR analysis, cycle aging",
   },
   {
-    icon: "🌡️",
+    icon: "ðŸŒ¡ï¸",
     title: "Thermal & Pack Systems",
     description: "Immersion cooling, swappable architectures, heat recovery, pack-level safety",
   },
@@ -25,7 +25,7 @@ const topics = [
 
 const experience = [
   {
-    role: "Deputy Manager — Battery Systems",
+    role: "Deputy Manager â€” Battery Systems",
     company: "Volvo Eicher Commercial Vehicles",
     details: "End-to-end pack development across electric buses, trucks and LCVs. From architecture to homologation.",
     duration: "3+ Years",
@@ -33,8 +33,8 @@ const experience = [
   },
   {
     role: "M.E. Design Engineering",
-    company: "BITS Pilani · Postgraduate",
-    details: "GATE 2021 — All India Top 1%",
+    company: "BITS Pilani Â· Postgraduate",
+    details: "GATE 2021 â€” All India Top 1%",
     duration: "Masters",
     type: "",
   },
@@ -55,29 +55,29 @@ export default function AboutPage() {
         <div className="about-hero-left">
           <p className="about-label">ABOUT VOLTPULSE</p>
           <h1 className="about-hero-heading">
-            Hi, I'm<br />
+            Hi, I&apos;m<br />
             <span className="about-hero-name">Sai Chaitanya.</span>
           </h1>
-          <p className="about-hero-subtitle">Battery Systems Engineer ✦</p>
+          <p className="about-hero-subtitle">Battery Systems Engineer âœ¦</p>
           <p className="about-hero-text">
-            I've spent 3+ years inside commercial EV development — designing packs, writing BMS logic, and navigating homologation. VoltPulse is where I put what I've actually learned into writing.
+            I&apos;ve spent 3+ years inside commercial EV development â€” designing packs, writing BMS logic, and navigating homologation. VoltPulse is where I put what I&apos;ve actually learned into writing.
           </p>
           <div className="about-checkmarks">
-            <span className="about-check">✓</span>
-            <span>From cell to system — immersion cooling to swappable packs</span>
+            <span className="about-check">âœ“</span>
+            <span>From cell to system â€” immersion cooling to swappable packs</span>
           </div>
           <div className="about-checkmarks">
-            <span className="about-check">✓</span>
+            <span className="about-check">âœ“</span>
             <span>Standards-aware, not standards-obsessed</span>
           </div>
           <div className="about-checkmarks">
-            <span className="about-check">✓</span>
+            <span className="about-check">âœ“</span>
             <span>Written from the bench, not the boardroom</span>
           </div>
           <div className="about-hero-buttons">
-            <Link href="/contact" className="about-btn-black">Let's Talk</Link>
-            <a href="https://www.linkedin.com/in/dasarisaisrinivasachaitanya" target="_blank" rel="noreferrer" className="about-btn-outline">LinkedIn ↗</a>
-            <a href="https://github.com/saichaitanyadasari99-lab" target="_blank" rel="noreferrer" className="about-btn-outline">GitHub ↗</a>
+            <Link href="/contact" className="about-btn-black">Let&apos;s Talk</Link>
+            <a href="https://www.linkedin.com/in/dasarisaisrinivasachaitanya" target="_blank" rel="noreferrer" className="about-btn-outline">LinkedIn â†—</a>
+            <a href="https://github.com/saichaitanyadasari99-lab" target="_blank" rel="noreferrer" className="about-btn-outline">GitHub â†—</a>
           </div>
         </div>
         <div className="about-hero-right">
@@ -105,7 +105,7 @@ export default function AboutPage() {
       <section className="about-marquee">
         <div className="about-marquee-track">
           {[...marqueeTags, ...marqueeTags].map((tag, idx) => (
-            <span key={idx} className="about-marquee-item">⟡ {tag}</span>
+            <span key={idx} className="about-marquee-item">âŸ¡ {tag}</span>
           ))}
         </div>
       </section>
@@ -122,7 +122,7 @@ export default function AboutPage() {
               <div className="about-card-icon-box">{topic.icon}</div>
               <h3 className="about-card-title">{topic.title}</h3>
               <p className="about-card-desc">{topic.description}</p>
-              <Link href="/blogs" className="about-card-link">Read more →</Link>
+              <Link href="/blogs" className="about-card-link">Read more â†’</Link>
             </article>
           ))}
         </div>
@@ -150,3 +150,4 @@ export default function AboutPage() {
     </main>
   );
 }
+

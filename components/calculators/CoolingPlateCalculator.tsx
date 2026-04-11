@@ -1,6 +1,21 @@
 "use client";
 
 import { useState } from "react";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+
+type CoolingResults = {
+  requiredFlowRate: string;
+  massFlow: string;
+  heatFlux: string;
+  deltaT: string;
+  requiredFlowRateLmin: string;
+};
+
+type CoolingChartPoint = {
+  flowRate: number;
+  tempRise: number;
+  heatFlux: number;
+};
 
 export function CoolingPlateCalculator() {
   const [inputs, setInputs] = useState({
@@ -13,14 +28,13 @@ export function CoolingPlateCalculator() {
     flowRate: 2,
   });
 
-  const [results, setResults] = useState<any>(null);
+  const [results, setResults] = useState<CoolingResults | null>(null);
+  const [chartData, setChartData] = useState<CoolingChartPoint[]>([]);
 
   const calculate = () => {
     const { heatLoad, inletTemp, outletTemp, plateLength, plateWidth, flowRate } = inputs;
     const Cp = 4186;
     const rho = 1000;
-    const k = 200;
-    const thicknessM = inputs.thickness / 1000;
     
     const deltaT = outletTemp - inletTemp;
     const massFlow = (flowRate / 60) * rho;
@@ -28,8 +42,16 @@ export function CoolingPlateCalculator() {
     
     const area = (plateLength / 1000) * (plateWidth / 1000);
     const q = heatLoad / area;
-    const U = k / thicknessM;
-    const LMTD = ((outletTemp - inletTemp) / Math.log(1 + (outletTemp - inletTemp) / (inletTemp - 25))) || deltaT;
+    
+    const flowData = [];
+    for (let f = 0.5; f <= 5; f += 0.5) {
+      const tempRise = heatLoad / (Cp * (f / 60) * rho);
+      flowData.push({
+        flowRate: f,
+        tempRise: parseFloat(tempRise.toFixed(1)),
+        heatFlux: parseFloat(q.toFixed(0)),
+      });
+    }
     
     setResults({
       requiredFlowRate: requiredFlow.toFixed(2),
@@ -38,6 +60,7 @@ export function CoolingPlateCalculator() {
       deltaT: deltaT.toFixed(1),
       requiredFlowRateLmin: (requiredFlow * 60 / rho).toFixed(2),
     });
+    setChartData(flowData);
   };
 
   return (
@@ -72,7 +95,7 @@ export function CoolingPlateCalculator() {
           <input type="number" value={inputs.flowRate} onChange={(e) => setInputs({...inputs, flowRate: +e.target.value})} />
         </div>
       </div>
-      <button className="calc-btn" onClick={calculate}>Calculate</button>
+      <button className="calc-btn" onClick={calculate}>Run</button>
       {results && (
         <div className="calc-results">
           <h4>Results</h4>
@@ -88,6 +111,20 @@ export function CoolingPlateCalculator() {
             <span>Temperature Rise:</span>
             <span className="result-value">{results.deltaT} °C</span>
           </div>
+        </div>
+      )}
+      {chartData.length > 0 && (
+        <div className="calc-chart">
+          <h4>Flow Rate vs Temperature Rise</h4>
+          <ResponsiveContainer width="100%" height={250}>
+            <LineChart data={chartData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+              <XAxis dataKey="flowRate" stroke="var(--text2)" fontSize={12} />
+              <YAxis stroke="var(--text2)" fontSize={12} />
+              <Tooltip contentStyle={{ background: 'var(--surface)', border: '1px solid var(--border)' }} />
+              <Line type="monotone" dataKey="tempRise" stroke="var(--accent)" strokeWidth={2} dot={false} />
+            </LineChart>
+          </ResponsiveContainer>
         </div>
       )}
     </div>

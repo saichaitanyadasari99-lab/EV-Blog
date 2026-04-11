@@ -32,6 +32,11 @@ function normalizeEncoding(input: string) {
     .replaceAll("Î©", "Ω");
 }
 
+function buildUploadPath(prefix: string, fileName: string) {
+  const ext = fileName.split(".").pop() || "bin";
+  return `${prefix}-${crypto.randomUUID()}.${ext}`;
+}
+
 function formatInline(text: string) {
   // Extract images and links BEFORE HTML escaping so URLs are never mangled.
   // Replace each match with a null-byte-delimited index placeholder, then
@@ -254,8 +259,7 @@ export function Editor({ initialPost }: Props) {
 
   const uploadImageToEditor = async (file: File) => {
     const supabase = getBrowserSupabaseClient();
-    const ext = file.name.split(".").pop();
-    const path = `editor-${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+    const path = buildUploadPath("editor", file.name);
     setStatus("Uploading image...");
     const { error } = await supabase.storage.from("media").upload(path, file, { upsert: false });
     if (error) { setStatus(error.message); return; }
@@ -355,8 +359,7 @@ export function Editor({ initialPost }: Props) {
 
   const uploadCover = async (file: File) => {
     const supabase = getBrowserSupabaseClient();
-    const ext = file.name.split(".").pop();
-    const path = `cover-${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+    const path = buildUploadPath("cover", file.name);
     setUploadingCover(true);
     setStatus("Uploading cover image...");
     const { error } = await supabase.storage.from("media").upload(path, file, { upsert: false });
