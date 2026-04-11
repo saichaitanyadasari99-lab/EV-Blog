@@ -1,8 +1,8 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
-import { getBrowserSupabaseClient } from "@/lib/supabase/client";
+import { useUploadThing } from "@/lib/uploadthing";
 
 type Props = {
   onUploaded: (url: string, type: "image" | "video" | "pdf" | "doc") => void;
@@ -10,45 +10,44 @@ type Props = {
 
 export function MediaUpload({ onUploaded }: Props) {
   const [status, setStatus] = useState<string>("");
-  const supabase = useMemo(() => getBrowserSupabaseClient(), []);
 
-  const getFileType = (file: File): "image" | "video" | "pdf" | "doc" => {
-    if (file.type.includes("pdf")) return "pdf";
-    if (file.type.startsWith("video/")) return "video";
-    if (file.type.startsWith("image/")) return "image";
+  const getFileType = (name: string): "image" | "video" | "pdf" | "doc" => {
+    const ext = name.split(".").pop()?.toLowerCase() || "";
+    if (ext === "pdf") return "pdf";
+    if (["mp4", "webm", "mov", "avi"].includes(ext)) return "video";
+    if (["jpg", "jpeg", "png", "gif", "webp", "svg"].includes(ext)) return "image";
     return "doc";
   };
+
+  const { startUpload, isUploading } = useUploadThing("media", {
+    onClientUploadComplete: (res) => {
+      if (res && res[0]) {
+        const url = res[0].url;
+        const name = res[0].name;
+        const type = getFileType(name);
+        onUploaded(url, type);
+        setStatus("Uploaded");
+      }
+    },
+    onUploadError: (error) => {
+      setStatus(`Error: ${error.message}`);
+    },
+  });
 
   const onDrop = useCallback(
     async (files: File[]) => {
       const file = files[0];
       if (!file) return;
-
-      const ext = file.name.split(".").pop();
-      const path = `${crypto.randomUUID()}.${ext || "bin"}`;
       setStatus("Uploading...");
-
-      const { error } = await supabase.storage.from("media").upload(path, file, {
-        upsert: false,
-      });
-
-      if (error) {
-        setStatus(error.message);
-        return;
-      }
-
-      const {
-        data: { publicUrl },
-      } = supabase.storage.from("media").getPublicUrl(path);
-
-      const type = getFileType(file);
-      onUploaded(publicUrl, type);
-      setStatus("Uploaded");
+      await startUpload([file]);
     },
-    [onUploaded, supabase],
+    [startUpload]
   );
 
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({ 
+    onDrop,
+    disabled: isUploading 
+  });
 
   return (
     <div
@@ -58,7 +57,9 @@ export function MediaUpload({ onUploaded }: Props) {
       <input {...getInputProps()} />
       <p className="text-sm text-[var(--ink-soft)]">
         {isDragActive
-          ? "Drop to upload into Supabase Storage/media"
+          ? "Drop to upload into UploadThing"
+          : isUploading
+          ? "Uploading..."
           : "Drag image/PDF/video/doc or click to upload"}
       </p>
       {status ? <p className="mt-2 text-xs text-[var(--accent)]">{status}</p> : null}

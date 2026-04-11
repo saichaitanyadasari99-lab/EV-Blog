@@ -12,6 +12,10 @@ export const uploadRouter = {
       maxFileSize: "16MB",
       maxFileCount: 1,
     },
+    "application/pdf": {
+      maxFileSize: "4MB",
+      maxFileCount: 5,
+    },
   }).onUploadComplete(({ file }) => {
     console.log("Upload complete:", file.name);
   }),
