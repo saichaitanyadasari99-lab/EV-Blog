@@ -7,6 +7,7 @@ import { tiptapExtensions } from "@/lib/tiptap";
 import { parseTiptapJson } from "@/lib/tiptap";
 import { MediaUpload } from "@/components/MediaUpload";
 import { getBrowserSupabaseClient } from "@/lib/supabase/client";
+import { useUploadThing } from "@/lib/uploadthing";
 import type { PostRecord } from "@/types/post";
 
 type Props = {
@@ -257,15 +258,34 @@ export function Editor({ initialPost }: Props) {
   const coverFileRef = useRef<HTMLInputElement | null>(null);
   const markdownFileRef = useRef<HTMLInputElement | null>(null);
 
+  const { startUpload: uploadToEditor, isUploading: isUploadingEditor } = useUploadThing("media", {
+    onClientUploadComplete: (res) => {
+      if (res && res[0] && editor) {
+        editor.chain().focus().setImage({ src: res[0].url }).run();
+        setStatus("Image added.");
+      }
+    },
+    onUploadError: (error) => {
+      setStatus(`Error: ${error.message}`);
+    },
+  });
+
+  const { startUpload: uploadCoverToUt, isUploading: isUploadingCoverUt } = useUploadThing("media", {
+    onClientUploadComplete: (res) => {
+      if (res && res[0]) {
+        setCoverUrl(res[0].url);
+        setStatus("Cover image uploaded.");
+      }
+    },
+    onUploadError: (error) => {
+      setStatus(`Error: ${error.message}`);
+      setUploadingCover(false);
+    },
+  });
+
   const uploadImageToEditor = async (file: File) => {
-    const supabase = getBrowserSupabaseClient();
-    const path = buildUploadPath("editor", file.name);
     setStatus("Uploading image...");
-    const { error } = await supabase.storage.from("media").upload(path, file, { upsert: false });
-    if (error) { setStatus(error.message); return; }
-    const { data: { publicUrl } } = supabase.storage.from("media").getPublicUrl(path);
-    if (editor) editor.chain().focus().setImage({ src: publicUrl }).run();
-    setStatus("Image added.");
+    await uploadToEditor([file]);
   };
 
   useEffect(() => {
@@ -358,15 +378,9 @@ export function Editor({ initialPost }: Props) {
   };
 
   const uploadCover = async (file: File) => {
-    const supabase = getBrowserSupabaseClient();
-    const path = buildUploadPath("cover", file.name);
     setUploadingCover(true);
     setStatus("Uploading cover image...");
-    const { error } = await supabase.storage.from("media").upload(path, file, { upsert: false });
-    if (error) { setStatus(error.message); setUploadingCover(false); return; }
-    const { data: { publicUrl } } = supabase.storage.from("media").getPublicUrl(path);
-    setCoverUrl(publicUrl);
-    setStatus("Cover image uploaded.");
+    await uploadCoverToUt([file]);
     setUploadingCover(false);
   };
 
