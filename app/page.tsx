@@ -106,10 +106,12 @@ export default async function HomePage() {
       </section>
       <section className="calc-grid-home">
         {[
-          { name: "Cooling Plate", slug: "cooling-plate" },
-          { name: "Heat Generation", slug: "heat-generation" },
-          { name: "Bus Bar", slug: "bus-bar" },
-          { name: "Pack Size", slug: "pack-size" },
+          { name: "Battery Pack Designer", slug: "pack-size" },
+          { name: "Thermal Load Analyzer", slug: "heat-generation" },
+          { name: "Cooling System Sizing", slug: "cooling-plate" },
+          { name: "Bus Bar & Fusing", slug: "bus-bar" },
+          { name: "SOC Estimator", slug: "soc-estimator" },
+          { name: "Charging Time", slug: "charging-time" },
         ].map((calc) => (
           <Link key={calc.slug} href={`/calculators/${calc.slug}`} className="calc-card-home">
             <span className="calc-icon">⚡</span>

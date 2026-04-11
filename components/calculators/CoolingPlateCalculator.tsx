@@ -1,132 +1,277 @@
-"use client";
+﻿"use client";
 
-import { useState } from "react";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import { useMemo, useState } from "react";
+import {
+  CartesianGrid,
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
+import { NumberField, downloadCsv, toCsv, useShareUrl } from "./common";
 
-type CoolingResults = {
-  requiredFlowRate: string;
-  massFlow: string;
-  heatFlux: string;
-  deltaT: string;
-  requiredFlowRateLmin: string;
+type Coolant = "water-glycol" | "water" | "oil";
+type PlateMaterial = "al6061" | "al3003" | "copper";
+
+const COOLANT_DATA: Record<Coolant, { density: number; cp: number; viscosity: number; thermalK: number }> = {
+  "water-glycol": { density: 1040, cp: 3500, viscosity: 0.0035, thermalK: 0.41 },
+  water: { density: 998, cp: 4186, viscosity: 0.0010, thermalK: 0.60 },
+  oil: { density: 870, cp: 2100, viscosity: 0.0190, thermalK: 0.14 },
 };
 
-type CoolingChartPoint = {
-  flowRate: number;
-  tempRise: number;
-  heatFlux: number;
+const MATERIAL_K: Record<PlateMaterial, number> = {
+  al6061: 167,
+  al3003: 155,
+  copper: 385,
+};
+
+type Inputs = {
+  coolant: Coolant;
+  inletC: number;
+  outletTargetC: number;
+  flowLpm: number;
+  channelWidthMm: number;
+  channelDepthMm: number;
+  channelCount: number;
+  channelLengthMm: number;
+  plateMaterial: PlateMaterial;
+  heatLoadW: number;
+};
+
+const DEFAULTS: Inputs = {
+  coolant: "water-glycol",
+  inletC: 28,
+  outletTargetC: 35,
+  flowLpm: 8,
+  channelWidthMm: 4,
+  channelDepthMm: 2.5,
+  channelCount: 10,
+  channelLengthMm: 520,
+  plateMaterial: "al6061",
+  heatLoadW: 6500,
 };
 
 export function CoolingPlateCalculator() {
-  const [inputs, setInputs] = useState({
-    heatLoad: 500,
-    inletTemp: 25,
-    outletTemp: 35,
-    plateLength: 300,
-    plateWidth: 200,
-    thickness: 3,
-    flowRate: 2,
+  const [inputs, setInputs] = useState<Inputs>(DEFAULTS);
+
+  const results = useMemo(() => {
+    const coolant = COOLANT_DATA[inputs.coolant];
+    const areaOneChannel = (inputs.channelWidthMm / 1000) * (inputs.channelDepthMm / 1000);
+    const totalArea = areaOneChannel * inputs.channelCount;
+
+    const volumetricFlowM3s = inputs.flowLpm / 60_000;
+    const velocity = volumetricFlowM3s / Math.max(totalArea, 1e-7);
+
+    const hydraulicDiameter =
+      (2 * (inputs.channelWidthMm / 1000) * (inputs.channelDepthMm / 1000)) /
+      ((inputs.channelWidthMm + inputs.channelDepthMm) / 1000);
+
+    const reynolds = (coolant.density * velocity * hydraulicDiameter) / coolant.viscosity;
+    const regime = reynolds < 2300 ? "laminar" : reynolds < 4000 ? "transition" : "turbulent";
+
+    const prandtl = (coolant.cp * coolant.viscosity) / coolant.thermalK;
+    const nusselt = reynolds < 2300 ? 3.66 : 0.023 * Math.pow(reynolds, 0.8) * Math.pow(prandtl, 0.4);
+    const h = (nusselt * coolant.thermalK) / hydraulicDiameter;
+
+    const deltaT = Math.max(inputs.outletTargetC - inputs.inletC, 1);
+    const requiredFlowM3s = inputs.heatLoadW / (coolant.density * coolant.cp * deltaT);
+    const requiredFlowLpm = requiredFlowM3s * 60_000;
+
+    const f = reynolds < 2300 ? 64 / Math.max(reynolds, 1) : 0.3164 / Math.pow(Math.max(reynolds, 1), 0.25);
+    const channelLengthM = inputs.channelLengthMm / 1000;
+    const dpPa = f * (channelLengthM / Math.max(hydraulicDiameter, 1e-5)) * (coolant.density * velocity * velocity / 2);
+    const dpBar = dpPa / 100_000;
+
+    const plateK = MATERIAL_K[inputs.plateMaterial];
+    const conductancePenalty = 1 + 180 / plateK;
+
+    const flowCurve = Array.from({ length: 12 }, (_, idx) => {
+      const flow = 2 + idx * 1.5;
+      const q = flow / 60_000;
+      const vel = q / Math.max(totalArea, 1e-7);
+      const re = (coolant.density * vel * hydraulicDiameter) / coolant.viscosity;
+      const nu = re < 2300 ? 3.66 : 0.023 * Math.pow(re, 0.8) * Math.pow(prandtl, 0.4);
+      const hLocal = (nu * coolant.thermalK) / hydraulicDiameter;
+      const heatFlux = (hLocal * (inputs.outletTargetC - inputs.inletC)) / conductancePenalty;
+      return { flowLpm: Number(flow.toFixed(1)), heatFlux: Number(heatFlux.toFixed(0)) };
+    });
+
+    const pumpHeadM = (dpPa / (coolant.density * 9.81)).toFixed(2);
+
+    return {
+      reynolds,
+      regime,
+      nusselt,
+      h,
+      requiredFlowLpm,
+      dpPa,
+      dpBar,
+      pumpHeadM,
+      flowCurve,
+    };
+  }, [inputs]);
+
+  const shareUrl = useShareUrl("cooling-plate", {
+    flow: inputs.flowLpm,
+    q: inputs.heatLoadW,
+    cool: inputs.coolant,
+    w: inputs.channelWidthMm,
+    d: inputs.channelDepthMm,
   });
 
-  const [results, setResults] = useState<CoolingResults | null>(null);
-  const [chartData, setChartData] = useState<CoolingChartPoint[]>([]);
-
-  const calculate = () => {
-    const { heatLoad, inletTemp, outletTemp, plateLength, plateWidth, flowRate } = inputs;
-    const Cp = 4186;
-    const rho = 1000;
-    
-    const deltaT = outletTemp - inletTemp;
-    const massFlow = (flowRate / 60) * rho;
-    const requiredFlow = heatLoad / (Cp * deltaT);
-    
-    const area = (plateLength / 1000) * (plateWidth / 1000);
-    const q = heatLoad / area;
-    
-    const flowData = [];
-    for (let f = 0.5; f <= 5; f += 0.5) {
-      const tempRise = heatLoad / (Cp * (f / 60) * rho);
-      flowData.push({
-        flowRate: f,
-        tempRise: parseFloat(tempRise.toFixed(1)),
-        heatFlux: parseFloat(q.toFixed(0)),
-      });
-    }
-    
-    setResults({
-      requiredFlowRate: requiredFlow.toFixed(2),
-      massFlow: massFlow.toFixed(2),
-      heatFlux: q.toFixed(0),
-      deltaT: deltaT.toFixed(1),
-      requiredFlowRateLmin: (requiredFlow * 60 / rho).toFixed(2),
-    });
-    setChartData(flowData);
+  const exportResults = () => {
+    const csv = toCsv([
+      {
+        coolant: inputs.coolant,
+        reynolds: results.reynolds.toFixed(0),
+        regime: results.regime,
+        nusselt: results.nusselt.toFixed(2),
+        heat_transfer_coefficient: results.h.toFixed(0),
+        required_flow_lpm: results.requiredFlowLpm.toFixed(2),
+        pressure_drop_pa: results.dpPa.toFixed(0),
+        pressure_drop_bar: results.dpBar.toFixed(3),
+      },
+    ]);
+    downloadCsv("cooling-system-sizing.csv", csv);
   };
 
+  const regimeClass = results.regime === "turbulent" ? "ok" : results.regime === "transition" ? "warn" : "danger";
+
   return (
-    <div className="calc-form">
-      <div className="calc-inputs">
+    <div className="calc-split">
+      <section className="calc-panel">
         <div className="input-group">
-          <label>Heat Load (W)</label>
-          <input type="number" value={inputs.heatLoad} onChange={(e) => setInputs({...inputs, heatLoad: +e.target.value})} />
+          <label>Coolant</label>
+          <select value={inputs.coolant} onChange={(event) => setInputs((prev) => ({ ...prev, coolant: event.target.value as Coolant }))}>
+            <option value="water-glycol">Water-glycol 50/50</option>
+            <option value="water">Pure water</option>
+            <option value="oil">Dielectric oil</option>
+          </select>
         </div>
+
         <div className="input-group">
-          <label>Inlet Temperature (°C)</label>
-          <input type="number" value={inputs.inletTemp} onChange={(e) => setInputs({...inputs, inletTemp: +e.target.value})} />
+          <label>Plate Material</label>
+          <select value={inputs.plateMaterial} onChange={(event) => setInputs((prev) => ({ ...prev, plateMaterial: event.target.value as PlateMaterial }))}>
+            <option value="al6061">Al 6061</option>
+            <option value="al3003">Al 3003</option>
+            <option value="copper">Copper</option>
+          </select>
         </div>
-        <div className="input-group">
-          <label>Outlet Temperature (°C)</label>
-          <input type="number" value={inputs.outletTemp} onChange={(e) => setInputs({...inputs, outletTemp: +e.target.value})} />
+
+        <NumberField
+          label="Heat Load"
+          value={inputs.heatLoadW}
+          min={500}
+          max={20000}
+          step={100}
+          unit="W"
+          onChange={(value) => setInputs((prev) => ({ ...prev, heatLoadW: value }))}
+        />
+
+        <NumberField
+          label="Inlet Temperature"
+          value={inputs.inletC}
+          min={5}
+          max={60}
+          step={1}
+          unit="C"
+          onChange={(value) => setInputs((prev) => ({ ...prev, inletC: value }))}
+        />
+
+        <NumberField
+          label="Target Outlet Temperature"
+          value={inputs.outletTargetC}
+          min={10}
+          max={75}
+          step={1}
+          unit="C"
+          onChange={(value) => setInputs((prev) => ({ ...prev, outletTargetC: value }))}
+        />
+
+        <NumberField
+          label="Flow Rate"
+          value={inputs.flowLpm}
+          min={1}
+          max={30}
+          step={0.2}
+          unit="LPM"
+          onChange={(value) => setInputs((prev) => ({ ...prev, flowLpm: value }))}
+        />
+
+        <NumberField
+          label="Channel Width"
+          value={inputs.channelWidthMm}
+          min={1}
+          max={12}
+          step={0.1}
+          unit="mm"
+          onChange={(value) => setInputs((prev) => ({ ...prev, channelWidthMm: value }))}
+        />
+
+        <NumberField
+          label="Channel Depth"
+          value={inputs.channelDepthMm}
+          min={0.6}
+          max={8}
+          step={0.1}
+          unit="mm"
+          onChange={(value) => setInputs((prev) => ({ ...prev, channelDepthMm: value }))}
+        />
+
+        <NumberField
+          label="Number of Channels"
+          value={inputs.channelCount}
+          min={2}
+          max={40}
+          step={1}
+          onChange={(value) => setInputs((prev) => ({ ...prev, channelCount: Math.round(value) }))}
+        />
+
+        <NumberField
+          label="Channel Length"
+          value={inputs.channelLengthMm}
+          min={80}
+          max={1200}
+          step={10}
+          unit="mm"
+          onChange={(value) => setInputs((prev) => ({ ...prev, channelLengthMm: value }))}
+        />
+
+        <div className="calc-actions">
+          <button className="calc-btn" type="button" onClick={exportResults}>Export CSV</button>
+          <a className="calc-link" href={shareUrl}>Share Config URL</a>
         </div>
-        <div className="input-group">
-          <label>Plate Length (mm)</label>
-          <input type="number" value={inputs.plateLength} onChange={(e) => setInputs({...inputs, plateLength: +e.target.value})} />
+      </section>
+
+      <section className="calc-panel">
+        <div className="calc-results-grid">
+          <article className="result-card"><p>Reynolds Number</p><h4>{results.reynolds.toFixed(0)}</h4></article>
+          <article className="result-card"><p>Nusselt Number</p><h4>{results.nusselt.toFixed(2)}</h4></article>
+          <article className="result-card"><p>Heat Transfer Coeff.</p><h4>{results.h.toFixed(0)} W/m2K</h4></article>
+          <article className="result-card"><p>Required Flow</p><h4>{results.requiredFlowLpm.toFixed(2)} LPM</h4></article>
+          <article className="result-card"><p>Pressure Drop</p><h4>{results.dpPa.toFixed(0)} Pa</h4></article>
+          <article className="result-card"><p>Pressure Drop</p><h4>{results.dpBar.toFixed(3)} bar</h4></article>
         </div>
-        <div className="input-group">
-          <label>Plate Width (mm)</label>
-          <input type="number" value={inputs.plateWidth} onChange={(e) => setInputs({...inputs, plateWidth: +e.target.value})} />
+
+        <div className={`calc-alert ${regimeClass}`}>
+          Flow regime: {results.regime}. Recommended pump head: {results.pumpHeadM} m, rated flow {Math.max(results.requiredFlowLpm, inputs.flowLpm).toFixed(1)} LPM.
         </div>
-        <div className="input-group">
-          <label>Channel Thickness (mm)</label>
-          <input type="number" value={inputs.thickness} onChange={(e) => setInputs({...inputs, thickness: +e.target.value})} />
-        </div>
-        <div className="input-group">
-          <label>Flow Rate (L/min)</label>
-          <input type="number" value={inputs.flowRate} onChange={(e) => setInputs({...inputs, flowRate: +e.target.value})} />
-        </div>
-      </div>
-      <button className="calc-btn" onClick={calculate}>Run</button>
-      {results && (
-        <div className="calc-results">
-          <h4>Results</h4>
-          <div className="result-item">
-            <span>Required Flow Rate:</span>
-            <span className="result-value">{results.requiredFlowRateLmin} L/min</span>
-          </div>
-          <div className="result-item">
-            <span>Heat Flux:</span>
-            <span className="result-value">{results.heatFlux} W/m²</span>
-          </div>
-          <div className="result-item">
-            <span>Temperature Rise:</span>
-            <span className="result-value">{results.deltaT} °C</span>
-          </div>
-        </div>
-      )}
-      {chartData.length > 0 && (
+
         <div className="calc-chart">
-          <h4>Flow Rate vs Temperature Rise</h4>
-          <ResponsiveContainer width="100%" height={250}>
-            <LineChart data={chartData}>
+          <h4>Heat Flux vs Flow Rate</h4>
+          <ResponsiveContainer width="100%" height={240}>
+            <LineChart data={results.flowCurve}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-              <XAxis dataKey="flowRate" stroke="var(--text2)" fontSize={12} />
-              <YAxis stroke="var(--text2)" fontSize={12} />
-              <Tooltip contentStyle={{ background: 'var(--surface)', border: '1px solid var(--border)' }} />
-              <Line type="monotone" dataKey="tempRise" stroke="var(--accent)" strokeWidth={2} dot={false} />
+              <XAxis dataKey="flowLpm" stroke="var(--text2)" />
+              <YAxis stroke="var(--text2)" />
+              <Tooltip contentStyle={{ background: "var(--surface)", border: "1px solid var(--border)" }} />
+              <Line type="monotone" dataKey="heatFlux" stroke="var(--accent)" strokeWidth={2} dot={false} />
             </LineChart>
           </ResponsiveContainer>
         </div>
-      )}
+      </section>
     </div>
   );
 }
