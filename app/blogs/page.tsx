@@ -1,5 +1,7 @@
-﻿import { PostCard } from "@/components/PostCard";
+import { PostCard } from "@/components/PostCard";
 import { getPublishedPosts } from "@/lib/posts";
+import { getCategoryTone } from "@/lib/category-theme";
+import Link from "next/link";
 
 type SectionSpec = {
   title: string;
@@ -16,6 +18,15 @@ const defaultSections: SectionSpec[] = [
   { title: "Standards and Compliance", keyword: "Keywords: UN ECE R100, UL 2580, ISO 15118, IEC 61851", category: "standards" },
   { title: "News", keyword: "Keywords: Latest EV and battery industry news", category: "news" },
 ];
+
+const CATEGORY_ICONS: Record<string, string> = {
+  "cell-chemistry": "🔋",
+  "bms-design": "🧠",
+  "ev-benchmarks": "📊",
+  "vehicle-reviews": "🚗",
+  "standards": "📋",
+  "news": "📰",
+};
 
 const categoryAliases: Record<string, string> = {
   post: "cell-chemistry",
@@ -71,12 +82,27 @@ export default async function BlogsPage() {
     return a.localeCompare(b);
   });
 
-  return (
+return (
     <main className="page-main wrapper">
       <section className="page-hero page-hero-center">
         <div className="hero-badge">BLOGS</div>
         <h1 className="page-title">All Published Articles</h1>
         <p className="page-subtitle">A complete archive of EV battery research notes, benchmarks, and explainers.</p>
+      </section>
+
+      <section className="category-cards">
+        {sortedCategories.map((category) => {
+          const categoryPosts = grouped.get(category) ?? [];
+          const tone = getCategoryTone(category);
+          const icon = CATEGORY_ICONS[category] || "📄";
+          return (
+            <Link key={category} href={`/category/${category}`} className="category-card" style={{ borderColor: tone }}>
+              <span className="category-icon">{icon}</span>
+              <span className="category-name">{getSectionTitle(category)}</span>
+              <span className="category-count">{categoryPosts.length} articles</span>
+            </Link>
+          );
+        })}
       </section>
 
       {sortedCategories.map((category) => {
