@@ -85,3 +85,45 @@ export function downloadCsv(filename: string, csv: string) {
   document.body.removeChild(anchor);
   URL.revokeObjectURL(url);
 }
+
+type InputSectionProps = {
+  title: string;
+  children: React.ReactNode;
+};
+
+export function InputSection({ title, children }: InputSectionProps) {
+  return (
+    <div className="input-section">
+      <h3 className="input-section-title">{title}</h3>
+      {children}
+    </div>
+  );
+}
+
+type Step = {
+  title: string;
+  formula: string;
+  result: string;
+};
+
+type StepByStepProps = {
+  steps: Step[];
+};
+
+export function StepByStep({ steps }: StepByStepProps) {
+  return (
+    <div className="step-by-step">
+      <h4>Calculation Steps</h4>
+      {steps.map((step, index) => (
+        <div key={index} className="step">
+          <div className="step-header">
+            <span className="step-number">{index + 1}</span>
+            <span className="step-title">{step.title}</span>
+          </div>
+          <div className="step-formula">{step.formula}</div>
+          <div className="step-result">= {step.result}</div>
+        </div>
+      ))}
+    </div>
+  );
+}
