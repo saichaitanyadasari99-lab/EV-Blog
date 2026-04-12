@@ -1,6 +1,5 @@
 import { PostCard } from "@/components/PostCard";
 import { getPublishedPosts } from "@/lib/posts";
-import { getCategoryTone } from "@/lib/category-theme";
 import Link from "next/link";
 
 type SectionSpec = {
@@ -20,12 +19,21 @@ const defaultSections: SectionSpec[] = [
 ];
 
 const CATEGORY_ICONS: Record<string, string> = {
-  "cell-chemistry": "🔋",
-  "bms-design": "🧠",
-  "ev-benchmarks": "📊",
-  "vehicle-reviews": "🚗",
-  "standards": "📋",
-  "news": "📰",
+  "cell-chemistry": "◉",
+  "bms-design": "◈",
+  "ev-benchmarks": "◎",
+  "vehicle-reviews": "◇",
+  "standards": "◻",
+  "news": "◉",
+};
+
+const CATEGORY_COLORS: Record<string, string> = {
+  "cell-chemistry": "#00d8f2",
+  "bms-design": "#7c3aed",
+  "ev-benchmarks": "#ff6b35",
+  "vehicle-reviews": "#00d68f",
+  "standards": "#ffd60a",
+  "news": "#00d8f2",
 };
 
 const categoryAliases: Record<string, string> = {
@@ -93,11 +101,11 @@ return (
       <section className="category-cards">
         {sortedCategories.map((category) => {
           const categoryPosts = grouped.get(category) ?? [];
-          const tone = getCategoryTone(category);
-          const icon = CATEGORY_ICONS[category] || "📄";
+          const color = CATEGORY_COLORS[category] || "#00d8f2";
+          const icon = CATEGORY_ICONS[category] || "◎";
           return (
-            <Link key={category} href={`/category/${category}`} className="category-card" style={{ borderColor: tone }}>
-              <span className="category-icon">{icon}</span>
+            <Link key={category} href={`/category/${category}`} className="category-card" style={{ borderColor: color }}>
+              <span className="category-icon" style={{ color: color }}>{icon}</span>
               <span className="category-name">{getSectionTitle(category)}</span>
               <span className="category-count">{categoryPosts.length} articles</span>
             </Link>

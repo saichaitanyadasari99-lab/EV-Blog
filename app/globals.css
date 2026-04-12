@@ -746,34 +746,38 @@ a {
   align-items: center;
   background: var(--surface);
   border: 2px solid var(--border);
-  border-radius: 12px;
+  border-radius: 8px;
   display: flex;
   flex-direction: column;
   gap: 4px;
-  padding: 16px 24px;
+  padding: 12px 20px;
   text-decoration: none;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: all 0.2s ease;
+  min-width: 120px;
 }
 
 .category-card:hover {
+  border-color: var(--accent) !important;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .category-icon {
-  font-size: 28px;
+  font-size: 24px;
+  line-height: 1;
 }
 
 .category-name {
   color: var(--text);
   font-family: var(--font-syne), sans-serif;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .category-count {
   color: var(--text2);
-  font-size: 12px;
+  font-size: 11px;
 }
 
 .section-keywords {
