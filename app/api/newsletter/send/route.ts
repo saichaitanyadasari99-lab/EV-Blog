@@ -133,11 +133,13 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const resend = new Resend(process.env.RESEND_API_KEY);
-
-  if (!process.env.RESEND_API_KEY) {
-    return NextResponse.json({ error: "RESEND_API_KEY not configured" }, { status: 500 });
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    console.error("RESEND_API_KEY is not set");
+    return NextResponse.json({ error: "RESEND_API_KEY not configured on server" }, { status: 500 });
   }
+  
+  const resend = new Resend(apiKey);
 
   try {
     const [subscribers, posts] = await Promise.all([getSubscribers(), getLatestPosts()]);
@@ -176,12 +178,19 @@ export async function POST(request: NextRequest) {
             subscriber.email
           );
           
-          await resend.emails.send({
+          const res = await resend.emails.send({
             from: "VoltPulse <news@voltPulse.com>",
             to: subscriber.email,
             subject: `⚡ New EV Battery Content - ${posts[0].title}`,
             html: personalizedHtml,
           });
+          
+          console.log("Resend response:", JSON.stringify(res));
+          
+          if (res.error) {
+            return { email: subscriber.email, status: "failed", error: res.error.message };
+          }
+          
           return { email: subscriber.email, status: "sent" };
         } catch (err) {
           return { email: subscriber.email, status: "failed", error: String(err) };
