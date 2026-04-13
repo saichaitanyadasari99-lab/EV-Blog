@@ -1,4 +1,5 @@
-﻿import Link from "next/link";
+import type { Metadata } from "next";
+import Link from "next/link";
 import type { CSSProperties } from "react";
 import { notFound } from "next/navigation";
 import { getCategoryTone } from "@/lib/category-theme";
@@ -23,6 +24,33 @@ function extractHeadings(html: string) {
     .map((match) => stripTags(match[1] ?? ""))
     .filter(Boolean)
     .slice(0, 8);
+}
+
+export async function generateMetadata({ params }: Params): Promise<Metadata> {
+  const { slug } = await params;
+  const post = await getPublishedPostBySlug(slug);
+  
+  if (!post) return {};
+  
+  const description = post.excerpt ?? (post.content ? stripTags(post.content).slice(0, 160) : "EV battery insights and technical analysis");
+  
+  return {
+    title: post.title,
+    description,
+    openGraph: {
+      title: post.title,
+      description,
+      type: "article",
+      url: `https://volt-pulse.com/blog/${post.slug}`,
+      images: post.cover_url ? [{ url: post.cover_url }] : [],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: post.title,
+      description,
+      images: post.cover_url ? [post.cover_url] : [],
+    },
+  };
 }
 
 export default async function BlogPostPage({ params }: Params) {

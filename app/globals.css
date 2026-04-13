@@ -758,7 +758,51 @@ a {
 
 .category-card:hover {
   border-color: var(--accent) !important;
-  transform: translateY(-2px);
+}
+
+.search-filters {
+  margin-top: 16px;
+}
+
+.filter-row {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+
+.field-select {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  font-size: 13px;
+  padding: 8px 12px;
+}
+
+.active-filters {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 12px;
+}
+
+.filter-tag {
+  align-items: center;
+  border-radius: 16px;
+  display: flex;
+  gap: 6px;
+  padding: 4px 10px;
+  font-size: 12px;
+}
+
+.filter-remove {
+  color: inherit;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.filter-remove:hover {
+  opacity: 0.7;
 }
 
 .category-icon {
