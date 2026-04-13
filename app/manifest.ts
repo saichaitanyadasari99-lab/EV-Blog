@@ -1,0 +1,20 @@
+import { MetadataRoute } from "next";
+
+export default function manifest(): MetadataRoute.Manifest {
+  return {
+    name: "VoltPulse - EV Battery Calculators",
+    short_name: "VoltPulse",
+    description: "Professional EV battery design calculators and tools",
+    start_url: "/",
+    display: "standalone",
+    background_color: "#0f172a",
+    theme_color: "#22c55e",
+    icons: [
+      {
+        src: "/icon.svg",
+        sizes: "192x192",
+        type: "image/svg+xml",
+      },
+    ],
+  };
+}
