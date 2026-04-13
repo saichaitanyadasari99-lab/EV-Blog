@@ -185,6 +185,18 @@ export function CoolingPlateCalculator() {
     downloadCsv("cooling-system-sizing.csv", csv);
   };
 
+  const shareResultsFn = () => {
+    shareResults("Cooling Plate Sizing Results", {
+      Coolant: inputs.coolant,
+      Reynolds: results.reynolds.toFixed(0),
+      Regime: results.regime,
+      "Nusselt Number": results.nusselt.toFixed(2),
+      "HTC": `${results.h.toFixed(0)} W/m²K`,
+      "Required Flow": `${results.requiredFlowLpm.toFixed(2)} LPM`,
+      "Pressure Drop": `${results.dpPa.toFixed(0)} Pa`,
+    });
+  };
+
   const regimeClass = results.regime === "turbulent" ? "ok" : results.regime === "transition" ? "warn" : "danger";
   const flowSufficient = inputs.flowLpm >= results.requiredFlowLpm;
 
@@ -296,6 +308,7 @@ export function CoolingPlateCalculator() {
 
         <div className="calc-actions">
           <button className="calc-btn" type="button" onClick={exportResults}>Export CSV</button>
+          <button className="calc-btn" type="button" onClick={shareResultsFn}>Share Results</button>
           <a className="calc-link" href={shareUrl}>Share Config URL</a>
           <button className="calc-btn secondary" type="button" onClick={() => setShowSteps(!showSteps)}>
             {showSteps ? "Hide Steps" : "Show Calculation Steps"}

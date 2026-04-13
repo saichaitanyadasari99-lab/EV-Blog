@@ -14,7 +14,7 @@ import {
   ReferenceLine,
   ReferenceDot,
 } from "recharts";
-import { NumberField, downloadCsv, toCsv, useShareUrl, InputSection, StepByStep } from "./common";
+import { NumberField, downloadCsv, toCsv, useShareUrl, InputSection, StepByStep, shareResults } from "./common";
 
 type Chemistry = "lfp" | "nmc" | "nca" | "na-ion";
 
@@ -172,6 +172,17 @@ export function SocEstimatorCalculator() {
     rest: inputs.restTimeMin,
   });
 
+  const shareResultsFn = () => {
+    shareResults("SOC Estimator Results", {
+      Chemistry: inputs.chemistry,
+      "Measured OCV": `${inputs.ocv} V`,
+      "Temperature": `${inputs.tempC}°C`,
+      "Rest Time": `${inputs.restTimeMin} min`,
+      "Estimated SOC": `${(result.soc * 100).toFixed(1)}%`,
+      "Uncertainty": result.uncertainty.range,
+    });
+  };
+
   return (
     <div className="calc-split">
       <section className="calc-panel">
@@ -234,6 +245,7 @@ export function SocEstimatorCalculator() {
           >
             Export CSV
           </button>
+          <button className="calc-btn" type="button" onClick={shareResultsFn}>Share Results</button>
           <a className="calc-link" href={shareUrl}>Share Config URL</a>
           <button className="calc-btn secondary" type="button" onClick={() => setShowSteps(!showSteps)}>
             {showSteps ? "Hide Steps" : "Show Calculation Steps"}

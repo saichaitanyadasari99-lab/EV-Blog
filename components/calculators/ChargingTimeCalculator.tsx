@@ -12,7 +12,7 @@ import {
   YAxis,
   Area,
 } from "recharts";
-import { NumberField, downloadCsv, toCsv, useShareUrl, InputSection, StepByStep } from "./common";
+import { NumberField, downloadCsv, toCsv, useShareUrl, InputSection, StepByStep, shareResults } from "./common";
 
 type Inputs = {
   packKwh: number;
@@ -107,6 +107,18 @@ export function ChargingTimeCalculator() {
     t: inputs.targetSoc,
   });
 
+  const shareResultsFn = () => {
+    shareResults("Charging Time Calculator Results", {
+      "Pack Energy": `${inputs.packKwh} kWh`,
+      "Charger Power": `${inputs.chargerKw} kW`,
+      "Start SOC": `${inputs.startSoc}%`,
+      "Target SOC": `${inputs.targetSoc}%`,
+      "CC Time": `${result.ccMinutes.toFixed(1)} min`,
+      "CV Time": `${result.cvMinutes.toFixed(1)} min`,
+      "Total Time": `${result.totalMinutes.toFixed(1)} min`,
+    });
+  };
+
   return (
     <div className="calc-split">
       <section className="calc-panel">
@@ -124,6 +136,7 @@ export function ChargingTimeCalculator() {
 
         <div className="calc-actions">
           <button className="calc-btn" type="button" onClick={() => downloadCsv("charging-time.csv", toCsv([{ total_minutes: result.totalMinutes.toFixed(1), cc_minutes: result.ccMinutes.toFixed(1), cv_minutes: result.cvMinutes.toFixed(1), cc_power_kw: result.ccPower.toFixed(1) }]))}>Export CSV</button>
+          <button className="calc-btn" type="button" onClick={shareResultsFn}>Share Results</button>
           <a className="calc-link" href={shareUrl}>Share Config URL</a>
           <button className="calc-btn secondary" type="button" onClick={() => setShowSteps(!showSteps)}>
             {showSteps ? "Hide Steps" : "Show Calculation Steps"}

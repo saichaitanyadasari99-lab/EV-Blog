@@ -12,7 +12,7 @@ import {
   ReferenceLine,
   Cell,
 } from "recharts";
-import { NumberField, downloadCsv, toCsv, useShareUrl, InputSection, StepByStep } from "./common";
+import { NumberField, downloadCsv, toCsv, useShareUrl, InputSection, StepByStep, shareResults } from "./common";
 
 type Inputs = {
   cellMinV: number;
@@ -103,6 +103,18 @@ export function BmsVoltageWindowCalculator() {
     bal: inputs.balanceStartV,
   });
 
+  const shareResultsFn = () => {
+    shareResults("BMS Voltage Window Results", {
+      "Series Count": inputs.sCount,
+      "Pack Min": `${result.packMin.toFixed(1)} V`,
+      "Pack Nominal": `${result.packNom.toFixed(1)} V`,
+      "Pack Max": `${result.packMax.toFixed(1)} V`,
+      "Balancing Headroom": `${result.balancingHeadroomMv.toFixed(0)} mV`,
+      "Usable SOC": `${result.usableSoc.toFixed(1)}%`,
+      "Compliant": result.aisStyle ? "Yes" : "No",
+    });
+  };
+
   return (
     <div className="calc-split">
       <section className="calc-panel">
@@ -122,6 +134,7 @@ export function BmsVoltageWindowCalculator() {
 
         <div className="calc-actions">
           <button className="calc-btn" type="button" onClick={() => downloadCsv("bms-window.csv", toCsv([{ pack_min_v: result.packMin.toFixed(1), pack_nom_v: result.packNom.toFixed(1), pack_max_v: result.packMax.toFixed(1), balancing_headroom_mv: result.balancingHeadroomMv.toFixed(0), ais_style_ok: result.aisStyle ? "yes" : "no" }]))}>Export CSV</button>
+          <button className="calc-btn" type="button" onClick={shareResultsFn}>Share Results</button>
           <a className="calc-link" href={shareUrl}>Share Config URL</a>
           <button className="calc-btn secondary" type="button" onClick={() => setShowSteps(!showSteps)}>
             {showSteps ? "Hide Steps" : "Show Calculation Steps"}

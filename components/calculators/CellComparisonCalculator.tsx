@@ -10,7 +10,7 @@ import {
   ResponsiveContainer,
   Tooltip,
 } from "recharts";
-import { downloadCsv, toCsv, InputSection, StepByStep } from "./common";
+import { downloadCsv, toCsv, useShareUrl, InputSection, StepByStep, shareResults } from "./common";
 
 type UseCase = "passenger" | "bus" | "truck" | "storage";
 
@@ -58,6 +58,19 @@ export function CellComparisonCalculator() {
   const [selectedIds, setSelectedIds] = useState<string[]>(["catl-lfp-280", "samsung-nmc811", "catl-na-ion"]);
   const [useCase, setUseCase] = useState<UseCase>("passenger");
   const [showSteps, setShowSteps] = useState(false);
+
+  const shareUrl = useShareUrl("cell-comparison", {
+    cells: selectedIds.join(","),
+    uc: useCase,
+  });
+
+  const shareResultsFn = () => {
+    shareResults("Cell Comparison Results", {
+      "Use Case": useCase,
+      ...Object.fromEntries(selected.map((cell, i) => [`Cell ${i + 1}`, cell.name])),
+      ...Object.fromEntries(selected.map((cell, i) => [`Score ${i + 1}`, `${scores[i]?.score ?? 0}/100`])),
+    });
+  };
 
   const selected = useMemo(
     () => CELLS.filter((cell) => selectedIds.includes(cell.id)).slice(0, 3),
@@ -182,6 +195,8 @@ export function CellComparisonCalculator() {
           >
             Export CSV
           </button>
+          <button className="calc-btn" type="button" onClick={shareResultsFn}>Share Results</button>
+          <a className="calc-link" href={shareUrl}>Share Config URL</a>
           <button className="calc-btn secondary" type="button" onClick={() => setShowSteps(!showSteps)}>
             {showSteps ? "Hide Steps" : "Show Calculation Steps"}
           </button>

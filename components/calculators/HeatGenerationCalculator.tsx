@@ -195,6 +195,18 @@ export function HeatGenerationCalculator() {
     downloadCsv("thermal-load-analyzer.csv", csv);
   };
 
+  const shareResultsFn = () => {
+    shareResults("Heat Generation Analyzer Results", {
+      Chemistry: inputs.chemistry,
+      "Duty Cycle": inputs.dutyCycle,
+      "C-Rate": inputs.cRate,
+      "Pack Current": `${results.currentA.toFixed(1)} A`,
+      "Heat Per Cell": `${results.heatPerCellW.toFixed(1)} W`,
+      "Total Heat": `${results.totalHeatW.toFixed(1)} W`,
+      "Required Cooling": `${results.requiredCoolingW.toFixed(1)} W`,
+    });
+  };
+
   const safetyStatus: "ok" | "warn" | "danger" =
     results.runawayMargin > 30 ? "ok" : results.runawayMargin > 15 ? "warn" : "danger";
 
@@ -291,6 +303,7 @@ export function HeatGenerationCalculator() {
 
         <div className="calc-actions">
           <button className="calc-btn" type="button" onClick={exportResults}>Export CSV</button>
+          <button className="calc-btn" type="button" onClick={shareResultsFn}>Share Results</button>
           <a className="calc-link" href={shareUrl}>Share Config URL</a>
           <button className="calc-btn secondary" type="button" onClick={() => setShowSteps(!showSteps)}>
             {showSteps ? "Hide Steps" : "Show Calculation Steps"}

@@ -13,7 +13,7 @@ import {
   ComposedChart,
   Bar,
 } from "recharts";
-import { NumberField, downloadCsv, toCsv, useShareUrl, InputSection, StepByStep } from "./common";
+import { NumberField, downloadCsv, toCsv, useShareUrl, InputSection, StepByStep, shareResults } from "./common";
 
 type Material = "copper" | "aluminum";
 type SurfaceFinish = "bare" | "tin" | "nickel";
@@ -200,6 +200,18 @@ export function BusBarCalculator() {
     downloadCsv("busbar-fusing-calculator.csv", csv);
   };
 
+  const shareResultsFn = () => {
+    shareResults("Bus Bar Calculator Results", {
+      Material: inputs.material,
+      "Continuous Current": `${inputs.continuousA} A`,
+      "Peak Current": `${inputs.peakA} A`,
+      "Required Area": `${primary.requiredAreaMm2.toFixed(2)} mm²`,
+      "Power Loss": `${primary.powerLossW.toFixed(1)} W`,
+      "Temp Rise": `${primary.tempRiseC.toFixed(1)} °C`,
+      "Fuse Rating": fuseRating,
+    });
+  };
+
   const alertState: "ok" | "warn" | "danger" =
     primary.tempRiseC < 25 ? "ok" : primary.tempRiseC < 40 ? "warn" : "danger";
 
@@ -312,6 +324,7 @@ export function BusBarCalculator() {
 
         <div className="calc-actions">
           <button className="calc-btn" type="button" onClick={exportResults}>Export CSV</button>
+          <button className="calc-btn" type="button" onClick={shareResultsFn}>Share Results</button>
           <a className="calc-link" href={shareUrl}>Share Config URL</a>
           <button className="calc-btn secondary" type="button" onClick={() => setShowSteps(!showSteps)}>
             {showSteps ? "Hide Steps" : "Show Calculation Steps"}

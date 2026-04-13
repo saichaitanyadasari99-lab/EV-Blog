@@ -14,7 +14,7 @@ import {
   Area,
   ComposedChart,
 } from "recharts";
-import { NumberField, downloadCsv, toCsv, useShareUrl, InputSection, StepByStep } from "./common";
+import { NumberField, downloadCsv, toCsv, useShareUrl, InputSection, StepByStep, shareResults } from "./common";
 
 type Inputs = {
   packKwh: number;
@@ -147,6 +147,18 @@ export function RangeEstimatorCalculator() {
     aux: inputs.auxiliaryLoadW,
   });
 
+  const shareResultsFn = () => {
+    shareResults("Range Estimator Results", {
+      "Pack Energy": `${inputs.packKwh} kWh`,
+      "Cruise Speed": `${inputs.cruiseSpeedKmh} km/h`,
+      "Vehicle Mass": `${inputs.vehicleMassKg} kg`,
+      "Drag Coefficient": inputs.dragCoeff,
+      "Estimated Range": `${result.nominal.rangeKm} km`,
+      "Energy Consumption": `${result.nominal.whPerKm} Wh/km`,
+      "Optimal Speed": `${result.optimalSpeed} km/h`,
+    });
+  };
+
   return (
     <div className="calc-split">
       <section className="calc-panel">
@@ -173,6 +185,7 @@ export function RangeEstimatorCalculator() {
 
         <div className="calc-actions">
           <button className="calc-btn" type="button" onClick={() => downloadCsv("range-estimator.csv", toCsv(result.currentCurve))}>Export CSV</button>
+          <button className="calc-btn" type="button" onClick={shareResultsFn}>Share Results</button>
           <a className="calc-link" href={shareUrl}>Share Config URL</a>
           <button className="calc-btn secondary" type="button" onClick={() => setShowSteps(!showSteps)}>
             {showSteps ? "Hide Steps" : "Show Calculation Steps"}
