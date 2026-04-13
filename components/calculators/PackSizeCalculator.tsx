@@ -13,7 +13,7 @@ import {
   ReferenceLine,
   ReferenceDot,
 } from "recharts";
-import { NumberField, clampNumber, downloadCsv, toCsv, useShareUrl, InputSection, StepByStep } from "./common";
+import { NumberField, clampNumber, downloadCsv, toCsv, useShareUrl, InputSection, StepByStep, shareResults } from "./common";
 
 type Chemistry = "lfp" | "nmc" | "nca" | "na-ion";
 type UnitSystem = "metric" | "imperial";
@@ -288,6 +288,19 @@ export function PackSizeCalculator() {
     downloadCsv("battery-pack-designer.csv", csv);
   };
 
+  const shareResultsFn = () => {
+    shareResults("Battery Pack Designer Results", {
+      Chemistry: inputs.chemistry,
+      "Series (S)": computed.series,
+      "Parallel (P)": computed.parallel,
+      "Pack Voltage": `${computed.packVoltage.toFixed(1)} V`,
+      "Pack Capacity": `${computed.packCapacityAh.toFixed(1)} Ah`,
+      "Pack Energy": `${computed.packEnergyKwh.toFixed(2)} kWh`,
+      "Volumetric Density": `${computed.volumetricWhL.toFixed(1)} Wh/L`,
+      "C-rate @ Load": `${computed.cRateAtLoad.toFixed(2)} C`,
+    });
+  };
+
   const applyPreset = (presetId: string) => {
     const preset = CELL_PRESETS.find((item) => item.id === presetId);
     if (!preset) return;
@@ -484,6 +497,7 @@ export function PackSizeCalculator() {
 
         <div className="calc-actions">
           <button className="calc-btn" type="button" onClick={exportResults}>Export CSV</button>
+          <button className="calc-btn" type="button" onClick={shareResultsFn}>Share Results</button>
           <a className="calc-link" href={shareUrl}>Share Config URL</a>
           <button className="calc-btn secondary" type="button" onClick={() => setShowSteps(!showSteps)}>
             {showSteps ? "Hide Steps" : "Show Calculation Steps"}

@@ -13,7 +13,7 @@ import {
   ReferenceLine,
   ReferenceDot,
 } from "recharts";
-import { NumberField, downloadCsv, toCsv, useShareUrl, InputSection, StepByStep } from "./common";
+import { NumberField, downloadCsv, toCsv, useShareUrl, InputSection, StepByStep, shareResults } from "./common";
 
 type Coolant = "water-glycol" | "water" | "oil";
 type PlateMaterial = "al6061" | "al3003" | "copper";

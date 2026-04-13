@@ -14,7 +14,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { NumberField, downloadCsv, toCsv, useShareUrl, InputSection, StepByStep } from "./common";
+import { NumberField, downloadCsv, toCsv, useShareUrl, InputSection, StepByStep, shareResults } from "./common";
 
 type DutyCycle = "continuous" | "pulse" | "wltc";
 type Chemistry = "lfp" | "nmc" | "nca" | "na-ion";

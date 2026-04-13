@@ -86,6 +86,28 @@ export function downloadCsv(filename: string, csv: string) {
   URL.revokeObjectURL(url);
 }
 
+export function copyToClipboard(text: string) {
+  navigator.clipboard.writeText(text);
+}
+
+export function shareResults(title: string, results: Record<string, string | number>) {
+  const text = Object.entries(results)
+    .map(([key, value]) => `${key}: ${value}`)
+    .join('\n');
+  
+  const fullText = `${title}\n\n${text}\n\nCalculated on VoltPulse`;
+  
+  if (navigator.share) {
+    navigator.share({
+      title: title,
+      text: fullText,
+    });
+  } else {
+    copyToClipboard(fullText);
+    alert('Results copied to clipboard!');
+  }
+}
+
 type InputSectionProps = {
   title: string;
   children: React.ReactNode;
