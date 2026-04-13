@@ -42,43 +42,31 @@ async function getSubscribers(): Promise<Subscriber[]> {
 async function getQueuePosition(): Promise<{ position: number; weekStarted: string | null }> {
   const supabase = await getServerSupabaseClient();
   
-  try {
-    const { data, error } = await supabase
-      .from("newsletter_queue")
-      .select("position, week_started")
-      .order("created_at", { ascending: false })
-      .limit(1)
-      .single();
+  const { data } = await supabase
+    .from("newsletter_queue")
+    .select("position, week_started")
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
     
-    if (error?.code === "PGRST116") {
-      await supabase.from("newsletter_queue").insert({ position: 0 });
-      return { position: 0, weekStarted: new Date().toISOString() };
-    }
-    
-    if (data) {
-      return { position: data.position ?? 0, weekStarted: data.week_started };
-    }
-    
-    return { position: 0, weekStarted: null };
-  } catch {
-    await supabase.from("newsletter_queue").insert({ position: 0 });
-    return { position: 0, weekStarted: new Date().toISOString() };
+  if (data) {
+    return { position: data.position ?? 0, weekStarted: data.week_started };
   }
+  
+  await supabase.from("newsletter_queue").insert({ position: 0, week_started: new Date().toISOString() });
+  return { position: 0, weekStarted: new Date().toISOString() };
 }
 
 async function resetQueue() {
   const supabase = await getServerSupabaseClient();
-  await supabase.from("newsletter_queue").delete().neq("id", "00000000-0000-0000-0000-000000000000");
-  await supabase.from("newsletter_queue").insert({ position: 0, week_started: new Date().toISOString() });
+  await supabase.from("newsletter_queue").update({ position: 0, week_started: new Date().toISOString() });
 }
 
 async function updateQueuePosition(newPosition: number) {
   const supabase = await getServerSupabaseClient();
-  const { data } = await supabase.from("newsletter_queue").select("id").order("created_at", { ascending: false }).limit(1).single();
+  const { data } = await supabase.from("newsletter_queue").select("id").order("created_at", { ascending: false }).limit(1).maybeSingle();
   if (data?.id) {
     await supabase.from("newsletter_queue").update({ position: newPosition }).eq("id", data.id);
-  } else {
-    await supabase.from("newsletter_queue").insert({ position: newPosition });
   }
 }
 
@@ -236,7 +224,17 @@ export async function GET() {
       .select("position, week_started")
       .order("created_at", { ascending: false })
       .limit(1)
-      .single();
+      .maybeSingle();
+
+    let queuePosition = 0;
+    let weekStarted = null;
+    
+    if (queueData) {
+      queuePosition = queueData.position ?? 0;
+      weekStarted = queueData.week_started;
+    } else {
+      await supabase.from("newsletter_queue").insert({ position: 0, week_started: new Date().toISOString() });
+    }
 
     const [{ data: subscribersData }, { data: postsData }] = await Promise.all([
       supabase
@@ -253,18 +251,18 @@ export async function GET() {
 
     const totalSubscribers = (subscribersData ?? []).length;
     const pendingPosts = (postsData ?? []).length;
-    const currentPosition = queueData?.position ?? 0;
-    const remaining = totalSubscribers - currentPosition;
+    const remaining = totalSubscribers - queuePosition;
 
     return NextResponse.json({
       totalSubscribers,
       pendingPosts,
-      currentPosition,
+      currentPosition: queuePosition,
       remainingThisWeek: Math.max(0, remaining),
       batchesRemaining: Math.ceil(Math.max(0, remaining) / BATCH_SIZE),
-      weekStarted: queueData?.week_started,
+      weekStarted,
     });
-  } catch {
+  } catch (error) {
+    console.error("GET error:", error);
     return NextResponse.json({
       totalSubscribers: 0,
       pendingPosts: 0,
