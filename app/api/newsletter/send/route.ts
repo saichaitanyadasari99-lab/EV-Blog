@@ -179,7 +179,7 @@ export async function POST(request: NextRequest) {
           );
           
           const res = await resend.emails.send({
-            from: "VoltPulse <news@voltPulse.com>",
+            from: "VoltPulse <onboarding@resend.dev>",
             to: subscriber.email,
             subject: `⚡ New EV Battery Content - ${posts[0].title}`,
             html: personalizedHtml,
