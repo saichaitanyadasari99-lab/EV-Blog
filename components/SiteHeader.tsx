@@ -3,17 +3,56 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { useState } from "react";
 
-const links = [
-  { href: "/", label: "Home" },
-  { href: "/blogs", label: "Blogs" },
-  { href: "/about", label: "About" },
-  { href: "/contact", label: "Contact" },
-  { href: "/admin", label: "Admin" },
+const navItems = [
+  { 
+    href: "/", 
+    label: "Home" 
+  },
+  { 
+    href: "/blogs", 
+    label: "Blogs",
+    hasMega: true,
+    megaItems: [
+      { href: "/blogs", label: "All Articles" },
+      { href: "/category/cell-chemistry", label: "Cell Chemistry" },
+      { href: "/category/bms-design", label: "Pack & BMS Design" },
+      { href: "/category/ev-benchmarks", label: "EV Benchmarks" },
+      { href: "/category/vehicle-reviews", label: "Vehicle Reviews" },
+      { href: "/category/standards", label: "Standards & Compliance" },
+      { href: "/category/news", label: "News" },
+    ]
+  },
+  { 
+    href: "/calculators", 
+    label: "Calculators",
+    hasMega: true,
+    megaItems: [
+      { href: "/calculators/pack-size", label: "Battery Pack Designer" },
+      { href: "/calculators/heat-generation", label: "Thermal Load Analyzer" },
+      { href: "/calculators/cooling-plate", label: "Cooling System Sizing" },
+      { href: "/calculators/bus-bar", label: "Bus Bar & Fusing" },
+      { href: "/calculators/soc-estimator", label: "OCV-SOC Estimator" },
+      { href: "/calculators/charging-time", label: "Charging Time" },
+      { href: "/calculators/range-estimator", label: "Range Estimator" },
+      { href: "/calculators/cell-comparison", label: "Cell Comparison" },
+      { href: "/calculators/bms-voltage-window", label: "BMS Voltage Window" },
+    ]
+  },
+  { 
+    href: "/about", 
+    label: "About" 
+  },
+  { 
+    href: "/contact", 
+    label: "Contact" 
+  },
 ];
 
 export function SiteHeader() {
   const pathname = usePathname();
+  const [openMega, setOpenMega] = useState<string | null>(null);
 
   return (
     <header className="navbar">
@@ -25,14 +64,37 @@ export function SiteHeader() {
       </Link>
 
       <nav className="nav-cats">
-        {links.map((link) => (
-          <Link
-            key={link.href}
-            href={link.href}
-            className={`nav-cat ${pathname === link.href ? "active" : ""}`}
+        {navItems.map((item) => (
+          <div 
+            key={item.href} 
+            className="nav-item-wrapper"
+            onMouseEnter={() => item.hasMega && setOpenMega(item.href)}
+            onMouseLeave={() => item.hasMega && setOpenMega(null)}
           >
-            {link.label}
-          </Link>
+            <Link
+              href={item.href}
+              className={`nav-cat ${pathname === item.href ? "active" : ""} ${item.hasMega ? 'has-mega' : ''}`}
+            >
+              {item.label}
+              {item.hasMega && <span className="nav-arrow">▾</span>}
+            </Link>
+            
+            {item.hasMega && openMega === item.href && (
+              <div className="mega-menu">
+                <div className="mega-menu-grid">
+                  {item.megaItems?.map((subItem) => (
+                    <Link 
+                      key={subItem.href} 
+                      href={subItem.href}
+                      className="mega-menu-link"
+                    >
+                      {subItem.label}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
         ))}
       </nav>
 
