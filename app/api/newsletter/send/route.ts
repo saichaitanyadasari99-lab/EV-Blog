@@ -183,51 +183,47 @@ export async function POST(request: NextRequest) {
     const batch = subscribers.slice(startIdx, endIdx);
     const newPosition = endIdx;
     
-    console.log("Batch start:", startIdx, "end:", endIdx);
-    console.log("Batch subscribers:", batch.map(s => s.email));
+    console.log("Batch calculated: startIdx:", startIdx, "endIdx:", endIdx);
+    console.log("Batch size:", batch.length);
+    console.log("First subscriber:", batch[0]?.email);
+    
+    if (batch.length === 0) {
+      return NextResponse.json({ 
+        error: "Batch is empty. Check subscribers.",
+        startIdx,
+        endIdx,
+        totalSubscribers
+      });
+    }
 
     const unsubscribeBase = "https://voltPulse.com/api/newsletter/unsubscribe";
     const emailHtml = getEmailHtml(posts, unsubscribeBase);
 
-    const results = await Promise.all(
-      batch.map(async (subscriber) => {
-        try {
-          const personalizedHtml = emailHtml.replace(
-            '{unsubscribe_email}',
-            subscriber.email
-          );
-          
-          console.log("Sending to:", subscriber.email);
-          
-          const res = await resend.emails.send({
-            from: "onboarding@resend.dev",
-            to: subscriber.email,
-            subject: `⚡ New EV Battery Content - ${posts[0].title}`,
-            html: personalizedHtml,
-          });
-          
-          console.log("Resend result:", JSON.stringify(res));
-          
-          // Check for errors in different ways
-          if (res.error) {
-            console.log("Error sending to", subscriber.email, ":", res.error);
-            return { email: subscriber.email, status: "failed", error: res.error.message || JSON.stringify(res.error) };
-          }
-          
-          // Check if data exists (successful response)
-          if (res.data && res.data.id) {
-            return { email: subscriber.email, status: "sent", messageId: res.data.id };
-          }
-          
-          // Unknown state - treat as failed
-          console.log("Unknown response for", subscriber.email, ":", res);
-          return { email: subscriber.email, status: "failed", error: "Unknown response: " + JSON.stringify(res) };
-        } catch (err) {
-          console.log("Exception sending to", subscriber.email, ":", err);
-          return { email: subscriber.email, status: "failed", error: String(err) };
-        }
-      })
-    );
+    const results = [];
+    
+    // Send one test email first
+    const testRecipient = batch[0];
+    console.log("Sending test email to:", testRecipient.email);
+    
+    try {
+      const res = await resend.emails.send({
+        from: "onboarding@resend.dev",
+        to: testRecipient.email,
+        subject: `⚡ Test Email - ${posts[0]?.title || 'VoltPulse'}`,
+        html: "<h1>Test Email</h1><p>This is a test from VoltPulse newsletter.</p>",
+      });
+      
+      console.log("Resend API response:", JSON.stringify(res));
+      
+      if (res.error) {
+        results.push({ email: testRecipient.email, status: "failed", error: res.error.message });
+      } else {
+        results.push({ email: testRecipient.email, status: "sent", messageId: res.data?.id });
+      }
+    } catch (err) {
+      console.log("Exception:", err);
+      results.push({ email: testRecipient.email, status: "failed", error: String(err) });
+    }
 
     await updateQueuePosition(newPosition);
 
