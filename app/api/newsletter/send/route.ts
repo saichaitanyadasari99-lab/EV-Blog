@@ -168,6 +168,18 @@ export async function POST(request: NextRequest) {
 
     const startIdx = currentPosition;
     const endIdx = Math.min(currentPosition + BATCH_SIZE, totalSubscribers);
+    
+    console.log("Calculating batch: startIdx", startIdx, "endIdx", endIdx);
+    
+    if (startIdx >= endIdx) {
+      console.log("No emails to send - batch range is empty");
+      return NextResponse.json({ 
+        error: "No emails to send in this batch. All subscribers may have been sent.",
+        currentPosition,
+        totalSubscribers
+      });
+    }
+    
     const batch = subscribers.slice(startIdx, endIdx);
     const newPosition = endIdx;
     
@@ -185,21 +197,33 @@ export async function POST(request: NextRequest) {
             subscriber.email
           );
           
+          console.log("Sending to:", subscriber.email);
+          
           const res = await resend.emails.send({
-            from: "VoltPulse <onboarding@resend.dev>",
+            from: "onboarding@resend.dev",
             to: subscriber.email,
             subject: `⚡ New EV Battery Content - ${posts[0].title}`,
             html: personalizedHtml,
           });
           
-          console.log("Resend response:", JSON.stringify(res));
+          console.log("Resend result:", JSON.stringify(res));
           
+          // Check for errors in different ways
           if (res.error) {
-            return { email: subscriber.email, status: "failed", error: res.error.message };
+            console.log("Error sending to", subscriber.email, ":", res.error);
+            return { email: subscriber.email, status: "failed", error: res.error.message || JSON.stringify(res.error) };
           }
           
-          return { email: subscriber.email, status: "sent" };
+          // Check if data exists (successful response)
+          if (res.data && res.data.id) {
+            return { email: subscriber.email, status: "sent", messageId: res.data.id };
+          }
+          
+          // Unknown state - treat as failed
+          console.log("Unknown response for", subscriber.email, ":", res);
+          return { email: subscriber.email, status: "failed", error: "Unknown response: " + JSON.stringify(res) };
         } catch (err) {
+          console.log("Exception sending to", subscriber.email, ":", err);
           return { email: subscriber.email, status: "failed", error: String(err) };
         }
       })
