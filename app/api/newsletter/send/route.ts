@@ -153,8 +153,12 @@ export async function POST(request: NextRequest) {
     }
 
     const totalSubscribers = subscribers.length;
+    console.log("Total subscribers:", totalSubscribers);
+    console.log("Latest posts:", posts.map(p => p.title));
+    
     const queueInfo = await getQueuePosition();
     let currentPosition = queueInfo.position;
+    console.log("Current queue position:", currentPosition);
     const weekStarted = new Date();
     
     if (currentPosition >= totalSubscribers) {
@@ -166,6 +170,9 @@ export async function POST(request: NextRequest) {
     const endIdx = Math.min(currentPosition + BATCH_SIZE, totalSubscribers);
     const batch = subscribers.slice(startIdx, endIdx);
     const newPosition = endIdx;
+    
+    console.log("Batch start:", startIdx, "end:", endIdx);
+    console.log("Batch subscribers:", batch.map(s => s.email));
 
     const unsubscribeBase = "https://voltPulse.com/api/newsletter/unsubscribe";
     const emailHtml = getEmailHtml(posts, unsubscribeBase);
@@ -214,6 +221,7 @@ export async function POST(request: NextRequest) {
       },
       nextBatch: newPosition < totalSubscribers ? newPosition + 1 : null,
       postsShared: posts.map((p) => p.title),
+      errors: results.filter((r) => r.status === "failed").map((r) => r.error),
     });
   } catch (error) {
     console.error("Newsletter error:", error);
