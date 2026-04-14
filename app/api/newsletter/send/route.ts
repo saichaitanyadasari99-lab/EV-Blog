@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { Resend } from "resend";
 import { getServerSupabaseClient } from "@/lib/supabase/server";
 import { requireAdminUser } from "@/lib/auth";
 
 const BATCH_SIZE = 100;
+const SENDER_EMAIL = "saichaitanyadasari99@gmail.com";
+const SENDER_NAME = "VoltPulse";
 
 type Subscriber = {
   id: string;
@@ -48,7 +49,7 @@ async function getQueuePosition(): Promise<{ position: number; weekStarted: stri
     .order("created_at", { ascending: false })
     .limit(1)
     .maybeSingle();
-    
+
   if (data) {
     return { position: data.position ?? 0, weekStarted: data.week_started };
   }
@@ -126,6 +127,51 @@ function getEmailHtml(posts: Post[], unsubscribeUrl: string) {
   `.trim();
 }
 
+async function sendEmailViaMailjet(toEmail: string, subject: string, htmlContent: string) {
+  const apiKey = process.env.MAILJET_API_KEY;
+  const apiSecret = process.env.MAILJET_API_SECRET;
+  
+  if (!apiKey || !apiSecret) {
+    throw new Error("Mailjet API keys not configured");
+  }
+
+  const credentials = Buffer.from(`${apiKey}:${apiSecret}`).toString("base64");
+
+  const response = await fetch("https://api.mailjet.com/v3.1/send", {
+    method: "POST",
+    headers: {
+      "Authorization": `Basic ${credentials}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      Messages: [
+        {
+          From: {
+            Email: SENDER_EMAIL,
+            Name: SENDER_NAME,
+          },
+          To: [
+            {
+              Email: toEmail,
+            },
+          ],
+          Subject: subject,
+          HTMLPart: htmlContent,
+        },
+      ],
+    }),
+  });
+
+  const data = await response.json();
+  
+  if (!response.ok) {
+    console.error("Mailjet error:", JSON.stringify(data));
+    throw new Error(data.ErrorMessage || "Failed to send email");
+  }
+  
+  return data;
+}
+
 export async function POST(request: NextRequest) {
   try {
     await requireAdminUser();
@@ -133,13 +179,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const apiKey = process.env.RESEND_API_KEY;
-  if (!apiKey) {
-    console.error("RESEND_API_KEY is not set");
-    return NextResponse.json({ error: "RESEND_API_KEY not configured on server" }, { status: 500 });
+  const apiKey = process.env.MAILJET_API_KEY;
+  const apiSecret = process.env.MAILJET_API_SECRET;
+
+  if (!apiKey || !apiSecret) {
+    return NextResponse.json({ error: "MAILJET_API_KEY or MAILJET_API_SECRET not configured" }, { status: 500 });
   }
-  
-  const resend = new Resend(apiKey);
 
   try {
     const [subscribers, posts] = await Promise.all([getSubscribers(), getLatestPosts()]);
@@ -159,7 +204,6 @@ export async function POST(request: NextRequest) {
     const queueInfo = await getQueuePosition();
     let currentPosition = queueInfo.position;
     console.log("Current queue position:", currentPosition);
-    const weekStarted = new Date();
     
     if (currentPosition >= totalSubscribers) {
       currentPosition = 0;
@@ -186,7 +230,7 @@ export async function POST(request: NextRequest) {
     console.log("Batch calculated: startIdx:", startIdx, "endIdx:", endIdx);
     console.log("Batch size:", batch.length);
     console.log("First subscriber:", batch[0]?.email);
-    
+
     if (batch.length === 0) {
       return NextResponse.json({ 
         error: "Batch is empty. Check subscribers.",
@@ -206,20 +250,14 @@ export async function POST(request: NextRequest) {
     console.log("Sending test email to:", testRecipient.email);
     
     try {
-      const res = await resend.emails.send({
-        from: "onboarding@resend.dev",
-        to: testRecipient.email,
-        subject: `⚡ Test Email - ${posts[0]?.title || 'VoltPulse'}`,
-        html: "<h1>Test Email</h1><p>This is a test from VoltPulse newsletter.</p>",
-      });
+      const res = await sendEmailViaMailjet(
+        testRecipient.email,
+        `⚡ New EV Battery Content - ${posts[0]?.title || 'VoltPulse'}`,
+        "<h1>Test Email</h1><p>This is a test from VoltPulse newsletter.</p>"
+      );
       
-      console.log("Resend API response:", JSON.stringify(res));
-      
-      if (res.error) {
-        results.push({ email: testRecipient.email, status: "failed", error: res.error.message });
-      } else {
-        results.push({ email: testRecipient.email, status: "sent", messageId: res.data?.id });
-      }
+      console.log("Mailjet response:", JSON.stringify(res));
+      results.push({ email: testRecipient.email, status: "sent" });
     } catch (err) {
       console.log("Exception:", err);
       results.push({ email: testRecipient.email, status: "failed", error: String(err) });
