@@ -245,22 +245,23 @@ export async function POST(request: NextRequest) {
 
     const results = [];
     
-    // Send one test email first
-    const testRecipient = batch[0];
-    console.log("Sending test email to:", testRecipient.email);
-    
-    try {
-      const res = await sendEmailViaMailjet(
-        testRecipient.email,
-        `⚡ New EV Battery Content - ${posts[0]?.title || 'VoltPulse'}`,
-        "<h1>Test Email</h1><p>This is a test from VoltPulse newsletter.</p>"
-      );
+    // Send emails to all subscribers in batch
+    for (const subscriber of batch) {
+      console.log("Sending to:", subscriber.email);
       
-      console.log("Mailjet response:", JSON.stringify(res));
-      results.push({ email: testRecipient.email, status: "sent" });
-    } catch (err) {
-      console.log("Exception:", err);
-      results.push({ email: testRecipient.email, status: "failed", error: String(err) });
+      try {
+        const res = await sendEmailViaMailjet(
+          subscriber.email,
+          `⚡ New EV Battery Content - ${posts[0]?.title || 'VoltPulse'}`,
+          emailHtml
+        );
+        
+        console.log("Mailjet response for", subscriber.email, ":", JSON.stringify(res));
+        results.push({ email: subscriber.email, status: "sent" });
+      } catch (err) {
+        console.log("Exception sending to", subscriber.email, ":", err);
+        results.push({ email: subscriber.email, status: "failed", error: String(err) });
+      }
     }
 
     await updateQueuePosition(newPosition);
