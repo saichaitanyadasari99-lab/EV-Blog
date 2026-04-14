@@ -1,7 +1,7 @@
 import { MetadataRoute } from "next";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = "https://voltPulse.com";
+  const baseUrl = "https://ev-blog-post.vercel.app";
 
   return [
     {

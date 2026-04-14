@@ -7,6 +7,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: "/",
       disallow: ["/admin/", "/api/", "/admin"],
     },
-    sitemap: "https://voltPulse.com/sitemap.xml",
+    sitemap: "https://ev-blog-post.vercel.app/sitemap.xml",
   };
 }

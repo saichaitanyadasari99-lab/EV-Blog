@@ -71,20 +71,22 @@ async function updateQueuePosition(newPosition: number) {
   }
 }
 
+const BASE_URL = "https://ev-blog-post.vercel.app";
+
 function getEmailHtml(posts: Post[], unsubscribeUrl: string) {
   const postList = posts
     .map(
       (post) => `
     <div style="margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid #e5e7eb;">
       <h3 style="margin: 0 0 8px; font-size: 18px;">
-        <a href="https://voltPulse.com/blog/${post.slug}" style="color: #22c55e; text-decoration: none;">
+        <a href="${BASE_URL}/blog/${post.slug}" style="color: #22c55e; text-decoration: none;">
           ${post.title}
         </a>
       </h3>
       <p style="margin: 0; color: #6b7280; font-size: 14px;">
         ${post.excerpt || "Read more on VoltPulse..."}
       </p>
-      <a href="https://voltPulse.com/blog/${post.slug}" style="color: #22c55e; font-size: 14px;">
+      <a href="${BASE_URL}/blog/${post.slug}" style="color: #22c55e; font-size: 14px;">
         Read more →
       </a>
     </div>
@@ -240,7 +242,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    const unsubscribeBase = "https://voltPulse.com/api/newsletter/unsubscribe";
+    const unsubscribeBase = "https://ev-blog-post.vercel.app/api/newsletter/unsubscribe";
     const emailHtml = getEmailHtml(posts, unsubscribeBase);
 
     const results = [];
