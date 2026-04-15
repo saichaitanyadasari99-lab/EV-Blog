@@ -94,6 +94,40 @@ export function AdminNewsletterClient({
     setSending(false);
   }
 
+  async function sendPreview() {
+    if (!confirm("Send preview to your email address?")) return;
+
+    setSending(true);
+    setLastResult(null);
+
+    try {
+      const res = await fetch("/api/newsletter/send?preview=true", { method: "POST" });
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        setLastResult({
+          sent: 1,
+          failed: 0,
+          message: `Preview sent to ${data.recipient}. Check your inbox!`,
+        });
+      } else {
+        setLastResult({
+          sent: 0,
+          failed: 0,
+          message: data.error || "Failed to send preview",
+        });
+      }
+    } catch (err) {
+      setLastResult({
+        sent: 0,
+        failed: 0,
+        message: String(err),
+      });
+    }
+
+    setSending(false);
+  }
+
   const emailList = subscribers.map((s) => s.email).join(", ");
 
   return (
@@ -141,13 +175,22 @@ export function AdminNewsletterClient({
               Sends 100 emails at a time. Click again to send next batch.
             </p>
           </div>
-          <button
-            onClick={sendNextBatch}
-            disabled={sending}
-            className="rounded-lg bg-[var(--accent)] px-6 py-3 font-bold text-white disabled:opacity-50"
-          >
-            {sending ? "Sending..." : "Send Next 100"}
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={sendPreview}
+              disabled={sending}
+              className="rounded-lg border border-[var(--border)] px-4 py-3 font-bold disabled:opacity-50"
+            >
+              {sending ? "Sending..." : "Preview"}
+            </button>
+            <button
+              onClick={sendNextBatch}
+              disabled={sending}
+              className="rounded-lg bg-[var(--accent)] px-6 py-3 font-bold text-white disabled:opacity-50"
+            >
+              {sending ? "Sending..." : "Send Next 100"}
+            </button>
+          </div>
         </div>
 
         {lastResult && (

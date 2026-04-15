@@ -5,6 +5,7 @@ import { requireAdminUser } from "@/lib/auth";
 const BATCH_SIZE = 100;
 const SENDER_EMAIL = "saichaitanyadasari99@gmail.com";
 const SENDER_NAME = "VoltPulse";
+const ADMIN_EMAIL = "saichaitanyadasari99@gmail.com";
 
 type Subscriber = {
   id: string;
@@ -181,6 +182,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  const { searchParams } = new URL(request.url);
+  const isPreview = searchParams.get("preview") === "true";
+
   const apiKey = process.env.MAILJET_API_KEY;
   const apiSecret = process.env.MAILJET_API_SECRET;
 
@@ -189,11 +193,41 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const [subscribers, posts] = await Promise.all([getSubscribers(), getLatestPosts()]);
+    const posts = await getLatestPosts();
 
     if (posts.length === 0) {
       return NextResponse.json({ error: "No published posts to share" }, { status: 400 });
     }
+
+    // PREVIEW MODE - Send only to admin email
+    if (isPreview) {
+      console.log("Sending preview to:", ADMIN_EMAIL);
+      
+      const unsubscribeBase = "https://ev-blog-post.vercel.app/api/newsletter/unsubscribe";
+      const emailHtml = getEmailHtml(posts, unsubscribeBase);
+      
+      try {
+        await sendEmailViaMailjet(
+          ADMIN_EMAIL,
+          `⚡ PREVIEW: ${posts[0].title}`,
+          emailHtml
+        );
+        
+        return NextResponse.json({
+          success: true,
+          sent: 1,
+          preview: true,
+          recipient: ADMIN_EMAIL,
+          postsShared: posts.map((p) => p.title),
+          message: "Preview sent to your email address"
+        });
+      } catch (err) {
+        return NextResponse.json({ error: "Failed to send preview", details: String(err) }, { status: 500 });
+      }
+    }
+
+    // NORMAL MODE - Send to subscribers
+    const subscribers = await getSubscribers();
 
     if (subscribers.length === 0) {
       return NextResponse.json({ error: "No subscribers found" }, { status: 400 });
