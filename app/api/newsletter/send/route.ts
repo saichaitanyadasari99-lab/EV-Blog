@@ -134,6 +134,9 @@ async function sendEmailViaMailjet(toEmail: string, subject: string, htmlContent
   const apiKey = process.env.MAILJET_API_KEY;
   const apiSecret = process.env.MAILJET_API_SECRET;
   
+  console.log("Mailjet API Key exists:", !!apiKey);
+  console.log("Mailjet API Secret exists:", !!apiSecret);
+  
   if (!apiKey || !apiSecret) {
     throw new Error("Mailjet API keys not configured");
   }
