@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 
 const marqueeTags = [
   "BMS DESIGN", "LFP / NA-ION", "IMMERSION COOLING", "SWAPPABLE BATTERY",
@@ -97,8 +98,14 @@ export default function AboutPage() {
         </div>
         <div className="about-hero-right">
           <div className="about-avatar-box">
-            <div className="about-avatar-circle">
-              <span className="about-avatar-initials">SC</span>
+            <div className="about-profile-image">
+              <Image
+                src="/profile.jpg"
+                alt="Sai Chaitanya Dasari"
+                width={380}
+                height={380}
+                className="about-profile-img"
+              />
             </div>
             <p className="about-avatar-name">Sai Chaitanya Dasari</p>
           </div>

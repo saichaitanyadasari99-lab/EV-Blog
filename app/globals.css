@@ -1468,8 +1468,8 @@ a {
 /* About Page */
 .about-hero-grid {
   display: grid;
-  grid-template-columns: 1fr 200px;
-  gap: 40px;
+  grid-template-columns: 1fr 440px;
+  gap: 48px;
   align-items: start;
   padding: 48px;
   background: var(--surface);
@@ -1477,13 +1477,34 @@ a {
   border-radius: 16px;
 }
 
+@media (max-width: 900px) {
+  .about-hero-grid {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+  
+  .about-hero-right {
+    order: -1;
+  }
+  
+  .about-profile-image {
+    width: 100%;
+    max-width: 380px;
+    height: auto;
+    aspect-ratio: 1;
+  }
+}
+
 .about-hero-left {
   max-width: 600px;
+  padding: 32px 0;
 }
 
 .about-hero-right {
   display: flex;
   justify-content: center;
+  align-items: center;
+  padding: 32px 0;
 }
 
 .about-label {
@@ -1579,32 +1600,30 @@ a {
   padding: 32px;
   text-align: center;
   width: 100%;
-  max-width: 300px;
+  max-width: 420px;
   margin: 0 auto;
 }
 
-.about-avatar-circle {
-  background: var(--green-dim);
-  border-radius: 50%;
-  width: 250px;
-  height: 250px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 16px;
+.about-profile-image {
+  width: 380px;
+  height: 380px;
+  border-radius: 12px;
   overflow: hidden;
+  margin: 0 auto 24px;
+  background: var(--surface);
 }
 
-.about-avatar-initials {
-  color: var(--green);
-  font-weight: 700;
-  font-size: 72px;
-  font-family: var(--font-syne), sans-serif;
+.about-profile-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .about-avatar-name {
-  color: var(--text2);
-  font-size: 13px;
+  color: var(--text);
+  font-family: var(--font-syne), sans-serif;
+  font-size: 20px;
+  font-weight: 600;
 }
 
 .about-social-bar {
