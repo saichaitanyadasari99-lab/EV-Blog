@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import Link from "next/link";
 import type { PostRecord } from "@/types/post";
@@ -13,6 +13,14 @@ export function PostCard({ post }: Props) {
   const coverUrl = post.cover_url;
   const showImage = coverUrl && (coverUrl.startsWith('http') || coverUrl.startsWith('/'));
   
+  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    const img = e.currentTarget;
+    img.style.display = 'none';
+    if (img.parentElement) {
+      img.parentElement.setAttribute('style', 'background: linear-gradient(135deg,#091830 0%,#0F2A4A 40%,#072038 100%)');
+    }
+  };
+  
   return (
     <article className="a-card">
       {showImage ? (
@@ -20,6 +28,7 @@ export function PostCard({ post }: Props) {
           src={coverUrl} 
           alt={post.title}
           className="a-card-img"
+          onError={handleImageError}
         />
       ) : (
         <div className="a-card-img" style={{
@@ -27,7 +36,7 @@ export function PostCard({ post }: Props) {
         }} />
       )}
       <div className="a-card-body">
-        <span className="a-badge" style={{ background: `${tone}22`, color: tone }}>
+        <span className="a-badge" style={{ background: tone + '22', color: tone }}>
           {post.category ?? "article"}
         </span>
         <h3 className="a-title">
@@ -39,5 +48,3 @@ export function PostCard({ post }: Props) {
     </article>
   );
 }
-
-

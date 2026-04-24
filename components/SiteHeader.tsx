@@ -37,7 +37,7 @@ const navItems = [
       { href: "/calculators/charging-time", label: "Charging Time" },
       { href: "/calculators/range-estimator", label: "Range Estimator" },
       { href: "/calculators/cell-comparison", label: "Cell Comparison" },
-      { href: "/calculators/bms-voltage-window", label: "BMS Voltage Window" },
+      { href: "/calculators/bms-window-checker", label: "BMS Voltage Window" },
     ]
   },
   { 

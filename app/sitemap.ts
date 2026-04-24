@@ -47,7 +47,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.7,
     },
     {
-      url: `${baseUrl}/calculators/bms-voltage-window`,
+      url: `${baseUrl}/calculators/bms-window-checker`,
       lastModified: new Date(),
       changeFrequency: "monthly",
       priority: 0.7,

@@ -82,6 +82,19 @@ export default async function BlogPostPage({ params }: Params) {
 
   return (
     <article className="page-main wrapper">
+      {post.cover_url && (
+        <div className="post-cover-image">
+          <img 
+            src={post.cover_url} 
+            alt={post.title}
+            onError={(e) => {
+              const img = e.currentTarget;
+              img.style.display = 'none';
+            }}
+          />
+        </div>
+      )}
+
       <header style={toneStyle} className="page-hero">
         <p className="hero-badge" style={{ background: "var(--tone)", color: "#000" }}>
           {post.category ?? "uncategorized"}
