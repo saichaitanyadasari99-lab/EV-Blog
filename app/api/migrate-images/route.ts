@@ -1,8 +1,6 @@
 import { NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
-import { UTApi, UTFile } from "uploadthing/server";
-import { Buffer } from "buffer";
 
 async function getSupabase() {
   const cookieStore = await cookies();
@@ -22,34 +20,47 @@ function isSupabaseUrl(url: string | null): boolean {
   return !!url && (url.includes("supabase.co/storage") || url.includes("storage/v1/object"));
 }
 
-async function downloadImage(url: string): Promise<Buffer | null> {
+async function downloadImage(url: string): Promise<ArrayBuffer | null> {
   try {
     const res = await fetch(url);
     if (!res.ok) return null;
-    const arrayBuffer = await res.arrayBuffer();
-    return Buffer.from(arrayBuffer);
+    return await res.arrayBuffer();
   } catch {
     return null;
   }
 }
 
-async function uploadToUploadThing(buffer: Buffer, fileName: string): Promise<string | null> {
+async function uploadToUploadThing(arrayBuffer: ArrayBuffer, fileName: string): Promise<string | null> {
   try {
-    const file = new UTFile([buffer], fileName);
-    const utapi = new UTApi();
+    // Use UploadThing's prepared upload API via multipart form
+    const formData = new FormData();
+    const blob = new Blob([arrayBuffer], { type: "image/jpeg" });
+    formData.append("file", blob, fileName);
     
-    const result = await utapi.uploadFiles(file);
-    
-    if (!result) return null;
-    
-    let url: string | null = null;
-    if (Array.isArray(result) && result[0]?.url) {
-      url = result[0].url;
-    } else if (result && typeof result === 'object' && 'url' in result) {
-      url = (result as Record<string, unknown>).url as string;
+    // Get token from env - works because it's set in Vercel
+    const token = process.env.UPLOADTHING_TOKEN;
+    if (!token) {
+      console.error("No UPLOADTHING_TOKEN in env");
+      return null;
     }
     
-    return url;
+    const response = await fetch("https://api.uploadthing.com/v6/uploadFiles", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "x-uploadthing-version": "6.12.0",
+      },
+      body: formData,
+    });
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("UploadThing error:", response.status, errorText);
+      return null;
+    }
+    
+    const data = await response.json();
+    return data[0]?.url || null;
   } catch (error) {
     console.error("Upload error:", error);
     return null;
@@ -61,7 +72,6 @@ export async function POST() {
   const results = { migrated: 0, failed: 0, errors: [] as string[] };
   
   try {
-    // Fetch all posts with cover images
     const { data: posts, error } = await supabase
       .from("posts")
       .select("id, title, slug, cover_url")
@@ -71,7 +81,6 @@ export async function POST() {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
     
-    // Filter to only Supabase URLs
     const toMigrate = posts?.filter(p => p.cover_url && isSupabaseUrl(p.cover_url)) || [];
     
     console.log(`Found ${toMigrate.length} images to migrate`);
@@ -79,25 +88,22 @@ export async function POST() {
     for (const post of toMigrate) {
       console.log(`Migrating: ${post.title}`);
       
-      // Download from Supabase
-      const buffer = await downloadImage(post.cover_url!);
-      if (!buffer) {
+      const arrayBuffer = await downloadImage(post.cover_url!);
+      if (!arrayBuffer) {
         results.failed++;
-        results.errors.push(`Failed to download: ${post.title}`);
+        results.errors.push(`Download failed: ${post.title}`);
         continue;
       }
       
-      // Upload to UploadThing
       const fileName = `${post.slug}-${Date.now()}.jpg`;
-      const newUrl = await uploadToUploadThing(buffer, fileName);
+      const newUrl = await uploadToUploadThing(arrayBuffer, fileName);
       
       if (!newUrl) {
         results.failed++;
-        results.errors.push(`Failed to upload: ${post.title}`);
+        results.errors.push(`Upload failed: ${post.title}`);
         continue;
       }
       
-      // Update database with new URL
       const { error: updateError } = await supabase
         .from("posts")
         .update({ cover_url: newUrl })
@@ -105,7 +111,7 @@ export async function POST() {
       
       if (updateError) {
         results.failed++;
-        results.errors.push(`Failed to update DB: ${post.title}`);
+        results.errors.push(`DB update failed: ${post.title}`);
         continue;
       }
       
@@ -127,7 +133,7 @@ export async function POST() {
 
 export async function GET() {
   return NextResponse.json({
-    message: "POST to /api/migrate-images to run migration",
-    info: "This will migrate Supabase Storage images to UploadThing",
+    message: "POST to migrate-images to run migration",
+    info: "Migrates Supabase Storage images to UploadThing",
   });
 }
