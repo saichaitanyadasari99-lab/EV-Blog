@@ -136,6 +136,7 @@ async function sendEmailViaMailjet(toEmail: string, subject: string, htmlContent
   
   console.log("Mailjet API Key exists:", !!apiKey);
   console.log("Mailjet API Secret exists:", !!apiSecret);
+  console.log("Sender email:", SENDER_EMAIL);
   
   if (!apiKey || !apiSecret) {
     throw new Error("Mailjet API keys not configured");
@@ -143,6 +144,8 @@ async function sendEmailViaMailjet(toEmail: string, subject: string, htmlContent
 
   const credentials = Buffer.from(`${apiKey}:${apiSecret}`).toString("base64");
 
+  console.log("Calling Mailjet API...");
+  
   const response = await fetch("https://api.mailjet.com/v3.1/send", {
     method: "POST",
     headers: {
@@ -170,9 +173,13 @@ async function sendEmailViaMailjet(toEmail: string, subject: string, htmlContent
 
   const data = await response.json();
   
+  console.log("Mailjet response status:", response.status);
+  console.log("Mailjet response:", JSON.stringify(data));
+  
   if (!response.ok) {
-    console.error("Mailjet error:", JSON.stringify(data));
-    throw new Error(data.ErrorMessage || "Failed to send email");
+    const errorMsg = data.Messages?.[0]?.Errors?.[0]?.ErrorMessage || data.ErrorMessage || JSON.stringify(data);
+    console.error("Mailjet error:", errorMsg);
+    throw new Error(errorMsg);
   }
   
   return data;
