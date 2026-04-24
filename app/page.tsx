@@ -1,11 +1,19 @@
-﻿import Link from "next/link";
+import Link from "next/link";
 import { getPublishedPosts } from "@/lib/posts";
 import { PostCard } from "@/components/PostCard";
 import { getCategoryTone } from "@/lib/category-theme";
 import { NewsletterForm } from "@/components/NewsletterForm";
+import type { PostRecord } from "@/types/post";
 
 export default async function HomePage() {
-  const posts = await getPublishedPosts();
+  let posts: PostRecord[] = [];
+  
+  try {
+    posts = await getPublishedPosts();
+  } catch (err) {
+    console.error("Error loading posts:", err);
+  }
+  
   const hero = posts[0];
   const side = posts.slice(1, 4);
   const topStories = posts.slice(0, 5);
