@@ -56,41 +56,46 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 export default async function BlogPostPage({ params }: Params) {
   const { slug } = await params;
   
-  const [post, allPosts] = await Promise.all([
-    getPublishedPostBySlug(slug),
-    getPublishedPosts(),
-  ]);
+  let post: PostRecord | null = null;
+  let allPosts: PostRecord[] = [];
+  
+  try {
+    [post, allPosts] = await Promise.all([
+      getPublishedPostBySlug(slug),
+      getPublishedPosts(),
+    ]);
+  } catch (err) {
+    console.error("Error loading post:", err);
+  }
 
   if (!post) notFound();
 
-  const html = renderTiptapHtml(post.content);
-  const toneStyle = { ["--tone" as string]: getCategoryTone(post.category) } as CSSProperties;
-  const references = (post as PostRecord).references ?? [];
+  const html = renderTiptapHtml(post?.content ?? null);
+  const toneStyle = { ["--tone" as string]: getCategoryTone(post?.category ?? "cell-chemistry") } as CSSProperties;
+  const references = (post as PostRecord)?.references ?? [];
   const headings = extractHeadings(html);
 
   const relatedByCategory = allPosts
-    .filter((item) => item.slug !== post.slug && item.category === post.category)
+    .filter((item) => item.slug !== post?.slug && item.category === post?.category)
     .slice(0, 4);
 
-  const tagSet = new Set((post.tags ?? []).map((tag) => tag.toLowerCase()));
+  const tagSet = new Set((post?.tags ?? []).map((tag) => tag.toLowerCase()));
   const relatedByTags = allPosts
     .filter(
       (item) =>
-        item.slug !== post.slug && item.tags?.some((tag) => tagSet.has(tag.toLowerCase())),
+        item.slug !== post?.slug && item.tags?.some((tag) => tagSet.has(tag.toLowerCase())),
     )
     .slice(0, 4);
 
+  const coverUrl = post?.cover_url;
+
   return (
     <article className="page-main wrapper">
-      {post.cover_url && (
+      {coverUrl && (
         <div className="post-cover-image">
           <img 
-            src={post.cover_url} 
-            alt={post.title}
-            onError={(e) => {
-              const img = e.currentTarget;
-              img.style.display = 'none';
-            }}
+            src={coverUrl} 
+            alt={post?.title ?? ""}
           />
         </div>
       )}
