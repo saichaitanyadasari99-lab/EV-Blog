@@ -1,6 +1,7 @@
 import { PostCard } from "@/components/PostCard";
 import { getPublishedPosts } from "@/lib/posts";
 import Link from "next/link";
+import type { PostRecord } from "@/types/post";
 
 type SectionSpec = {
   title: string;
@@ -70,9 +71,15 @@ function getSectionKeywords(category: string): string {
 }
 
 export default async function BlogsPage() {
-  const posts = await getPublishedPosts();
+  let posts: PostRecord[] = [];
+  
+  try {
+    posts = await getPublishedPosts();
+  } catch (err) {
+    console.error("Error loading posts:", err);
+  }
 
-  const grouped = new Map<string, typeof posts>();
+  const grouped = new Map<string, PostRecord[]>();
   for (const post of posts) {
     const key = canonicalCategory(post.category);
     const bucket = grouped.get(key) ?? [];
