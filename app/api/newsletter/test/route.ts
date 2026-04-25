@@ -39,7 +39,7 @@ export async function GET() {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: "VoltPulse <newsletter@ev-blog-post.vercel.app>",
+        from: "VoltPulse <onboarding@resend.dev>",
         to: ADMIN_EMAIL,
         subject: "⚡ TEST: VoltPulse Newsletter",
         html: testHtml,

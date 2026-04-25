@@ -137,7 +137,7 @@ async function sendEmailViaResend(toEmail: string, subject: string, htmlContent:
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      from: FROM_NAME + " <newsletter@ev-blog-post.vercel.app>",
+      from: "VoltPulse <onboarding@resend.dev>",
       to: toEmail,
       subject: subject,
       html: htmlContent,
