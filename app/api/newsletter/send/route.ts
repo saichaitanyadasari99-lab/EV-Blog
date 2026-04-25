@@ -250,7 +250,7 @@ body{margin:0;padding:0;background:#ECEAE4;}
       </td></tr>
     </table>
     <p style="margin:0 0 18px;font-family:Lora,Georgia,serif;font-size:15px;line-height:1.88;color:#292524;">Dive deeper into the research and data behind this analysis.</p>
-    <a href="${articleUrl}" style="font-family:Lora,Georgia,serif;font-size:13px;color:#C2410C;text-decoration:underline;">Read the full breakdown →</a>
+    <a href="${articleUrl}" target="_blank" style="display:inline-block;font-family:Lora,Georgia,serif;font-size:14px;color:#C2410C;text-decoration:underline;padding:8px 0;">Read the full breakdown →</a>
   </td></tr>
   ` : ''}
   <tr><td bgcolor="#1C1917" align="center" class="ps" style="padding:36px 44px;">
@@ -268,7 +268,7 @@ body{margin:0;padding:0;background:#ECEAE4;}
       <tr>
         <td width="54" valign="top"><span style="display:inline-block;background:#E5E1D8;color:#78716C;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;padding:3px 8px;border-radius:2px;font-family:Lora,Georgia,serif;">Tech</span></td>
         <td style="padding-left:12px;font-family:Lora,Georgia,serif;font-size:14px;line-height:1.68;color:#292524;">
-          <strong style="color:#1C1917;font-weight:500;">${bite1Title}</strong> ${bite1Excerpt} <a href="${bite1Url}" style="color:#C2410C;font-size:12px;">→</a>
+          <a href="${bite1Url}" target="_blank" style="color:#1C1917;text-decoration:none;"><strong style="color:#1C1917;font-weight:500;">${bite1Title}</strong></a> ${bite1Excerpt} <a href="${bite1Url}" target="_blank" style="color:#C2410C;font-size:12px;text-decoration:underline;">Read →</a>
         </td>
       </tr>
     </table>
@@ -276,7 +276,7 @@ body{margin:0;padding:0;background:#ECEAE4;}
       <tr>
         <td width="54" valign="top"><span style="display:inline-block;background:#E5E1D8;color:#78716C;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;padding:3px 8px;border-radius:2px;font-family:Lora,Georgia,serif;">Market</span></td>
         <td style="padding-left:12px;font-family:Lora,Georgia,serif;font-size:14px;line-height:1.68;color:#292524;">
-          <strong style="color:#1C1917;font-weight:500;">${bite2Title}</strong> ${bite2Excerpt} <a href="${bite2Url}" style="color:#C2410C;font-size:12px;">→</a>
+          <a href="${bite2Url}" target="_blank" style="color:#1C1917;text-decoration:none;"><strong style="color:#1C1917;font-weight:500;">${bite2Title}</strong></a> ${bite2Excerpt} <a href="${bite2Url}" target="_blank" style="color:#C2410C;font-size:12px;text-decoration:underline;">Read →</a>
         </td>
       </tr>
     </table>
@@ -285,13 +285,13 @@ body{margin:0;padding:0;background:#ECEAE4;}
     <p style="margin:0 0 14px;font-family:Lora,Georgia,serif;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:#C2410C;">Tool of the Week</p>
     <h3 style="margin:0 0 8px;font-family:'Playfair Display',Georgia,serif;font-size:19px;font-weight:700;color:#1C1917;">${calcName} — VoltPulse</h3>
     <p style="margin:0 0 14px;font-family:Lora,Georgia,serif;font-size:14px;line-height:1.72;color:#57534E;">${calcDesc} Handles voltage, thermal, and power analysis. Free, no sign-up.</p>
-    <a href="${calculatorUrl}" style="font-family:Lora,Georgia,serif;font-size:13px;color:#C2410C;text-decoration:underline;">Try the calculator →</a>
+    <a href="${calculatorUrl}" target="_blank" style="font-family:Lora,Georgia,serif;font-size:13px;color:#C2410C;text-decoration:underline;">Try the calculator →</a>
   </td></tr>
   <tr><td bgcolor="#1C1917" align="center" class="ps" style="padding:26px 44px;">
     <p style="margin:0 0 6px;font-family:Lora,Georgia,serif;font-size:11px;color:rgba(251,248,243,0.3);line-height:1.9;">You're receiving this because you subscribed at voltpulse.in</p>
     <p style="margin:0 0 8px;font-family:Lora,Georgia,serif;font-size:11px;color:rgba(251,248,243,0.3);line-height:1.9;">
       <a href="${unsubUrl}" style="color:rgba(251,248,243,0.45);">Unsubscribe</a> ·
-      <a href="${BASE_URL}/blogs" style="color:rgba(251,248,243,0.45);">View in browser</a>
+      <a href="${BASE_URL}" style="color:rgba(251,248,243,0.45);">View in browser</a>
     </p>
     <p style="margin:0;font-family:Lora,Georgia,serif;font-size:11px;color:rgba(251,248,243,0.18);">VoltPulse · Visakhapatnam, India</p>
   </td></tr>
