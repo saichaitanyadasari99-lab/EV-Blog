@@ -313,7 +313,7 @@ async function sendEmailBrevo(toEmail: string, subject: string, html: string) {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      sender: { email: "newsletter@voltpulse.in", name: "VoltPulse" },
+      sender: { email: "saichaitanyadasari99@gmail.com", name: "VoltPulse" },
       to: [{ email: toEmail }],
       subject: subject,
       htmlContent: html,
@@ -321,8 +321,9 @@ async function sendEmailBrevo(toEmail: string, subject: string, html: string) {
   });
 
   if (!res.ok) {
-    const err = await res.json();
-    throw new Error(err.message || "Failed to send");
+    const err = await res.json().catch(() => ({}));
+    console.error("Brevo error:", err);
+    throw new Error(err.message || err.errorMessage || "Failed to send");
   }
   return res.json();
 }
