@@ -3,9 +3,9 @@ import { getServerSupabaseClient } from "@/lib/supabase/server";
 import { requireAdminUser } from "@/lib/auth";
 
 const BATCH_SIZE = 100;
-const SENDER_EMAIL = "saichaitanyadasari99@gmail.com";
-const SENDER_NAME = "VoltPulse";
 const ADMIN_EMAIL = "saichaitanyadasari99@gmail.com";
+const FROM_NAME = "VoltPulse";
+const BASE_URL = "https://ev-blog-post.vercel.app";
 
 type Subscriber = {
   id: string;
@@ -43,18 +43,15 @@ async function getSubscribers(): Promise<Subscriber[]> {
 
 async function getQueuePosition(): Promise<{ position: number; weekStarted: string | null }> {
   const supabase = await getServerSupabaseClient();
-  
   const { data } = await supabase
     .from("newsletter_queue")
     .select("position, week_started")
     .order("created_at", { ascending: false })
     .limit(1)
     .maybeSingle();
-
   if (data) {
     return { position: data.position ?? 0, weekStarted: data.week_started };
   }
-  
   await supabase.from("newsletter_queue").insert({ position: 0, week_started: new Date().toISOString() });
   return { position: 0, weekStarted: new Date().toISOString() };
 }
@@ -71,8 +68,6 @@ async function updateQueuePosition(newPosition: number) {
     await supabase.from("newsletter_queue").update({ position: newPosition }).eq("id", data.id);
   }
 }
-
-const BASE_URL = "https://ev-blog-post.vercel.app";
 
 function getEmailHtml(posts: Post[], unsubscribeUrl: string) {
   const postList = posts
@@ -113,9 +108,7 @@ function getEmailHtml(posts: Post[], unsubscribeUrl: string) {
           Your EV Battery Design Updates
         </p>
       </div>
-      
       ${postList}
-      
       <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid #e5e7eb;">
         <p style="margin: 0; font-size: 12px; color: #9ca3af;">
           You're receiving this because you subscribed to VoltPulse newsletter.
@@ -130,58 +123,34 @@ function getEmailHtml(posts: Post[], unsubscribeUrl: string) {
   `.trim();
 }
 
-async function sendEmailViaMailjet(toEmail: string, subject: string, htmlContent: string) {
-  const apiKey = process.env.MAILJET_API_KEY;
-  const apiSecret = process.env.MAILJET_API_SECRET;
-  
-  console.log("Mailjet API Key exists:", !!apiKey);
-  console.log("Mailjet API Secret exists:", !!apiSecret);
-  console.log("Sender email:", SENDER_EMAIL);
-  
-  if (!apiKey || !apiSecret) {
-    throw new Error("Mailjet API keys not configured");
+async function sendEmailViaResend(toEmail: string, subject: string, htmlContent: string) {
+  const apiKey = process.env.RESEND_API_KEY;
+
+  if (!apiKey) {
+    throw new Error("RESEND_API_KEY not configured");
   }
 
-  const credentials = Buffer.from(`${apiKey}:${apiSecret}`).toString("base64");
-
-  console.log("Calling Mailjet API...");
-  
-  const response = await fetch("https://api.mailjet.com/v3.1/send", {
+  const response = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
-      "Authorization": `Basic ${credentials}`,
+      "Authorization": `Bearer ${apiKey}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      Messages: [
-        {
-          From: {
-            Email: SENDER_EMAIL,
-            Name: SENDER_NAME,
-          },
-          To: [
-            {
-              Email: toEmail,
-            },
-          ],
-          Subject: subject,
-          HTMLPart: htmlContent,
-        },
-      ],
+      from: FROM_NAME + " <newsletter@ev-blog-post.vercel.app>",
+      to: toEmail,
+      subject: subject,
+      html: htmlContent,
     }),
   });
 
   const data = await response.json();
-  
-  console.log("Mailjet response status:", response.status);
-  console.log("Mailjet response:", JSON.stringify(data));
-  
+
   if (!response.ok) {
-    const errorMsg = data.Messages?.[0]?.Errors?.[0]?.ErrorMessage || data.ErrorMessage || JSON.stringify(data);
-    console.error("Mailjet error:", errorMsg);
-    throw new Error(errorMsg);
+    console.error("Resend error:", JSON.stringify(data));
+    throw new Error(data.message || "Failed to send email");
   }
-  
+
   return data;
 }
 
@@ -192,14 +161,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { searchParams } = new URL(request.url);
-  const isPreview = searchParams.get("preview") === "true";
+  const apiKey = process.env.RESEND_API_KEY;
 
-  const apiKey = process.env.MAILJET_API_KEY;
-  const apiSecret = process.env.MAILJET_API_SECRET;
-
-  if (!apiKey || !apiSecret) {
-    return NextResponse.json({ error: "MAILJET_API_KEY or MAILJET_API_SECRET not configured" }, { status: 500 });
+  if (!apiKey) {
+    return NextResponse.json({ error: "RESEND_API_KEY not configured" }, { status: 500 });
   }
 
   try {
@@ -209,20 +174,20 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "No published posts to share" }, { status: 400 });
     }
 
-    // PREVIEW MODE - Send only to admin email
+    const { searchParams } = new URL(request.url);
+    const isPreview = searchParams.get("preview") === "true";
+
     if (isPreview) {
-      console.log("Sending preview to:", ADMIN_EMAIL);
-      
-      const unsubscribeBase = "https://ev-blog-post.vercel.app/api/newsletter/unsubscribe";
+      const unsubscribeBase = `${BASE_URL}/api/newsletter/unsubscribe`;
       const emailHtml = getEmailHtml(posts, unsubscribeBase);
-      
+
       try {
-        await sendEmailViaMailjet(
+        await sendEmailViaResend(
           ADMIN_EMAIL,
           `⚡ PREVIEW: ${posts[0].title}`,
           emailHtml
         );
-        
+
         return NextResponse.json({
           success: true,
           sent: 1,
@@ -236,7 +201,6 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // NORMAL MODE - Send to subscribers
     const subscribers = await getSubscribers();
 
     if (subscribers.length === 0) {
@@ -244,13 +208,9 @@ export async function POST(request: NextRequest) {
     }
 
     const totalSubscribers = subscribers.length;
-    console.log("Total subscribers:", totalSubscribers);
-    console.log("Latest posts:", posts.map(p => p.title));
-    
     const queueInfo = await getQueuePosition();
     let currentPosition = queueInfo.position;
-    console.log("Current queue position:", currentPosition);
-    
+
     if (currentPosition >= totalSubscribers) {
       currentPosition = 0;
       await resetQueue();
@@ -258,27 +218,20 @@ export async function POST(request: NextRequest) {
 
     const startIdx = currentPosition;
     const endIdx = Math.min(currentPosition + BATCH_SIZE, totalSubscribers);
-    
-    console.log("Calculating batch: startIdx", startIdx, "endIdx", endIdx);
-    
+
     if (startIdx >= endIdx) {
-      console.log("No emails to send - batch range is empty");
-      return NextResponse.json({ 
+      return NextResponse.json({
         error: "No emails to send in this batch. All subscribers may have been sent.",
         currentPosition,
         totalSubscribers
       });
     }
-    
+
     const batch = subscribers.slice(startIdx, endIdx);
     const newPosition = endIdx;
-    
-    console.log("Batch calculated: startIdx:", startIdx, "endIdx:", endIdx);
-    console.log("Batch size:", batch.length);
-    console.log("First subscriber:", batch[0]?.email);
 
     if (batch.length === 0) {
-      return NextResponse.json({ 
+      return NextResponse.json({
         error: "Batch is empty. Check subscribers.",
         startIdx,
         endIdx,
@@ -286,26 +239,20 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    const unsubscribeBase = "https://ev-blog-post.vercel.app/api/newsletter/unsubscribe";
+    const unsubscribeBase = `${BASE_URL}/api/newsletter/unsubscribe`;
     const emailHtml = getEmailHtml(posts, unsubscribeBase);
 
     const results = [];
-    
-    // Send emails to all subscribers in batch
+
     for (const subscriber of batch) {
-      console.log("Sending to:", subscriber.email);
-      
       try {
-        const res = await sendEmailViaMailjet(
+        await sendEmailViaResend(
           subscriber.email,
           `⚡ New EV Battery Content - ${posts[0]?.title || 'VoltPulse'}`,
           emailHtml
         );
-        
-        console.log("Mailjet response for", subscriber.email, ":", JSON.stringify(res));
         results.push({ email: subscriber.email, status: "sent" });
       } catch (err) {
-        console.log("Exception sending to", subscriber.email, ":", err);
         results.push({ email: subscriber.email, status: "failed", error: String(err) });
       }
     }
@@ -340,7 +287,7 @@ export async function POST(request: NextRequest) {
 export async function GET() {
   try {
     const supabase = await getServerSupabaseClient();
-    
+
     const { data: queueData } = await supabase
       .from("newsletter_queue")
       .select("position, week_started")
@@ -350,7 +297,7 @@ export async function GET() {
 
     let queuePosition = 0;
     let weekStarted = null;
-    
+
     if (queueData) {
       queuePosition = queueData.position ?? 0;
       weekStarted = queueData.week_started;

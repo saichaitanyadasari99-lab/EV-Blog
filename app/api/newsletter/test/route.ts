@@ -1,14 +1,12 @@
 import { NextResponse } from "next/server";
 
 export async function GET() {
-  const apiKey = process.env.MAILJET_API_KEY;
-  const apiSecret = process.env.MAILJET_API_SECRET;
-  
-  if (!apiKey || !apiSecret) {
-    return NextResponse.json({ success: false, error: "API keys not configured" });
+  const apiKey = process.env.RESEND_API_KEY;
+
+  if (!apiKey) {
+    return NextResponse.json({ success: false, error: "RESEND_API_KEY not configured" });
   }
 
-  const credentials = Buffer.from(`${apiKey}:${apiSecret}`).toString("base64");
   const ADMIN_EMAIL = "saichaitanyadasari99@gmail.com";
 
   const testHtml = `
@@ -34,31 +32,27 @@ export async function GET() {
   `.trim();
 
   try {
-    const response = await fetch("https://api.mailjet.com/v3.1/send", {
+    const response = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
-        "Authorization": `Basic ${credentials}`,
+        "Authorization": `Bearer ${apiKey}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        Messages: [
-          {
-            From: { Email: "saichaitanyadasari99@gmail.com", Name: "VoltPulse" },
-            To: [{ Email: ADMIN_EMAIL }],
-            Subject: "⚡ TEST: VoltPulse Newsletter",
-            HTMLPart: testHtml,
-          },
-        ],
+        from: "VoltPulse <newsletter@ev-blog-post.vercel.app>",
+        to: ADMIN_EMAIL,
+        subject: "⚡ TEST: VoltPulse Newsletter",
+        html: testHtml,
       }),
     });
 
     const data = await response.json();
-    
+
     if (!response.ok) {
-      console.error("Mailjet error:", JSON.stringify(data));
+      console.error("Resend error:", JSON.stringify(data));
       return NextResponse.json({ success: false, error: data });
     }
-    
+
     return NextResponse.json({ success: true, message: "Test email sent!", data });
   } catch (err) {
     return NextResponse.json({ success: false, error: String(err) });
