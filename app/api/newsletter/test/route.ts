@@ -1,59 +1,48 @@
 import { NextResponse } from "next/server";
 
 export async function GET() {
-  const apiKey = process.env.RESEND_API_KEY;
-
+  const apiKey = process.env.SENDGRID_API_KEY;
+  
   if (!apiKey) {
-    return NextResponse.json({ success: false, error: "RESEND_API_KEY not configured" });
+    return NextResponse.json({ 
+      success: false, 
+      error: "SENDGRID_API_KEY not configured. Add to Vercel env vars.",
+      setup: "Go to https://sendgrid.com -> API Keys -> Create API Key"
+    });
   }
 
   const ADMIN_EMAIL = "saichaitanyadasari99@gmail.com";
 
   const testHtml = `
 <!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-</head>
-<body style="margin: 0; padding: 20px; font-family: Arial, sans-serif; background-color: #f5f5f5;">
-  <div style="max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
-    <h1 style="color: #22c55e; margin: 0 0 20px 0;">⚡ VoltPulse Newsletter</h1>
-    <p style="color: #666;">Hello! This is a test email to check the newsletter format.</p>
-    <div style="margin: 20px 0; padding: 15px; background: #f9fafb; border-radius: 8px;">
-      <h3 style="margin: 0 0 10px;">Sample Post Title</h3>
-      <p style="margin: 0; color: #666;">This is a sample post excerpt that shows how your blog posts will appear in the newsletter...</p>
-      <a href="#" style="color: #22c55e;">Read more →</a>
-    </div>
-    <p style="font-size: 12px; color: #999;">You're receiving this because you're subscribed to VoltPulse newsletter.</p>
+<html><body style="margin:0;padding:20px;font-family:Arial,sans-serif;background:#f5f5f5;">
+  <div style="max-width:600px;margin:0 auto;background:white;padding:25px;border-radius:10px;">
+    <h1 style="color:#22c55e;margin:0 0 15px;">⚡ VoltPulse Newsletter</h1>
+    <p>Test email from your newsletter!</p>
   </div>
-</body>
-</html>
-  `.trim();
+</body></html>`;
 
   try {
-    const response = await fetch("https://api.resend.com/emails", {
+    const res = await fetch("https://api.sendgrid.com/v3/mail/send", {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${apiKey}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: "VoltPulse <onboarding@resend.dev>",
-        to: ADMIN_EMAIL,
+        personalizations: [{ to: [{ email: ADMIN_EMAIL }] }],
+        from: { email: ADMIN_EMAIL, name: "VoltPulse" },
         subject: "⚡ TEST: VoltPulse Newsletter",
-        html: testHtml,
+        content: [{ type: "text/html", value: testHtml }],
       }),
     });
 
-    const data = await response.json();
-
-    if (!response.ok) {
-      console.error("Resend error:", JSON.stringify(data));
-      return NextResponse.json({ success: false, error: data });
+    if (!res.ok) {
+      const err = await res.text();
+      return NextResponse.json({ success: false, error: err });
     }
 
-    return NextResponse.json({ success: true, message: "Test email sent!", data });
+    return NextResponse.json({ success: true, message: "Test email sent!" });
   } catch (err) {
     return NextResponse.json({ success: false, error: String(err) });
   }

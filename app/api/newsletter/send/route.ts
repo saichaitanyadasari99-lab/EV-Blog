@@ -5,6 +5,7 @@ import { requireAdminUser } from "@/lib/auth";
 const BATCH_SIZE = 100;
 const ADMIN_EMAIL = "saichaitanyadasari99@gmail.com";
 const FROM_NAME = "VoltPulse";
+const FROM_EMAIL = "saichaitanyadasari99@gmail.com";
 const BASE_URL = "https://ev-blog-post.vercel.app";
 
 type Subscriber = {
@@ -18,21 +19,20 @@ type Post = {
   title: string;
   slug: string;
   excerpt: string | null;
-  updated_at: string;
 };
 
-async function getLatestPosts(limit = 3): Promise<Post[]> {
+async function getLatestPosts() {
   const supabase = await getServerSupabaseClient();
   const { data } = await supabase
     .from("posts")
-    .select("id, title, slug, excerpt, updated_at")
+    .select("id, title, slug, excerpt")
     .eq("published", true)
     .order("updated_at", { ascending: false })
-    .limit(limit);
+    .limit(3);
   return (data ?? []) as Post[];
 }
 
-async function getSubscribers(): Promise<Subscriber[]> {
+async function getSubscribers() {
   const supabase = await getServerSupabaseClient();
   const { data } = await supabase
     .from("newsletter_subscribers")
@@ -41,304 +41,124 @@ async function getSubscribers(): Promise<Subscriber[]> {
   return (data ?? []) as Subscriber[];
 }
 
-async function getQueuePosition(): Promise<{ position: number; weekStarted: string | null }> {
+async function getQueuePosition() {
   const supabase = await getServerSupabaseClient();
   const { data } = await supabase
     .from("newsletter_queue")
-    .select("position, week_started")
+    .select("position")
     .order("created_at", { ascending: false })
     .limit(1)
     .maybeSingle();
-  if (data) {
-    return { position: data.position ?? 0, weekStarted: data.week_started };
-  }
-  await supabase.from("newsletter_queue").insert({ position: 0, week_started: new Date().toISOString() });
-  return { position: 0, weekStarted: new Date().toISOString() };
+  return data?.position ?? 0;
 }
 
-async function resetQueue() {
+async function updateQueue(pos: number) {
   const supabase = await getServerSupabaseClient();
-  await supabase.from("newsletter_queue").update({ position: 0, week_started: new Date().toISOString() });
-}
-
-async function updateQueuePosition(newPosition: number) {
-  const supabase = await getServerSupabaseClient();
-  const { data } = await supabase.from("newsletter_queue").select("id").order("created_at", { ascending: false }).limit(1).maybeSingle();
+  const { data } = await supabase.from("newsletter_queue").select("id").order("created_at").limit(1).maybeSingle();
   if (data?.id) {
-    await supabase.from("newsletter_queue").update({ position: newPosition }).eq("id", data.id);
+    await supabase.from("newsletter_queue").update({ position: pos }).eq("id", data.id);
   }
 }
 
-function getEmailHtml(posts: Post[], unsubscribeUrl: string) {
-  const postList = posts
-    .map(
-      (post) => `
-    <div style="margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid #e5e7eb;">
-      <h3 style="margin: 0 0 8px; font-size: 18px;">
-        <a href="${BASE_URL}/blog/${post.slug}" style="color: #22c55e; text-decoration: none;">
-          ${post.title}
-        </a>
-      </h3>
-      <p style="margin: 0; color: #6b7280; font-size: 14px;">
-        ${post.excerpt || "Read more on VoltPulse..."}
-      </p>
-      <a href="${BASE_URL}/blog/${post.slug}" style="color: #22c55e; font-size: 14px;">
-        Read more →
-      </a>
+function getEmailHtml(posts: Post[], unsubUrl: string) {
+  const postsHtml = posts.map(p => `
+    <div style="margin-bottom:20px;padding-bottom:15px;border-bottom:1px solid #eee;">
+      <h3 style="margin:0 0 8px;"><a href="${BASE_URL}/blog/${p.slug}" style="color:#22c55e;text-decoration:none;">${p.title}</a></h3>
+      <p style="margin:0;color:#666;font-size:14px;">${p.excerpt || 'Read more...'}</p>
     </div>
-  `
-    )
-    .join("");
+  `).join('');
 
-  return `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-</head>
-<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #f9fafb;">
-  <div style="max-width: 600px; margin: 0 auto; padding: 32px 16px;">
-    <div style="background: white; border-radius: 12px; padding: 32px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-      <div style="margin-bottom: 24px;">
-        <h1 style="margin: 0; font-size: 24px; color: #0f172a;">
-          ⚡ VoltPulse Weekly
-        </h1>
-        <p style="margin: 8px 0 0; color: #6b7280; font-size: 14px;">
-          Your EV Battery Design Updates
-        </p>
-      </div>
-      ${postList}
-      <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid #e5e7eb;">
-        <p style="margin: 0; font-size: 12px; color: #9ca3af;">
-          You're receiving this because you subscribed to VoltPulse newsletter.
-          <br>
-          <a href="${unsubscribeUrl}" style="color: #9ca3af;">Unsubscribe</a>
-        </p>
-      </div>
-    </div>
+  return `<!DOCTYPE html>
+<html><body style="margin:0;padding:20px;font-family:Arial,sans-serif;background:#f5f5f5;">
+  <div style="max-width:600px;margin:0 auto;background:white;padding:25px;border-radius:10px;">
+    <h1 style="color:#22c55e;margin:0 0 15px;">⚡ VoltPulse Weekly</h1>
+    <p>Your EV Battery Design Updates</p>
+    ${postsHtml}
+    <p style="font-size:12px;color:#999;margin-top:20px;">
+      Subscribed to VoltPulse. <a href="${unsubUrl}" style="color:#999;">Unsubscribe</a>
+    </p>
   </div>
-</body>
-</html>
-  `.trim();
+</body></html>`;
 }
 
-async function sendEmailViaResend(toEmail: string, subject: string, htmlContent: string) {
-  const apiKey = process.env.RESEND_API_KEY;
+async function sendEmailSendGrid(toEmail: string, subject: string, html: string) {
+  const apiKey = process.env.SENDGRID_API_KEY;
+  if (!apiKey) throw new Error("SENDGRID_API_KEY not configured");
 
-  if (!apiKey) {
-    throw new Error("RESEND_API_KEY not configured");
-  }
-
-  const response = await fetch("https://api.resend.com/emails", {
+  const res = await fetch("https://api.sendgrid.com/v3/mail/send", {
     method: "POST",
     headers: {
       "Authorization": `Bearer ${apiKey}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      from: "VoltPulse <onboarding@resend.dev>",
-      to: toEmail,
+      personalizations: [{ to: [{ email: toEmail }] }],
+      from: { email: FROM_EMAIL, name: FROM_NAME },
       subject: subject,
-      html: htmlContent,
+      content: [{ type: "text/html", value: html }],
     }),
   });
 
-  const data = await response.json();
-
-  if (!response.ok) {
-    console.error("Resend error:", JSON.stringify(data));
-    throw new Error(data.message || "Failed to send email");
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(err);
   }
-
-  return data;
 }
 
 export async function POST(request: NextRequest) {
-  try {
-    await requireAdminUser();
-  } catch {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  try { await requireAdminUser(); }
+  catch { return NextResponse.json({ error: "Unauthorized" }, { status: 401 }); }
 
-  const apiKey = process.env.RESEND_API_KEY;
-
-  if (!apiKey) {
-    return NextResponse.json({ error: "RESEND_API_KEY not configured" }, { status: 500 });
-  }
+  const apiKey = process.env.SENDGRID_API_KEY;
+  if (!apiKey) return NextResponse.json({ error: "SENDGRID_API_KEY not configured" }, { status: 500 });
 
   try {
     const posts = await getLatestPosts();
+    if (!posts.length) return NextResponse.json({ error: "No posts" }, { status: 400 });
 
-    if (posts.length === 0) {
-      return NextResponse.json({ error: "No published posts to share" }, { status: 400 });
+    const url = new URL(request.url);
+    const isPreview = url.searchParams.get("preview") === "true";
+    const target = isPreview ? ADMIN_EMAIL : null;
+
+    if (isPreview || !target) {
+      const html = getEmailHtml(posts, `${BASE_URL}/api/newsletter/unsubscribe`);
+      await sendEmailSendGrid(ADMIN_EMAIL, `⚡ PREVIEW: ${posts[0].title}`, html);
+      return NextResponse.json({ success: true, sent: 1, preview: true });
     }
 
-    const { searchParams } = new URL(request.url);
-    const isPreview = searchParams.get("preview") === "true";
+    const subs = await getSubscribers();
+    if (!subs.length) return NextResponse.json({ error: "No subscribers" }, { status: 400 });
 
-    if (isPreview) {
-      const unsubscribeBase = `${BASE_URL}/api/newsletter/unsubscribe`;
-      const emailHtml = getEmailHtml(posts, unsubscribeBase);
+    let pos = await getQueuePosition();
+    if (pos >= subs.length) { pos = 0; await updateQueue(0); }
 
-      try {
-        await sendEmailViaResend(
-          ADMIN_EMAIL,
-          `⚡ PREVIEW: ${posts[0].title}`,
-          emailHtml
-        );
+    const batch = subs.slice(pos, Math.min(pos + BATCH_SIZE, subs.length));
+    const html = getEmailHtml(posts, `${BASE_URL}/api/newsletter/unsubscribe`);
 
-        return NextResponse.json({
-          success: true,
-          sent: 1,
-          preview: true,
-          recipient: ADMIN_EMAIL,
-          postsShared: posts.map((p) => p.title),
-          message: "Preview sent to your email address"
-        });
-      } catch (err) {
-        return NextResponse.json({ error: "Failed to send preview", details: String(err) }, { status: 500 });
-      }
+    let sent = 0, failed = 0;
+    for (const s of batch) {
+      try { await sendEmailSendGrid(s.email, `⚡ ${posts[0].title}`, html); sent++; }
+      catch { failed++; }
     }
 
-    const subscribers = await getSubscribers();
-
-    if (subscribers.length === 0) {
-      return NextResponse.json({ error: "No subscribers found" }, { status: 400 });
-    }
-
-    const totalSubscribers = subscribers.length;
-    const queueInfo = await getQueuePosition();
-    let currentPosition = queueInfo.position;
-
-    if (currentPosition >= totalSubscribers) {
-      currentPosition = 0;
-      await resetQueue();
-    }
-
-    const startIdx = currentPosition;
-    const endIdx = Math.min(currentPosition + BATCH_SIZE, totalSubscribers);
-
-    if (startIdx >= endIdx) {
-      return NextResponse.json({
-        error: "No emails to send in this batch. All subscribers may have been sent.",
-        currentPosition,
-        totalSubscribers
-      });
-    }
-
-    const batch = subscribers.slice(startIdx, endIdx);
-    const newPosition = endIdx;
-
-    if (batch.length === 0) {
-      return NextResponse.json({
-        error: "Batch is empty. Check subscribers.",
-        startIdx,
-        endIdx,
-        totalSubscribers
-      });
-    }
-
-    const unsubscribeBase = `${BASE_URL}/api/newsletter/unsubscribe`;
-    const emailHtml = getEmailHtml(posts, unsubscribeBase);
-
-    const results = [];
-
-    for (const subscriber of batch) {
-      try {
-        await sendEmailViaResend(
-          subscriber.email,
-          `⚡ New EV Battery Content - ${posts[0]?.title || 'VoltPulse'}`,
-          emailHtml
-        );
-        results.push({ email: subscriber.email, status: "sent" });
-      } catch (err) {
-        results.push({ email: subscriber.email, status: "failed", error: String(err) });
-      }
-    }
-
-    await updateQueuePosition(newPosition);
-
-    const sentCount = results.filter((r) => r.status === "sent").length;
-    const failedCount = results.filter((r) => r.status === "failed").length;
-
+    await updateQueue(pos + batch.length);
     return NextResponse.json({
-      success: true,
-      sent: sentCount,
-      failed: failedCount,
-      batch: {
-        start: startIdx + 1,
-        end: endIdx,
-        total: totalSubscribers,
-      },
-      nextBatch: newPosition < totalSubscribers ? newPosition + 1 : null,
-      postsShared: posts.map((p) => p.title),
-      errors: results.filter((r) => r.status === "failed").map((r) => r.error),
+      success: true, sent, failed,
+      batch: { start: pos + 1, end: pos + batch.length, total: subs.length }
     });
-  } catch (error) {
-    console.error("Newsletter error:", error);
-    return NextResponse.json(
-      { error: "Failed to send newsletter", details: String(error) },
-      { status: 500 }
-    );
+  } catch (e) {
+    return NextResponse.json({ error: String(e) }, { status: 500 });
   }
 }
 
 export async function GET() {
+  const supabase = await getServerSupabaseClient();
   try {
-    const supabase = await getServerSupabaseClient();
-
-    const { data: queueData } = await supabase
-      .from("newsletter_queue")
-      .select("position, week_started")
-      .order("created_at", { ascending: false })
-      .limit(1)
-      .maybeSingle();
-
-    let queuePosition = 0;
-    let weekStarted = null;
-
-    if (queueData) {
-      queuePosition = queueData.position ?? 0;
-      weekStarted = queueData.week_started;
-    } else {
-      await supabase.from("newsletter_queue").insert({ position: 0, week_started: new Date().toISOString() });
-    }
-
-    const [{ data: subscribersData }, { data: postsData }] = await Promise.all([
-      supabase
-        .from("newsletter_subscribers")
-        .select("id")
-        .eq("opted_in", true),
-      supabase
-        .from("posts")
-        .select("id, title")
-        .eq("published", true)
-        .order("updated_at", { ascending: false })
-        .limit(3),
+    const [{ data: s }, { data: p }, pos] = await Promise.all([
+      supabase.from("newsletter_subscribers").select("id").eq("opted_in", true),
+      supabase.from("posts").select("id").eq("published", true),
+      getQueuePosition(),
     ]);
-
-    const totalSubscribers = (subscribersData ?? []).length;
-    const pendingPosts = (postsData ?? []).length;
-    const remaining = totalSubscribers - queuePosition;
-
-    return NextResponse.json({
-      totalSubscribers,
-      pendingPosts,
-      currentPosition: queuePosition,
-      remainingThisWeek: Math.max(0, remaining),
-      batchesRemaining: Math.ceil(Math.max(0, remaining) / BATCH_SIZE),
-      weekStarted,
-    });
-  } catch (error) {
-    console.error("GET error:", error);
-    return NextResponse.json({
-      totalSubscribers: 0,
-      pendingPosts: 0,
-      currentPosition: 0,
-      remainingThisWeek: 0,
-      batchesRemaining: 0,
-      weekStarted: null,
-    });
-  }
+    return NextResponse.json({ totalSubscribers: (s ?? []).length, pendingPosts: (p ?? []).length, position: pos });
+  } catch { return NextResponse.json({ totalSubscribers: 0 }); }
 }
