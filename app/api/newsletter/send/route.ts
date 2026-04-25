@@ -302,21 +302,21 @@ body{margin:0;padding:0;background:#ECEAE4;}
 </html>`;
 }
 
-async function sendEmailResend(toEmail: string, subject: string, html: string) {
-  const apiKey = process.env.RESEND_API_KEY;
-  if (!apiKey) throw new Error("RESEND_API_KEY not configured");
+async function sendEmailBrevo(toEmail: string, subject: string, html: string) {
+  const apiKey = process.env.BREVO_API_KEY;
+  if (!apiKey) throw new Error("BREVO_API_KEY not configured");
 
-  const res = await fetch("https://api.resend.com/emails", {
+  const res = await fetch("https://api.brevo.com/v3/smtp/email", {
     method: "POST",
     headers: {
-      "Authorization": `Bearer ${apiKey}`,
+      "api-key": apiKey,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      from: "VoltPulse <onboarding@resend.dev>",
-      to: toEmail,
+      sender: { email: "newsletter@voltpulse.in", name: "VoltPulse" },
+      to: [{ email: toEmail }],
       subject: subject,
-      html: html,
+      htmlContent: html,
     }),
   });
 
@@ -331,8 +331,8 @@ export async function POST(request: NextRequest) {
   try { await requireAdminUser(); }
   catch { return NextResponse.json({ error: "Unauthorized" }, { status: 401 }); }
 
-  const apiKey = process.env.RESEND_API_KEY;
-  if (!apiKey) return NextResponse.json({ error: "RESEND_API_KEY not configured" }, { status: 500 });
+  const apiKey = process.env.BREVO_API_KEY;
+  if (!apiKey) return NextResponse.json({ error: "BREVO_API_KEY not configured" }, { status: 500 });
 
   try {
     const posts = await getLatestPosts();
@@ -343,7 +343,7 @@ export async function POST(request: NextRequest) {
 
     if (isPreview) {
       const html = getEmailHtml(posts, `${BASE_URL}/api/newsletter/unsubscribe`);
-      await sendEmailResend(ADMIN_EMAIL, `⚡ PREVIEW: ${posts[0].title}`, html);
+      await sendEmailBrevo(ADMIN_EMAIL, `⚡ PREVIEW: ${posts[0].title}`, html);
       return NextResponse.json({ success: true, sent: 1, preview: true });
     }
 
@@ -358,7 +358,7 @@ export async function POST(request: NextRequest) {
 
     let sent = 0, failed = 0;
     for (const s of batch) {
-      try { await sendEmailResend(s.email, `⚡ ${posts[0].title}`, html); sent++; }
+      try { await sendEmailBrevo(s.email, `⚡ ${posts[0].title}`, html); sent++; }
       catch { failed++; }
     }
 
