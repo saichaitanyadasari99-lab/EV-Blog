@@ -5,7 +5,6 @@ import { requireAdminUser } from "@/lib/auth";
 const BATCH_SIZE = 100;
 const ADMIN_EMAIL = "saichaitanyadasari99@gmail.com";
 const FROM_NAME = "VoltPulse";
-const FROM_EMAIL = "saichaitanyadasari99@gmail.com";
 const BASE_URL = "https://ev-blog-post.vercel.app";
 
 type Subscriber = {
@@ -81,36 +80,37 @@ function getEmailHtml(posts: Post[], unsubUrl: string) {
 </body></html>`;
 }
 
-async function sendEmailSendGrid(toEmail: string, subject: string, html: string) {
-  const apiKey = process.env.SENDGRID_API_KEY;
-  if (!apiKey) throw new Error("SENDGRID_API_KEY not configured");
+async function sendEmailResend(toEmail: string, subject: string, html: string) {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) throw new Error("RESEND_API_KEY not configured");
 
-  const res = await fetch("https://api.sendgrid.com/v3/mail/send", {
+  const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
       "Authorization": `Bearer ${apiKey}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      personalizations: [{ to: [{ email: toEmail }] }],
-      from: { email: FROM_EMAIL, name: FROM_NAME },
+      from: "VoltPulse <onboarding@resend.dev>",
+      to: toEmail,
       subject: subject,
-      content: [{ type: "text/html", value: html }],
+      html: html,
     }),
   });
 
   if (!res.ok) {
-    const err = await res.text();
-    throw new Error(err);
+    const err = await res.json();
+    throw new Error(err.message || "Failed to send");
   }
+  return res.json();
 }
 
 export async function POST(request: NextRequest) {
   try { await requireAdminUser(); }
   catch { return NextResponse.json({ error: "Unauthorized" }, { status: 401 }); }
 
-  const apiKey = process.env.SENDGRID_API_KEY;
-  if (!apiKey) return NextResponse.json({ error: "SENDGRID_API_KEY not configured" }, { status: 500 });
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) return NextResponse.json({ error: "RESEND_API_KEY not configured" }, { status: 500 });
 
   try {
     const posts = await getLatestPosts();
@@ -118,11 +118,10 @@ export async function POST(request: NextRequest) {
 
     const url = new URL(request.url);
     const isPreview = url.searchParams.get("preview") === "true";
-    const target = isPreview ? ADMIN_EMAIL : null;
 
-    if (isPreview || !target) {
+    if (isPreview) {
       const html = getEmailHtml(posts, `${BASE_URL}/api/newsletter/unsubscribe`);
-      await sendEmailSendGrid(ADMIN_EMAIL, `⚡ PREVIEW: ${posts[0].title}`, html);
+      await sendEmailResend(ADMIN_EMAIL, `⚡ PREVIEW: ${posts[0].title}`, html);
       return NextResponse.json({ success: true, sent: 1, preview: true });
     }
 
@@ -137,7 +136,7 @@ export async function POST(request: NextRequest) {
 
     let sent = 0, failed = 0;
     for (const s of batch) {
-      try { await sendEmailSendGrid(s.email, `⚡ ${posts[0].title}`, html); sent++; }
+      try { await sendEmailResend(s.email, `⚡ ${posts[0].title}`, html); sent++; }
       catch { failed++; }
     }
 
