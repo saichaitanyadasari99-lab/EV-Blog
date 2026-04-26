@@ -313,7 +313,7 @@ async function sendEmailBrevo(toEmail: string, subject: string, html: string) {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      sender: { email: "saichaitanyadasari99@gmail.com", name: "VoltPulse" },
+      sender: { email: "chaitanya_dasari@evpulse.co.in", name: "VoltPulse" },
       to: [{ email: toEmail }],
       subject: subject,
       htmlContent: html,
