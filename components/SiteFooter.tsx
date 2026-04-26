@@ -1,4 +1,4 @@
-﻿import Link from "next/link";
+import Link from "next/link";
 
 export function SiteFooter() {
   return (
@@ -6,20 +6,20 @@ export function SiteFooter() {
       <div className="wrapper">
         <div className="footer-inner">
           <section>
-            <div className="footer-logo">
-              Volt<span>Pulse</span>
+<div className="footer-logo">
+              EV<span>Pulse</span>
             </div>
             <p className="footer-p">
               The most technically rigorous source for battery technology and EV engineering coverage.
             </p>
           </section>
 
-          <section className="footer-col">
+<section className="footer-col">
             <h4>Categories</h4>
-            <Link href="/category/post">Cell Chemistry</Link>
-            <Link href="/category/deep-dive">BMS Design</Link>
-            <Link href="/category/benchmark">Thermal Management</Link>
-            <Link href="/category/news">Charging Infrastructure</Link>
+            <Link href="/category/cell-chemistry">Cell Chemistry</Link>
+            <Link href="/category/bms-design">BMS Design</Link>
+            <Link href="/category/thermal">Thermal</Link>
+            <Link href="/category/charging">Charging</Link>
           </section>
 
           <section className="footer-col">
@@ -32,14 +32,12 @@ export function SiteFooter() {
 
           <section className="footer-col">
             <h4>Site</h4>
-            <Link href="/admin">Admin</Link>
-            <Link href="/admin/new">New Post</Link>
             <Link href="/blogs">Archive</Link>
           </section>
         </div>
 
         <div className="footer-bottom">
-          <p>(c) 2026 VoltPulse. All rights reserved.</p>
+          <p>(c) 2026 EVPulse. All rights reserved.</p>
           <div>
             <Link href="/about">About</Link>
           </div>
