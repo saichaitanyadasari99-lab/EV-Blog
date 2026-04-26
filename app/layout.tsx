@@ -35,14 +35,14 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),
   title: {
-    default: "VoltPulse - Battery and EV Technology Newsroom",
-    template: "%s | VoltPulse",
+    default: "EVPulse - Battery and EV Technology Newsroom",
+    template: "%s | EVPulse",
   },
   description: "Deep-dive technical analysis, battery engineering insights, and EV benchmarks for engineers and enthusiasts.",
   keywords: ["EV batteries", "battery technology", "electric vehicles", "BMS", "BMS design", "battery thermal management", "charging technology", "EV benchmarks"],
-  authors: [{ name: "VoltPulse Team" }],
-  creator: "VoltPulse",
-  publisher: "VoltPulse",
+  authors: [{ name: "EVPulse Team" }],
+  creator: "EVPulse",
+  publisher: "EVPulse",
   formatDetection: {
     email: false,
     address: false,
@@ -52,21 +52,21 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_US",
     url: baseUrl,
-    siteName: "VoltPulse",
-    title: "VoltPulse - Battery and EV Technology Newsroom",
+    siteName: "EVPulse",
+    title: "EVPulse - Battery and EV Technology Newsroom",
     description: "Deep-dive technical analysis, battery engineering insights, and EV benchmarks for engineers and enthusiasts.",
     images: [
       {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "VoltPulse",
+        alt: "EVPulse",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "VoltPulse - Battery and EV Technology Newsroom",
+    title: "EVPulse - Battery and EV Technology Newsroom",
     description: "Deep-dive technical analysis, battery engineering insights, and EV benchmarks.",
     images: ["/og-image.png"],
   },
@@ -99,7 +99,7 @@ export default function RootLayout({
         <meta name="theme-color" content="#0099b8" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <meta name="apple-mobile-web-app-title" content="VoltPulse" />
+        <meta name="apple-mobile-web-app-title" content="EVPulse" />
         <link rel="icon" type="image/svg+xml" href="/icon.svg" />
         <link rel="apple-touch-icon" href="/icon.svg" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />

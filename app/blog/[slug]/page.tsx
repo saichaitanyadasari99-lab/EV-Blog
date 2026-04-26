@@ -102,7 +102,7 @@ export default async function BlogPostPage({ params }: Params) {
     description: post.excerpt ?? "",
     slug: post.slug,
     cover_url: post.cover_url ?? undefined,
-    author: "VoltPulse Team",
+    author: "EVPulse Team",
     publishedAt: post.created_at ?? undefined,
     modifiedAt: post.updated_at ?? undefined,
     category: post.category ?? undefined,

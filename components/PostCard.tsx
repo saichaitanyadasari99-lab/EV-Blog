@@ -42,7 +42,7 @@ export function PostCard({ post }: Props) {
         <h3 className="a-title">
           <Link href={`/blog/${post.slug}`}>{post.title}</Link>
         </h3>
-        <p className="a-excerpt">{post.excerpt ?? "Technical update from VoltPulse."}</p>
+        <p className="a-excerpt">{post.excerpt ?? "Technical update from EVPulse."}</p>
         <div className="a-footer">{new Date(post.created_at).toLocaleDateString()}  |  {post.reading_time ?? 1} min read</div>
       </div>
     </article>

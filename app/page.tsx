@@ -58,7 +58,7 @@ export default async function HomePage() {
           <div className="hero-content">
             <span className="hero-badge">{hero?.category ?? "FEATURED"}</span>
             <h1 className="hero-title">
-              {hero ? <Link href={`/blog/${hero.slug}`}>{hero.title}</Link> : "VoltPulse battery and EV technology coverage"}
+              {hero ? <Link href={`/blog/${hero.slug}`}>{hero.title}</Link> : "EVPulse battery and EV technology coverage"}
             </h1>
             <p className="hero-meta">
               {hero ? `${new Date(hero.created_at).toLocaleDateString()}  |  ${hero.reading_time ?? 1} min read` : "No posts yet"}
