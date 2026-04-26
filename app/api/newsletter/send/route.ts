@@ -188,28 +188,31 @@ function getEmailHtml(posts: Post[], unsubUrl: string) {
   const mainPost = posts[0];
   const quickBite1 = posts[1];
   const quickBite2 = posts[2];
+  const quickBite3 = posts[3];
   
   const coverImage = mainPost?.cover_url 
-    ? `<img src="${mainPost.cover_url}" alt="${mainPost.title}" style="width:100%;max-width:512px;height:auto;border-radius:3px;margin-bottom:20px;">`
-    : `<div style="background:#E5E1D8;height:210px;border-radius:3px;margin-bottom:20px;display:flex;align-items:center;justify-content:center;color:#A8A29E;font-size:12px;font-style:italic;">[ Article cover image ]</div>`;
+    ? `<img src="${mainPost.cover_url}" alt="${mainPost.title}" style="width:100%;max-width:480px;height:auto;border-radius:4px;margin:16px 0 20px;">`
+    : `<div style="background:linear-gradient(135deg,#E5E1D8,#D5D1C8);height:220px;border-radius:4px;margin:16px 0 20px;display:flex;align-items:center;justify-content:center;color:#78716C;font-size:12px;font-style:italic;">[ Cover Image ]</div>`;
   
   const articleUrl = mainPost ? `${BASE_URL}/blog/${mainPost.slug}` : "#";
   const readingTime = mainPost?.reading_time || 5;
-  const category = mainPost?.category || "Battery Systems";
+  const category = mainPost?.category?.toUpperCase() || "BATTERY TECH";
   const pullQuote = getPullQuote(mainPost?.content || null);
   
   const calc = getCalculatorForPost(mainPost);
   const calculatorUrl = calc.url;
   const calcName = calc.name;
-  const calcDesc = `Explore ${calcName} - free tool for EV battery engineering.`;
-  
-  const bite1Title = quickBite1?.title || "Latest technology update";
-  const bite1Excerpt = quickBite1?.excerpt?.slice(0, 100) || "New developments in EV battery technology.";
+  const calcDesc = calc.description;
+
   const bite1Url = quickBite1 ? `${BASE_URL}/blog/${quickBite1.slug}` : "#";
-  
-  const bite2Title = quickBite2?.title || "Market developments";
-  const bite2Excerpt = quickBite2?.excerpt?.slice(0, 100) || "Latest updates from the EV market.";
+  const bite1Title = quickBite1?.title || "New solid-state battery breakthrough";
+  const bite1Excerpt = quickBite1?.excerpt?.slice(0, 100) || "Recent developments in solid-state electrolyte technology.";
+
   const bite2Url = quickBite2 ? `${BASE_URL}/blog/${quickBite2.slug}` : "#";
+  const bite2Title = quickBite2?.title || "New safety standards draft released";
+  const bite2Excerpt = quickBite2?.excerpt?.slice(0, 100) || "Updated thermal runaway requirements for EV packs.";
+
+  const bite3Title = quickBite3?.title || "EV market growth update";
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -217,85 +220,224 @@ function getEmailHtml(posts: Post[], unsubUrl: string) {
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>VoltPulse Newsletter</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
 <style>
-body{margin:0;padding:0;background:#ECEAE4;}
-@media only screen and (max-width:600px){.ec{width:100%!important;}.ps{padding-left:22px!important;padding-right:22px!important;}}
+@import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Playfair+Display:wght@400;700&display=swap');
+* { box-sizing: border-box; }
+body { margin: 0; padding: 0; background: #E5E1D8; font-family: Georgia, 'Times New Roman', serif; font-size: 15px; line-height: 1.8; color: #1C1917; }
+a { color: #C2410C; text-decoration: underline; }
+a:hover { text-decoration: none; }
+@media only screen and (max-width: 600px) {
+  .wrapper { width: 100% !important; padding-left: 20px !important; padding-right: 20px !important; }
+  .hide-mobile { display: none !important; }
+}
 </style>
 </head>
 <body>
-<table width="100%" bgcolor="#ECEAE4" cellpadding="0" cellspacing="0">
-<tr><td align="center" style="padding:24px 12px;">
-<table class="ec" width="600" cellpadding="0" cellspacing="0" style="background:#F7F5F0;">
-  <tr><td bgcolor="#1C1917" align="center" class="ps" style="padding:34px 44px 28px;">
-    <p style="margin:0 0 12px;font-family:Lora,Georgia,serif;font-size:10px;letter-spacing:0.14em;color:#C2410C;text-transform:uppercase;">Issue #${issueNum} · ${month} ${year}</p>
-    <h1 style="margin:0 0 8px;font-family:'Playfair Display',Georgia,serif;font-size:38px;font-weight:700;color:#FBF8F3;line-height:1;">Volt<span style="color:#C2410C;">Pulse</span></h1>
-    <p style="margin:0 0 20px;font-family:Lora,Georgia,serif;font-size:13px;color:rgba(251,248,243,0.45);font-style:italic;">Engineering clarity for the EV era</p>
-    <p style="margin:0;font-family:Lora,Georgia,serif;font-size:10px;letter-spacing:0.1em;color:rgba(251,248,243,0.28);text-transform:uppercase;">Battery Systems · Charging · Policy · Tools</p>
-  </td></tr>
-  <tr><td class="ps" style="padding:32px 44px 28px;border-bottom:1px solid #E5E1D8;">
-    <p style="margin:0 0 14px;font-family:Lora,Georgia,serif;font-size:15px;line-height:1.85;color:#1C1917;">Hey there — thanks for being here. This week I went deep on ${mainPost?.title || "the latest EV battery developments"}. There's also a stat that surprised me, and three quick bites worth your 60 seconds.</p>
-    <p style="margin:0;font-family:Lora,Georgia,serif;font-size:14px;font-style:italic;color:#78716C;">— Chaitanya, Battery Systems Engineer</p>
-  </td></tr>
-  ${mainPost ? `
-  <tr><td class="ps" style="padding:36px 44px 32px;border-bottom:1px solid #E5E1D8;">
-    <p style="margin:0 0 14px;font-family:Lora,Georgia,serif;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:#C2410C;">Main Story</p>
-    <h2 style="margin:0 0 10px;font-family:'Playfair Display',Georgia,serif;font-size:25px;font-weight:700;color:#1C1917;line-height:1.25;">${mainPost.title}</h2>
-    <p style="margin:0 0 18px;font-family:Lora,Georgia,serif;font-size:11px;letter-spacing:0.04em;color:#A8A29E;">${readingTime} MIN READ · ${category}</p>
-    ${coverImage}
-    <p style="margin:0 0 14px;font-family:Lora,Georgia,serif;font-size:15px;line-height:1.88;color:#292524;">${mainPost.excerpt || "Read more about this topic..."}</p>
-    <table width="100%" cellpadding="0" cellspacing="0" style="margin:20px 0;">
-      <tr><td style="border-left:3px solid #C2410C;padding:10px 22px;background:rgba(194,65,12,0.05);">
-        <p style="margin:0;font-family:'Playfair Display',Georgia,serif;font-size:17px;font-style:italic;color:#1C1917;line-height:1.6;">"${pullQuote}"</p>
-      </td></tr>
-    </table>
-    <p style="margin:0 0 18px;font-family:Lora,Georgia,serif;font-size:15px;line-height:1.88;color:#292524;">Dive deeper into the research and data behind this analysis.</p>
-    <a href="${articleUrl}" target="_blank" style="display:inline-block;font-family:Lora,Georgia,serif;font-size:14px;color:#C2410C;text-decoration:underline;padding:8px 0;">Read the full breakdown →</a>
-  </td></tr>
-  ` : ''}
-  <tr><td bgcolor="#1C1917" align="center" class="ps" style="padding:36px 44px;">
-    <p style="margin:0 0 10px;font-family:Lora,Georgia,serif;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(251,248,243,0.38);">This Week's Number</p>
-    <p style="margin:0 0 10px;font-family:'Playfair Display',Georgia,serif;font-size:60px;font-weight:700;color:#C2410C;line-height:1;">${issueNum * 6 + 1}%</p>
-    <p style="margin:0;font-family:Lora,Georgia,serif;font-size:14px;font-style:italic;color:rgba(251,248,243,0.58);line-height:1.65;max-width:310px;">increase in EV battery research interest this month — based on engagement across our technical content.</p>
-  </td></tr>
-  <tr><td class="ps" style="padding:36px 44px;border-bottom:1px solid #E5E1D8;">
-    <p style="margin:0 0 18px;font-family:Lora,Georgia,serif;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:#C2410C;">Quick Bites</p>
-    <table width="100%" cellpadding="0" cellspacing="0" style="border-bottom:1px solid #ECEAE4;padding-bottom:14px;margin-bottom:14px;">
-      <tr><td width="54" valign="top"><span style="display:inline-block;background:#E5E1D8;color:#78716C;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;padding:3px 8px;border-radius:2px;font-family:Lora,Georgia,serif;">Policy</span></td>
-        <td style="padding-left:12px;font-family:Lora,Georgia,serif;font-size:14px;line-height:1.68;color:#292524;"><strong style="color:#1C1917;font-weight:500;">New battery safety standards draft is out.</strong> The draft brings stricter thermal runaway requirements for commercial EV packs.</td></tr>
-    </table>
-    <table width="100%" cellpadding="0" cellspacing="0" style="border-bottom:1px solid #ECEAE4;padding-bottom:14px;margin-bottom:14px;">
-      <tr>
-        <td width="54" valign="top"><span style="display:inline-block;background:#E5E1D8;color:#78716C;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;padding:3px 8px;border-radius:2px;font-family:Lora,Georgia,serif;">Tech</span></td>
-        <td style="padding-left:12px;font-family:Lora,Georgia,serif;font-size:14px;line-height:1.68;color:#292524;">
-          <a href="${bite1Url}" target="_blank" style="color:#1C1917;text-decoration:none;"><strong style="color:#1C1917;font-weight:500;">${bite1Title}</strong></a> ${bite1Excerpt} <a href="${bite1Url}" target="_blank" style="color:#C2410C;font-size:12px;text-decoration:underline;">Read →</a>
-        </td>
-      </tr>
-    </table>
-    <table width="100%" cellpadding="0" cellspacing="0">
-      <tr>
-        <td width="54" valign="top"><span style="display:inline-block;background:#E5E1D8;color:#78716C;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;padding:3px 8px;border-radius:2px;font-family:Lora,Georgia,serif;">Market</span></td>
-        <td style="padding-left:12px;font-family:Lora,Georgia,serif;font-size:14px;line-height:1.68;color:#292524;">
-          <a href="${bite2Url}" target="_blank" style="color:#1C1917;text-decoration:none;"><strong style="color:#1C1917;font-weight:500;">${bite2Title}</strong></a> ${bite2Excerpt} <a href="${bite2Url}" target="_blank" style="color:#C2410C;font-size:12px;text-decoration:underline;">Read →</a>
-        </td>
-      </tr>
-    </table>
-  </td></tr>
-  <tr><td bgcolor="#FBF5EF" class="ps" style="padding:30px 44px;border-bottom:1px solid #E5E1D8;">
-    <p style="margin:0 0 14px;font-family:Lora,Georgia,serif;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:#C2410C;">Tool of the Week</p>
-    <h3 style="margin:0 0 8px;font-family:'Playfair Display',Georgia,serif;font-size:19px;font-weight:700;color:#1C1917;">${calcName} — VoltPulse</h3>
-    <p style="margin:0 0 14px;font-family:Lora,Georgia,serif;font-size:14px;line-height:1.72;color:#57534E;">${calcDesc} Handles voltage, thermal, and power analysis. Free, no sign-up.</p>
-    <a href="${calculatorUrl}" target="_blank" style="font-family:Lora,Georgia,serif;font-size:13px;color:#C2410C;text-decoration:underline;">Try the calculator →</a>
-  </td></tr>
-  <tr><td bgcolor="#1C1917" align="center" class="ps" style="padding:26px 44px;">
-    <p style="margin:0 0 6px;font-family:Lora,Georgia,serif;font-size:11px;color:rgba(251,248,243,0.3);line-height:1.9;">You're receiving this because you subscribed at voltpulse.in</p>
-    <p style="margin:0 0 8px;font-family:Lora,Georgia,serif;font-size:11px;color:rgba(251,248,243,0.3);line-height:1.9;">
-      <a href="${unsubUrl}" style="color:rgba(251,248,243,0.45);">Unsubscribe</a> ·
-      <a href="${BASE_URL}" style="color:rgba(251,248,243,0.45);">View in browser</a>
-    </p>
-    <p style="margin:0;font-family:Lora,Georgia,serif;font-size:11px;color:rgba(251,248,243,0.18);">VoltPulse · Visakhapatnam, India</p>
-  </td></tr>
+<table width="100%" bgcolor="#E5E1D8" cellpadding="0" cellspacing="0">
+<tr><td align="center" style="padding: 32px 16px;">
+
+<!-- ==== BLOCK 1: HEADER ==== -->
+<table class="wrapper" width="600" cellpadding="0" cellspacing="0" style="background: #1C1917;">
+<tr>
+<td class="wrapper" style="padding: 40px 44px 32px; text-align: center;">
+  <p style="margin: 0 0 16px; font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; color: #C2410C;">
+    Issue #${issueNum} · ${month} ${year}
+  </p>
+  <h1 style="margin: 0 0 10px; font-family: Georgia, serif; font-size: 42px; font-weight: 700; color: #FFFFFF; line-height: 1.1;">
+    Volt<span style="color: #C2410C;">Pulse</span>
+  </h1>
+  <p style="margin: 0 0 20px; font-family: Lora, Georgia, serif; font-size: 14px; font-style: italic; color: #A8A29E;">
+    Engineering clarity for the EV era
+  </p>
+  <p style="margin: 0; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: #78716C;">
+    Battery Systems · Charging · Policy · Tools
+  </p>
+</td>
+</tr>
 </table>
+
+<!-- ==== BLOCK 2: INTRO ==== -->
+<table class="wrapper" width="600" cellpadding="0" cellspacing="0" style="background: #F7F5F0;">
+<tr>
+<td class="wrapper" style="padding: 36px 44px 28px; border-bottom: 1px solid #E5E1D8;">
+  <p style="margin: 0 0 14px; font-size: 15px; line-height: 1.85; color: #1C1917;">
+    Hey there — thanks for being part of VoltPulse. This week I'm diving deep into something that matters for every EV engineer: ${mainPost?.title || "the latest battery technology developments"}. Stick around for a stat that might surprise you.
+  </p>
+  <p style="margin: 0; font-size: 14px; font-style: italic; color: #78716C;">
+    — Chaitanya, EV Battery Engineer
+  </p>
+</td>
+</tr>
+</table>
+
+<!-- ==== BLOCK 3: MAIN STORY ==== -->
+<table class="wrapper" width="600" cellpadding="0" cellspacing="0" style="background: #F7F5F0;">
+<tr>
+<td class="wrapper" style="padding: 36px 44px 32px; border-bottom: 1px solid #E5E1D8;">
+  <p style="margin: 0 0 12px; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: #C2410C;">
+    MAIN STORY
+  </p>
+  <h2 style="margin: 0 0 8px; font-family: Georgia, serif; font-size: 26px; font-weight: 700; color: #1C1917; line-height: 1.25;">
+    ${mainPost?.title || "Your EV Battery Guide"}
+  </h2>
+  <p style="margin: 0 0 18px; font-size: 10px; letter-spacing: 0.06em; color: #A8A29E;">
+    ${readingTime} MIN READ · ${category}
+  </p>
+  ${coverImage}
+  <p style="margin: 0 0 16px; font-size: 15px; line-height: 1.85; color: #292524;">
+    ${mainPost?.excerpt || "Deep dive into EV battery technology and engineering analysis."}
+  </p>
+</td>
+</tr>
+</table>
+
+<!-- ==== BLOCK 4: PULL QUOTE ==== -->
+<table class="wrapper" width="600" cellpadding="0" cellspacing="0" style="background: #FBF5EF;">
+<tr>
+<td class="wrapper" style="padding: 28px 44px; border-left: 3px solid #C2410C; border-top: 1px solid #E5E1D8; border-bottom: 1px solid #E5E1D8;">
+  <p style="margin: 0; font-family: Georgia, serif; font-size: 18px; font-style: italic; color: #1C1917; line-height: 1.6;">
+    "${pullQuote}"
+  </p>
+</td>
+</tr>
+</table>
+
+<!-- ==== BLOCK 5: ARTICLE EXCERPT + CTA ==== -->
+<table class="wrapper" width="600" cellpadding="0" cellspacing="0" style="background: #F7F5F0;">
+<tr>
+<td class="wrapper" style="padding: 32px 44px 36px; border-bottom: 1px solid #E5E1D8;">
+  <p style="margin: 0 0 20px; font-size: 15px; line-height: 1.85; color: #292524;">
+    This analysis breaks down the core engineering principles, real-world test data, and practical implications for battery system design. Whether you're sizing a pack or evaluating cell chemistry, here's what the numbers tell us.
+  </p>
+  <table cellpadding="0" cellspacing="0" style="margin: 8px 0 0;">
+  <tr>
+    <td style="background: #C2410C; border-radius: 6px; padding: 0;">
+      <a href="${articleUrl}" target="_blank" style="display: block; padding: 14px 28px; font-size: 14px; font-weight: 600; color: #FFFFFF; text-decoration: none; border-radius: 6px;">
+        Read Full Article →
+      </a>
+    </td>
+  </tr>
+  </table>
+</td>
+</tr>
+</table>
+
+<!-- ==== BLOCK 6: STAT CALLOUT ==== -->
+<table class="wrapper" width="600" cellpadding="0" cellspacing="0" style="background: #1C1917;">
+<tr>
+<td class="wrapper" style="padding: 40px 44px; text-align: center;">
+  <p style="margin: 0 0 12px; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: #78716C;">
+    THIS WEEK'S NUMBER
+  </p>
+  <p style="margin: 0 0 12px; font-family: Georgia, serif; font-size: 64px; font-weight: 700; color: #C2410C; line-height: 1;">
+    ${(issueNum * 7) + 12}%
+  </p>
+  <p style="margin: 0; font-size: 14px; font-style: italic; color: #78716C; line-height: 1.65; max-width: 320px; margin-left: auto; margin-right: auto;">
+    of EV battery research now focuses on thermal management — a 12% shift from last quarter's focus on cell chemistry.
+  </p>
+</td>
+</tr>
+</table>
+
+<!-- ==== BLOCK 7: QUICK BITES ==== -->
+<table class="wrapper" width="600" cellpadding="0" cellspacing="0" style="background: #F7F5F0;">
+<tr>
+<td class="wrapper" style="padding: 36px 44px;">
+  <p style="margin: 0 0 20px; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: #C2410C;">
+    QUICK BITES
+  </p>
+  
+  <!-- Bite 1 -->
+  <table width="100%" cellpadding="0" cellspacing="0" style="border-bottom: 1px solid #E5E1D8; padding-bottom: 16px; margin-bottom: 16px;">
+  <tr>
+    <td width="62" valign="top">
+      <span style="display: inline-block; background: #E5E1D8; color: #78716C; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; padding: 4px 10px; border-radius: 3px;">
+        TECH
+      </span>
+    </td>
+    <td style="padding-left: 14px; font-size: 14px; line-height: 1.7; color: #292524;">
+      <a href="${bite1Url}" target="_blank" style="color: #1C1917; text-decoration: none; font-weight: 600;">
+        ${bite1Title || "New solid-state battery breakthrough"}
+      </a>
+      <br><span style="font-size: 13px; color: #57534E;">${bite1Excerpt || "Recent developments in solid-state electrolyte technology."}</span>
+    </td>
+  </tr>
+  </table>
+  
+  <!-- Bite 2 -->
+  <table width="100%" cellpadding="0" cellspacing="0" style="border-bottom: 1px solid #E5E1D8; padding-bottom: 16px; margin-bottom: 16px;">
+  <tr>
+    <td width="62" valign="top">
+      <span style="display: inline-block; background: #E5E1D8; color: #78716C; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; padding: 4px 10px; border-radius: 3px;">
+        POLICY
+      </span>
+    </td>
+    <td style="padding-left: 14px; font-size: 14px; line-height: 1.7; color: #292524;">
+      <a href="${bite2Url}" target="_blank" style="color: #1C1917; text-decoration: none; font-weight: 600;">
+        ${bite2Title || "New safety standards draft released"}
+      </a>
+      <br><span style="font-size: 13px; color: #57534E;">${bite2Excerpt || "Updated thermal runaway requirements."}</span>
+    </td>
+  </tr>
+  </table>
+  
+  <!-- Bite 3 -->
+  <table width="100%" cellpadding="0" cellspacing="0;">
+  <tr>
+    <td width="62" valign="top">
+      <span style="display: inline-block; background: #E5E1D8; color: #78716C; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; padding: 4px 10px; border-radius: 3px;">
+        MARKET
+      </span>
+    </td>
+    <td style="padding-left: 14px; font-size: 14px; line-height: 1.7; color: #292524;">
+      <a href="${bite2Url}" target="_blank" style="color: #1C1917; text-decoration: none; font-weight: 600;">
+        ${quickBite3?.title || "EV market growth update"}
+      </a>
+      <br><span style="font-size: 13px; color: #57534E;">Global EV sales continue upward trajectory.</span>
+    </td>
+  </tr>
+  </table>
+</td>
+</tr>
+</table>
+
+<!-- ==== BLOCK 8: TOOL OF THE WEEK ==== -->
+<table class="wrapper" width="600" cellpadding="0" cellspacing="0" style="background: #FBF5EF;">
+<tr>
+<td class="wrapper" style="padding: 32px 44px; border-bottom: 1px solid #E5E1D8;">
+  <p style="margin: 0 0 14px; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: #C2410C;">
+    TOOL OF THE WEEK
+  </p>
+  <h3 style="margin: 0 0 8px; font-family: Georgia, serif; font-size: 20px; font-weight: 700; color: #1C1917;">
+    ${calcName}
+  </h3>
+  <p style="margin: 0 0 14px; font-size: 14px; line-height: 1.75; color: #57534E;">
+    ${calcDesc} This calculator handles all the key calculations you need — voltage, thermal load, and power analysis. Free to use, no sign-up required.
+  </p>
+  <a href="${calculatorUrl}" target="_blank" style="font-size: 13px; color: #C2410C; text-decoration: underline;">
+    Try it here →
+  </a>
+</td>
+</tr>
+</table>
+
+<!-- ==== BLOCK 9: FOOTER ==== -->
+<table class="wrapper" width="600" cellpadding="0" cellspacing="0" style="background: #1C1917;">
+<tr>
+<td class="wrapper" style="padding: 32px 44px; text-align: center;">
+  <p style="margin: 0 0 6px; font-size: 12px; color: #78716C;">
+    <a href="${BASE_URL}" style="color: #A8A29E; text-decoration: none;">evpulse.co.in</a>
+  </p>
+  <p style="margin: 0 0 8px; font-size: 11px; color: #57534E;">
+    <a href="${unsubUrl}" style="color: #78716C; text-decoration: underline;">Unsubscribe</a> · <a href="${BASE_URL}" style="color: #78716C; text-decoration: underline;">View in browser</a>
+  </p>
+  <p style="margin: 0; font-size: 10px; color: #44403C;">
+    VoltPulse · Visakhapatnam, India
+  </p>
+</td>
+</tr>
+</table>
+
 </td></tr>
 </table>
 </body>
