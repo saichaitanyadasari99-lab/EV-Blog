@@ -8,7 +8,7 @@ export async function GET() {
   }
 
   const ADMIN_EMAIL = "saichaitanyadasari99@gmail.com";
-  const BASE_URL = "https://ev-blog-post.vercel.app";
+  const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://www.evpulse.co.in";
   const now = new Date();
   const issueNum = Math.floor((now.getFullYear() - 2025) * 12 + now.getMonth()) + 1;
   const month = now.toLocaleString("en-US", { month: "long" });

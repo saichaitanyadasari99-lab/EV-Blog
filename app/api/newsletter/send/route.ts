@@ -5,7 +5,7 @@ import { parseTiptapJson } from "@/lib/tiptap";
 
 const BATCH_SIZE = 100;
 const ADMIN_EMAIL = "saichaitanyadasari99@gmail.com";
-const BASE_URL = "https://ev-blog-post.vercel.app";
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://www.evpulse.co.in";
 
 type Subscriber = {
   id: string;

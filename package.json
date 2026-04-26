@@ -20,6 +20,7 @@
     "@tiptap/react": "^3.22.0",
     "@tiptap/starter-kit": "^3.22.0",
     "@uploadthing/react": "^7.3.3",
+    "framer-motion": "^12.38.0",
     "jszip": "^3.10.1",
     "katex": "^0.16.45",
     "lowlight": "^3.3.0",

@@ -1,12 +1,13 @@
 import { MetadataRoute } from "next";
 
 export default function robots(): MetadataRoute.Robots {
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://www.evpulse.co.in";
   return {
     rules: {
       userAgent: "*",
       allow: "/",
       disallow: ["/admin/", "/api/", "/admin"],
     },
-    sitemap: "https://ev-blog-post.vercel.app/sitemap.xml",
+    sitemap: `${baseUrl}/sitemap.xml`,
   };
 }
