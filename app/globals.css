@@ -962,14 +962,17 @@ a {
 
 .ticker-item {
   align-items: center;
-  display: flex;
-  flex-shrink: 0;
-  gap: 10px;
+  color: var(--text2);
+  font-size: 12.5px;
   padding: 0 24px;
+  position: relative;
   white-space: nowrap;
-  cursor: pointer;
-  color: var(--text);
-  transition: color 0.2s ease;
+}
+
+.ticker-item::before {
+  content: "·";
+  position: absolute;
+  right: 8px;
 }
 
 .ticker-item:hover {
@@ -2194,6 +2197,9 @@ a {
     grid-template-columns: 1fr;
     gap: 8px;
   }
+  .featured-row {
+    grid-template-columns: 1fr;
+  }
   .articles-grid,
   .grid-4,
   .five-grid {
@@ -2889,9 +2895,9 @@ a {
 }
 
 .calc-grid-home {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
   gap: 12px;
-  flex-wrap: wrap;
   margin-bottom: 24px;
 }
 
