@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { DM_Sans, IBM_Plex_Mono, Syne } from "next/font/google";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
@@ -24,6 +24,13 @@ const ibmMono = IBM_Plex_Mono({
 });
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://www.evpulse.co.in";
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),
@@ -89,6 +96,14 @@ export default function RootLayout({
       className={`${syne.variable} ${dmSans.variable} ${ibmMono.variable} h-full antialiased`}
     >
       <head>
+        <meta name="theme-color" content="#0099b8" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="VoltPulse" />
+        <link rel="icon" type="image/svg+xml" href="/icon.svg" />
+        <link rel="apple-touch-icon" href="/icon.svg" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(ORGANIZATION_SCHEMA) }}
@@ -97,7 +112,9 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         <SkipLink />
         <SiteHeader />
-        <div className="flex-1">{children}</div>
+        <main id="main-content" className="flex-1" tabIndex={-1}>
+          {children}
+        </main>
         <SiteFooter />
       </body>
     </html>
