@@ -48,7 +48,7 @@ export function SiteHeader() {
           {/* Logo */}
           <Link href="/" className="header-logo">
             <span className="logo-icon">⚡</span>
-            <span className="logo-text">Volt<span className="logo-accent">Pulse</span></span>
+            <span className="logo-text">EV<span className="logo-accent">Pulse</span></span>
           </Link>
 
           {/* Desktop Navigation */}
