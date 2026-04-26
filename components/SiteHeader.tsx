@@ -6,10 +6,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { useState, useEffect } from "react";
 
 const navItems = [
-  { 
-    href: "/", 
-    label: "Home" 
-  },
+  { href: "/", label: "Home" },
   { 
     href: "/blogs", 
     label: "Blogs",
@@ -40,14 +37,8 @@ const navItems = [
       { href: "/calculators/bms-window-checker", label: "BMS Voltage Window" },
     ]
   },
-  { 
-    href: "/about", 
-    label: "About" 
-  },
-  { 
-    href: "/contact", 
-    label: "Contact" 
-  },
+  { href: "/about", label: "About" },
+  { href: "/contact", label: "Contact" },
 ];
 
 export function SiteHeader() {
@@ -55,6 +46,15 @@ export function SiteHeader() {
   const [openMega, setOpenMega] = useState<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobileSubMenu, setMobileSubMenu] = useState<string | null>(null);
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 10);
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   useEffect(() => {
     if (mobileMenuOpen) {
@@ -74,9 +74,9 @@ export function SiteHeader() {
 
   return (
     <>
-      <header className="navbar">
+      <header className={`navbar_new ${isScrolled ? "scrolled" : ""}`}>
         <Link href="/" className="nav-logo">
-          <span className="nav-logo-icon">VP</span>
+          <span className="nav-logo-icon">⚡</span>
           <span className="nav-logo-text">
             Volt<span>Pulse</span>
           </span>
@@ -92,10 +92,9 @@ export function SiteHeader() {
             >
               <Link
                 href={item.href}
-                className={`nav-cat ${pathname === item.href ? "active" : ""} ${item.hasMega ? 'has-mega' : ''}`}
+                className={`nav-cat ${pathname === item.href ? "active" : ""}`}
               >
                 {item.label}
-                {item.hasMega && <span className="nav-arrow">▾</span>}
               </Link>
               
               {item.hasMega && openMega === item.href && (
@@ -117,30 +116,33 @@ export function SiteHeader() {
           ))}
         </nav>
 
-        <div className="nav-actions">
-          <Link href="/search" className="nav-btn" aria-label="Search">
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2">
+        <div className="nav-actions_new">
+          <Link href="/search" className="nav-btn_new" aria-label="Search">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2">
               <circle cx="11" cy="11" r="7" />
               <path d="M20 20l-3.5-3.5" />
             </svg>
           </Link>
-          <ThemeToggle />
-          <Link href="/#newsletter" className="nav-subscribe">
+          
+          <button className="nav-btn_new theme-toggle-btn" aria-label="Toggle theme">
+            <ThemeToggle />
+          </button>
+          
+          <Link href="/#newsletter" className="nav-subscribe_new hide-mobile">
             SUBSCRIBE
           </Link>
+          
           <button 
-            className="mobile-menu-btn" 
+            className="mobile-menu-btn-new" 
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
             aria-expanded={mobileMenuOpen}
           >
-            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2">
               {mobileMenuOpen ? (
                 <path d="M18 6L6 18M6 6l12 12" />
               ) : (
-                <>
-                  <path d="M3 12h18M3 6h18M3 18h18" />
-                </>
+                <path d="M3 12h18M3 6h18M3 18h18" />
               )}
             </svg>
           </button>
@@ -153,29 +155,29 @@ export function SiteHeader() {
       )}
       
       {/* Mobile Menu Panel */}
-      <aside className={`mobile-menu ${mobileMenuOpen ? "open" : ""}`} aria-hidden={!mobileMenuOpen}>
-        <nav className="mobile-menu-nav">
+      <aside className={`mobile-menu-panel ${mobileMenuOpen ? "open" : ""}`}>
+        <nav className="mobile-menu-nav-new">
           {navItems.map((item) => (
-            <div key={item.href} className="mobile-menu-item">
+            <div key={item.href} className="mobile-menu-item-new">
               {item.hasMega ? (
                 <>
                   <button 
-                    className="mobile-menu-link has-submenu"
+                    className="mobile-menu-link-new has-submenu"
                     onClick={() => setMobileSubMenu(mobileSubMenu === item.href ? null : item.href)}
                     aria-expanded={mobileSubMenu === item.href}
                   >
-                    {item.label}
-                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" className={mobileSubMenu === item.href ? "rotated" : ""}>
+                    <span>{item.label}</span>
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" className={mobileSubMenu === item.href ? "rotated" : ""}>
                       <path d="M6 9l6 6 6-6" />
                     </svg>
                   </button>
                   {mobileSubMenu === item.href && (
-                    <div className="mobile-submenu">
+                    <div className="mobile-submenu-new">
                       {item.megaItems?.map((subItem) => (
                         <Link 
                           key={subItem.href} 
                           href={subItem.href}
-                          className="mobile-submenu-link"
+                          className="mobile-submenu-link-new"
                         >
                           {subItem.label}
                         </Link>
@@ -184,7 +186,7 @@ export function SiteHeader() {
                   )}
                 </>
               ) : (
-                <Link href={item.href} className="mobile-menu-link">
+                <Link href={item.href} className="mobile-menu-link-new">
                   {item.label}
                 </Link>
               )}
@@ -192,13 +194,13 @@ export function SiteHeader() {
           ))}
         </nav>
         
-        <div className="mobile-menu-footer">
-          <Link href="/#newsletter" className="mobile-subscribe-btn">
-            SUBSCRIBE
+        <div className="mobile-menu-footer-new">
+          <Link href="/#newsletter" className="mobile-subscribe-btn-new">
+            SUBSCRIBE TO NEWSLETTER
           </Link>
-          <div className="mobile-theme-toggle">
+          <div className="mobile-theme-new">
             <ThemeToggle />
-            <span>Dark Mode</span>
+            <span>Toggle Theme</span>
           </div>
         </div>
       </aside>

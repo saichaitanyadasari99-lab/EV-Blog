@@ -112,7 +112,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         <SkipLink />
         <SiteHeader />
-        <main id="main-content" className="flex-1" tabIndex={-1}>
+        <main id="main-content" className="flex-1 main-content-with-header" tabIndex={-1}>
           {children}
         </main>
         <SiteFooter />
