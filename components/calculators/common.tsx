@@ -95,7 +95,7 @@ export function shareResults(title: string, results: Record<string, string | num
     .map(([key, value]) => `${key}: ${value}`)
     .join('\n');
   
-  const fullText = `${title}\n\n${text}\n\nCalculated on VoltPulse`;
+  const fullText = `${title}\n\n${text}\n\nCalculated on EVPulse`;
   
   if (navigator.share) {
     navigator.share({

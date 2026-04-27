@@ -76,7 +76,7 @@ export default function AboutPage() {
           </h1>
           <p className="about-hero-subtitle">Battery Systems Engineer</p>
           <p className="about-hero-text">
-            I&apos;ve spent 3+ years inside commercial EV development — designing packs, writing BMS logic, and navigating homologation. VoltPulse is where I put what I&apos;ve actually learned into writing.
+            I&apos;ve spent 3+ years inside commercial EV development — designing packs, writing BMS logic, and navigating homologation. EVPulse is where I put what I&apos;ve actually learned into writing.
           </p>
           <div className="about-checkmarks">
             <span className="about-check">✓</span>
@@ -170,7 +170,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* What Makes VoltPulse Different */}
+      {/* What Makes EVPulse Different */}
       <section className="about-section">
         <div className="about-section-header">
           <p className="about-label">WHY VOLTPULSE</p>

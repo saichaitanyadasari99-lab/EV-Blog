@@ -14,7 +14,7 @@ export function ContactForm({ intent }: Props) {
   );
   const [message, setMessage] = useState(
     intent === "subscribe"
-      ? "Please add me to the VoltPulse newsletter list."
+      ? "Please add me to the EVPulse newsletter list."
       : "",
   );
   const [status, setStatus] = useState("");
@@ -66,7 +66,7 @@ export function ContactForm({ intent }: Props) {
       setName("");
       setEmail("");
       setSubject(intent === "subscribe" ? "Newsletter subscription request" : "");
-      setMessage(intent === "subscribe" ? "Please add me to the VoltPulse newsletter list." : "");
+      setMessage(intent === "subscribe" ? "Please add me to the EVPulse newsletter list." : "");
     })();
   };
 

@@ -65,7 +65,7 @@ async function sendContactEmailBrevo(data: { name: string; email: string; subjec
       <div class="message-box">${data.message}</div>
     </div>
     <div class="field" style="margin-top: 20px; font-size: 12px; color: #9aa3b2;">
-      Submitted from VoltPulse website contact form.
+      Submitted from EVPulse website contact form.
     </div>
   </div>
 </body>
@@ -78,7 +78,7 @@ async function sendContactEmailBrevo(data: { name: string; email: string; subjec
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      sender: { email: "chaitanya_dasari@evpulse.co.in", name: "VoltPulse Website" },
+      sender: { email: "chaitanya_dasari@evpulse.co.in", name: "EVPulse Website" },
       to: [{ email: "chaitanya_dasari@evpulse.co.in" }],
       subject: `[Contact] ${data.subject}`,
       htmlContent: html,

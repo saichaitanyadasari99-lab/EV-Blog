@@ -3,13 +3,13 @@ const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://www.evpulse.co.in";
 export const ORGANIZATION_SCHEMA = {
   "@context": "https://schema.org",
   "@type": "Organization",
-  name: "VoltPulse",
+  name: "EVPulse",
   url: baseUrl,
   logo: `${baseUrl}/favicon.ico`,
   description: "Battery and EV technology newsroom with deep-dive technical analysis, battery engineering insights, and EV benchmarks.",
   sameAs: [
-    "https://twitter.com/voltpulse",
-    "https://linkedin.com/company/voltpulse",
+    "https://twitter.com/evpulse",
+    "https://linkedin.com/company/evpulse",
   ],
   contactPoint: {
     "@type": "ContactPoint",
@@ -41,11 +41,11 @@ export function getArticleSchema(article: {
     dateModified: article.modifiedAt,
     author: {
       "@type": "Person",
-      name: article.author || "VoltPulse Team",
+      name: article.author || "EVPulse Team",
     },
     publisher: {
       "@type": "Organization",
-      name: "VoltPulse",
+      name: "EVPulse",
       logo: {
         "@type": "ImageObject",
         url: `${baseUrl}/favicon.ico`,

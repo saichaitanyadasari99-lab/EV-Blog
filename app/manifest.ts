@@ -2,8 +2,8 @@ import { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "VoltPulse - EV Battery Calculators",
-    short_name: "VoltPulse",
+    name: "EVPulse - EV Battery Calculators",
+    short_name: "EVPulse",
     description: "Professional EV battery design calculators and tools",
     start_url: "/",
     display: "standalone",

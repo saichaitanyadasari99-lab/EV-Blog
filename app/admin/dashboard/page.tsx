@@ -18,7 +18,7 @@ export default async function AdminDashboardPage() {
     <div className="space-y-4">
       <section className="panel p-6">
         <p className="text-xs font-black uppercase tracking-[0.14em] text-[var(--accent)]">
-          VoltPulse Admin
+          EVPulse Admin
         </p>
         <h1 className="mt-2 text-3xl font-black">Dashboard</h1>
         <p className="mt-2 text-sm text-[var(--ink-soft)]">Signed in as {user.email}</p>

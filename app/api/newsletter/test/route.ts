@@ -19,7 +19,7 @@ export async function GET() {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>VoltPulse Newsletter</title>
+<title>EVPulse Newsletter</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
 <style>
 body{margin:0;padding:0;background:#ECEAE4;}
@@ -64,13 +64,13 @@ td{padding:0;}
   </td></tr>
   <tr><td bgcolor="#FBF5EF" class="ps" style="padding:30px 44px;border-bottom:1px solid #E5E1D8;">
     <p style="margin:0 0 14px;font-family:Lora,Georgia,serif;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:#C2410C;">Tool of the Week</p>
-    <h3 style="margin:0 0 8px;font-family:'Playfair Display',Georgia,serif;font-size:19px;font-weight:700;color:#1C1917;">Battery Pack Designer — VoltPulse</h3>
+    <h3 style="margin:0 0 8px;font-family:'Playfair Display',Georgia,serif;font-size:19px;font-weight:700;color:#1C1917;">Battery Pack Designer — EVPulse</h3>
     <p style="margin:0 0 14px;font-family:Lora,Georgia,serif;font-size:14px;line-height:1.72;color:#57534E;">Sizing a new pack and don't want to start from scratch? The interactive calculator handles cell count, voltage window, thermal load, and cooling estimates in a single flow. Free, no sign-up.</p>
     <a href="${BASE_URL}/calculators" style="font-family:Lora,Georgia,serif;font-size:13px;color:#C2410C;text-decoration:underline;">Try the calculator →</a>
   </td></tr>
   <tr><td bgcolor="#1C1917" align="center" class="ps" style="padding:26px 44px;">
     <p style="margin:0 0 6px;font-family:Lora,Georgia,serif;font-size:11px;color:rgba(251,248,243,0.3);line-height:1.9;">You're receiving this because you subscribed at voltpulse.in</p>
-    <p style="margin:0;font-family:Lora,Georgia,serif;font-size:11px;color:rgba(251,248,243,0.18);">VoltPulse · Visakhapatnam, India</p>
+    <p style="margin:0;font-family:Lora,Georgia,serif;font-size:11px;color:rgba(251,248,243,0.18);">EVPulse · Visakhapatnam, India</p>
   </td></tr>
 </table>
 </td></tr>
@@ -86,9 +86,9 @@ td{padding:0;}
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: "VoltPulse <onboarding@resend.dev>",
+        from: "EVPulse <onboarding@resend.dev>",
         to: ADMIN_EMAIL,
-        subject: "⚡ TEST: VoltPulse Newsletter",
+        subject: "⚡ TEST: EVPulse Newsletter",
         html: testHtml,
       }),
     });

@@ -219,7 +219,7 @@ function getEmailHtml(posts: Post[], unsubUrl: string) {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>VoltPulse Newsletter</title>
+<title>EVPulse Newsletter</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Playfair+Display:wght@400;700&display=swap');
 * { box-sizing: border-box; }
@@ -244,7 +244,7 @@ a:hover { text-decoration: none; }
     Issue #${issueNum} · ${month} ${year}
   </p>
   <h1 style="margin: 0 0 10px; font-family: Georgia, serif; font-size: 42px; font-weight: 700; color: #FFFFFF; line-height: 1.1;">
-    Volt<span style="color: #C2410C;">Pulse</span>
+    EV<span style="color: #C2410C;">Pulse</span>
   </h1>
   <p style="margin: 0 0 20px; font-family: Lora, Georgia, serif; font-size: 14px; font-style: italic; color: #A8A29E;">
     Engineering clarity for the EV era
@@ -261,7 +261,7 @@ a:hover { text-decoration: none; }
 <tr>
 <td class="wrapper" style="padding: 36px 44px 28px; border-bottom: 1px solid #E5E1D8;">
   <p style="margin: 0 0 14px; font-size: 15px; line-height: 1.85; color: #1C1917;">
-    Hey there — thanks for being part of VoltPulse. This week I'm diving deep into something that matters for every EV engineer: ${mainPost?.title || "the latest battery technology developments"}. Stick around for a stat that might surprise you.
+    Hey there — thanks for being part of EVPulse. This week I'm diving deep into something that matters for every EV engineer: ${mainPost?.title || "the latest battery technology developments"}. Stick around for a stat that might surprise you.
   </p>
   <p style="margin: 0; font-size: 14px; font-style: italic; color: #78716C;">
     — Chaitanya, EV Battery Engineer
@@ -432,7 +432,7 @@ a:hover { text-decoration: none; }
     <a href="${unsubUrl}" style="color: #78716C; text-decoration: underline;">Unsubscribe</a> · <a href="${BASE_URL}" style="color: #78716C; text-decoration: underline;">View in browser</a>
   </p>
   <p style="margin: 0; font-size: 10px; color: #44403C;">
-    VoltPulse · Visakhapatnam, India
+    EVPulse · Visakhapatnam, India
   </p>
 </td>
 </tr>
@@ -455,7 +455,7 @@ async function sendEmailBrevo(toEmail: string, subject: string, html: string) {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      sender: { email: "chaitanya_dasari@evpulse.co.in", name: "VoltPulse" },
+      sender: { email: "chaitanya_dasari@evpulse.co.in", name: "EVPulse" },
       to: [{ email: toEmail }],
       subject: subject,
       htmlContent: html,
