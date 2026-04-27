@@ -38,6 +38,16 @@ function buildUploadPath(prefix: string, fileName: string) {
   return `${prefix}-${crypto.randomUUID()}.${ext}`;
 }
 
+function slugifyHeading(text: string) {
+  return text
+    .toLowerCase()
+    .replace(/[*_`[\]]/g, "")        // strip markdown formatting chars
+    .replace(/[^\w\s-]/g, "")        // strip non-word chars
+    .replace(/\s+/g, "-")            // spaces → hyphens
+    .replace(/-+/g, "-")             // collapse multiple hyphens
+    .trim();
+}
+
 function formatInline(text: string) {
   // Extract images and links BEFORE HTML escaping so URLs are never mangled.
   // Replace each match with a null-byte-delimited index placeholder, then
@@ -59,6 +69,8 @@ function formatInline(text: string) {
 
   // Apply inline markdown formatting to the escaped text.
   value = value.replace(/`([^`]+)`/g, "<code>$1</code>");
+  // Inline math: $...$ → styled code span so it looks distinct from regular code
+  value = value.replace(/\$([^$\n]+)\$/g, '<code class="math-inline">$1</code>');
   value = value.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
   value = value.replace(/\*([^*]+)\*/g, "<em>$1</em>");
 
@@ -108,6 +120,8 @@ function markdownToHtml(markdown: string) {
   const blocks: string[] = [];
   let paragraph: string[] = [];
   let listItems: string[] = [];
+  let orderedItems: string[] = [];
+  let blockquoteLines: string[] = [];
 
   const flushParagraph = () => {
     const text = paragraph.join(" ").trim();
@@ -122,19 +136,39 @@ function markdownToHtml(markdown: string) {
     listItems = [];
   };
 
+  // FIX 1: Numbered (ordered) list support
+  const flushOrderedList = () => {
+    if (!orderedItems.length) return;
+    blocks.push(`<ol>${orderedItems.map((item) => `<li>${formatInline(item)}</li>`).join("")}</ol>`);
+    orderedItems = [];
+  };
+
+  // FIX 2: Multi-line blockquote support
+  const flushBlockquote = () => {
+    if (!blockquoteLines.length) return;
+    const inner = blockquoteLines.join(" ").trim();
+    blocks.push(`<blockquote><p>${formatInline(inner)}</p></blockquote>`);
+    blockquoteLines = [];
+  };
+
+  const flushAll = () => {
+    flushParagraph();
+    flushList();
+    flushOrderedList();
+    flushBlockquote();
+  };
+
   for (let i = 0; i < lines.length; i += 1) {
     const line = lines[i].trim();
 
     if (!line) {
-      flushParagraph();
-      flushList();
+      flushAll();
       continue;
     }
 
     // Block math: fenced $$ ... $$
     if (line === "$$") {
-      flushParagraph();
-      flushList();
+      flushAll();
       const formulaLines: string[] = [];
       i += 1;
       while (i < lines.length && lines[i].trim() !== "$$") {
@@ -142,13 +176,15 @@ function markdownToHtml(markdown: string) {
         i += 1;
       }
       const formula = formulaLines.join("\n").trim();
-      blocks.push(`<p class="math-block" data-formula="${escapeHtml(formula)}">${escapeHtml(formula)}</p>`);
+      // Renders raw LaTeX as a styled block; if KaTeX is wired up client-side
+      // it will pick up data-formula. Otherwise the formula is human-readable
+      // as a styled code block.
+      blocks.push(`<pre class="math-block" data-formula="${escapeHtml(formula)}"><code>${escapeHtml(formula)}</code></pre>`);
       continue;
     }
 
     if (isTableLine(line)) {
-      flushParagraph();
-      flushList();
+      flushAll();
       const parsed = parseTable(lines, i);
       if (parsed.next !== i) {
         blocks.push(parsed.html);
@@ -157,60 +193,74 @@ function markdownToHtml(markdown: string) {
       }
     }
 
+    // FIX 3: Heading ids for working TOC anchor links
     if (line.startsWith("### ")) {
-      flushParagraph();
-      flushList();
-      blocks.push(`<h3>${formatInline(line.slice(4))}</h3>`);
+      flushAll();
+      const text = line.slice(4);
+      blocks.push(`<h3 id="${slugifyHeading(text)}">${formatInline(text)}</h3>`);
       continue;
     }
 
     if (line.startsWith("## ")) {
-      flushParagraph();
-      flushList();
-      blocks.push(`<h2>${formatInline(line.slice(3))}</h2>`);
+      flushAll();
+      const text = line.slice(3);
+      blocks.push(`<h2 id="${slugifyHeading(text)}">${formatInline(text)}</h2>`);
       continue;
     }
 
     if (line.startsWith("# ")) {
-      flushParagraph();
-      flushList();
-      blocks.push(`<h1>${formatInline(line.slice(2))}</h1>`);
+      flushAll();
+      const text = line.slice(2);
+      blocks.push(`<h1 id="${slugifyHeading(text)}">${formatInline(text)}</h1>`);
       continue;
     }
 
     if (line === "---") {
-      flushParagraph();
-      flushList();
+      flushAll();
       blocks.push("<hr />");
       continue;
     }
 
     if (line.startsWith("- ")) {
       flushParagraph();
+      flushOrderedList();
+      flushBlockquote();
       listItems.push(line.slice(2).trim());
       continue;
     }
 
+    // FIX 1 continued: detect "1. " / "2. " etc.
+    const orderedMatch = line.match(/^\d+\.\s+(.+)/);
+    if (orderedMatch) {
+      flushParagraph();
+      flushList();
+      flushBlockquote();
+      orderedItems.push(orderedMatch[1]);
+      continue;
+    }
+
+    // FIX 2 continued: accumulate consecutive blockquote lines
     if (line.startsWith("> ")) {
       flushParagraph();
       flushList();
-      blocks.push(`<blockquote><p>${formatInline(line.slice(2))}</p></blockquote>`);
+      flushOrderedList();
+      blockquoteLines.push(line.slice(2).trim());
       continue;
     }
 
     const imageNoteMatch = line.match(/^\[IMAGE:\s*(.+)\]$/i);
     if (imageNoteMatch) {
-      flushParagraph();
-      flushList();
+      flushAll();
       blocks.push(`<blockquote><p><strong>Image note:</strong> ${formatInline(imageNoteMatch[1])}</p></blockquote>`);
       continue;
     }
 
+    // If we were accumulating a blockquote and hit a non-> line, flush it first
+    flushBlockquote();
     paragraph.push(line);
   }
 
-  flushParagraph();
-  flushList();
+  flushAll();
 
   return blocks.join("");
 }
