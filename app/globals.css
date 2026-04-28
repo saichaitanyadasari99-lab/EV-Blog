@@ -2409,17 +2409,17 @@ a {
 }
 
 .prose .math-inline {
-  background: color-mix(in srgb, var(--accent) 15%, var(--surface));
-  border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+  background: var(--surface2);
+  border: 1px solid var(--border);
   border-radius: 4px;
-  color: var(--accent);
+  color: var(--text);
   display: inline-block;
   font-family: var(--font-ibm-mono), monospace;
   padding: 2px 8px;
 }
 
 .prose .math-block {
-  background: var(--surface);
+  background: var(--surface2);
   border: 1px solid var(--border);
   border-radius: 10px;
   margin: 16px 0;
@@ -2430,9 +2430,9 @@ a {
 
 .prose .math-block code {
   background: transparent;
-  color: var(--accent);
+  color: var(--text);
   font-family: var(--font-ibm-mono), monospace;
-  font-size: 16px;
+  font-size: 15px;
   padding: 0;
 }
 
@@ -3296,15 +3296,30 @@ a {
 @media (max-width: 900px) {
   .about-hero-grid {
     grid-template-columns: 1fr;
-    padding: 32px;
+    padding: 24px 16px;
+    text-align: center;
+  }
+  .about-hero-left {
+    text-align: center;
   }
   .about-hero-right {
     order: -1;
     margin-bottom: 24px;
   }
   .about-avatar-box {
-    max-width: 200px;
+    max-width: 220px;
     margin: 0 auto;
+    padding: 20px;
+  }
+  .about-profile-image {
+    width: 180px;
+    height: 180px;
+    margin: 0 auto 16px;
+  }
+  .about-profile-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
   .about-cards {
     grid-template-columns: 1fr;
@@ -3317,6 +3332,12 @@ a {
     text-align: left;
     flex-direction: row;
     gap: 12px;
+  }
+  .about-hero-buttons {
+    justify-content: center;
+  }
+  .about-checkmarks {
+    justify-content: center;
   }
 }
 
