@@ -4908,32 +4908,57 @@ tr.winner-row {
 /* Homepage Mobile Responsive */
 @media (max-width: 768px) {
   .home-hero {
-    padding: 32px 20px;
+    padding: 28px 16px;
+    border-radius: 12px;
+    margin-bottom: 16px;
   }
   
   .home-hero-content {
     grid-template-columns: 1fr;
-    text-align: center;
   }
   
   .home-hero-text {
     max-width: 100%;
+    text-align: center;
+  }
+  
+  .home-hero-label {
+    font-size: 10px;
   }
   
   .home-hero-title {
-    font-size: 32px;
+    font-size: clamp(26px, 6vw, 32px);
+    margin: 12px 0;
   }
   
   .home-hero-desc {
-    font-size: 16px;
+    font-size: 15px;
+    line-height: 1.5;
+    margin-bottom: 20px;
   }
   
   .home-hero-cta {
     justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  
+  .hero-btn {
+    padding: 12px 20px;
+    font-size: 14px;
   }
   
   .home-hero-stats {
     justify-content: center;
+    gap: 20px;
+  }
+  
+  .stat-num {
+    font-size: 22px;
+  }
+  
+  .stat-label {
+    font-size: 11px;
   }
   
   .home-hero-visual {
