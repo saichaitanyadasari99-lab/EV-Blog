@@ -2842,7 +2842,40 @@ a {
   .about-hero-grid {
     grid-template-columns: 1fr;
     gap: 32px;
-    padding: 32px;
+    padding: 24px 16px;
+    text-align: center;
+    justify-items: center;
+  }
+  
+  .about-hero-left {
+    text-align: center;
+    width: 100%;
+  }
+  
+  .about-hero-right {
+    order: -1;
+    margin-bottom: 24px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+  
+  .about-avatar-box {
+    max-width: 200px;
+    margin: 0 auto;
+    padding: 16px;
+  }
+  
+  .about-profile-image {
+    width: 160px;
+    height: 160px;
+    margin: 0 auto 12px;
+  }
+  
+  .about-profile-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
   
   .about-hero-right {
