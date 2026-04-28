@@ -126,22 +126,9 @@ export default async function HomePage() {
         </Link>
       </section>
       <section className="articles-grid home-grid">
-        {(topStories.length ? topStories : [null, null, null, null, null]).map((post, idx) =>
-          post ? (
-            <PostCard key={post.id} post={post} featured={idx === 0} />
-          ) : (
-            <article key={`top-f-${idx}`} className="a-card">
-              <div className="a-card-img" style={{ background: "var(--surface3)" }} />
-              <div className="a-card-body">
-                <span className="a-badge" style={{ background: "var(--surface3)", color: "var(--text3)" }}>
-                  ARTICLE
-                </span>
-                <h3 className="a-title">Waiting for next post</h3>
-                <p className="a-excerpt">Publish more articles to fill this slot.</p>
-              </div>
-            </article>
-          ),
-        )}
+        {topStories.map((post, idx) => (
+          <PostCard key={post.id} post={post} featured={idx === 0} />
+        ))}
       </section>
 
       {/* Calculators Section */}
@@ -198,10 +185,10 @@ export default async function HomePage() {
         <aside className="trending-panel">
           <h3 className="sec-title">Trending</h3>
           <div className="trending-list">
-            {(trending.length ? trending : [null, null, null, null]).map((post, idx) => (
-              <Link key={post?.id ?? `tr-${idx}`} href={post ? `/blog/${post.slug}` : "#"} className="trending-item">
+            {trending.map((post, idx) => (
+              <Link key={post.id} href={`/blog/${post.slug}`} className="trending-item">
                 <span className="trending-num">{String(idx + 1).padStart(2, "0")}</span>
-                <span className="trending-title">{post?.title ?? "Loading..."}</span>
+                <span className="trending-title">{post.title}</span>
               </Link>
             ))}
           </div>
@@ -234,21 +221,9 @@ export default async function HomePage() {
             </Link>
           </section>
           <section className="grid-4">
-            {(moreStories.length ? moreStories : [null, null, null, null]).map((post, idx) =>
-              post ? (
-                <PostCard key={post.id} post={post} />
-              ) : (
-                <article key={`more-f-${idx}`} className="a-card">
-                  <div className="a-card-img" style={{ background: "var(--surface3)" }} />
-                  <div className="a-card-body">
-                    <span className="a-badge" style={{ background: "var(--surface3)", color: "var(--text3)" }}>
-                      ARTICLE
-                    </span>
-                    <h3 className="a-title">Upcoming article</h3>
-                  </div>
-                </article>
-              ),
-            )}
+            {moreStories.map((post, idx) => (
+              <PostCard key={post.id} post={post} />
+            ))}
           </section>
         </>
       )}

@@ -30,6 +30,7 @@ export function PostCard({ post, featured = false }: Props) {
             src={coverUrl} 
             alt={post.title}
             className="a-card-img"
+            style={{ objectFit: 'contain', padding: '8px' }}
             onError={handleImageError}
           />
         </Link>
