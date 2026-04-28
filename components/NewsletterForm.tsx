@@ -121,23 +121,13 @@ export function NewsletterForm({ compact = false }: { compact?: boolean }) {
   }
 
   return (
-    <form onSubmit={handleSubmit} style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+    <form onSubmit={handleSubmit} className="nl-form-stack">
       <input
         type="text"
         placeholder="Your name"
         value={name}
         onChange={(e) => setName(e.target.value)}
         disabled={status === "loading" || status === "success"}
-        style={{
-          background: "var(--surface3)",
-          border: "1px solid var(--border2)",
-          borderRadius: "8px",
-          color: "var(--text)",
-          fontSize: "13px",
-          height: "40px",
-          padding: "0 14px",
-          width: "140px",
-        }}
       />
       <input
         type="email"
@@ -145,39 +135,15 @@ export function NewsletterForm({ compact = false }: { compact?: boolean }) {
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         disabled={status === "loading" || status === "success"}
-        style={{
-          background: "var(--surface3)",
-          border: "1px solid var(--border2)",
-          borderRadius: "8px",
-          color: "var(--text)",
-          fontSize: "13px",
-          height: "40px",
-          padding: "0 14px",
-          width: "200px",
-        }}
       />
       <button 
         type="submit" 
         disabled={status === "loading" || status === "success"}
-        style={{
-          background: "var(--accent)",
-          border: "none",
-          borderRadius: "8px",
-          color: "#000",
-          cursor: "pointer",
-          fontFamily: "var(--font-ibm-mono)",
-          fontSize: "12px",
-          fontWeight: 700,
-          height: "40px",
-          letterSpacing: "0.6px",
-          padding: "0 20px",
-          whiteSpace: "nowrap",
-        }}
       >
         {status === "loading" ? "..." : status === "success" ? "Done" : "Subscribe ->"}
       </button>
       {message && (
-        <span style={{ color: status === "error" ? "var(--red)" : "var(--green)", fontSize: "12px", whiteSpace: "nowrap" }}>
+        <span style={{ color: status === "error" ? "var(--red)" : "var(--green)", fontSize: "12px", gridColumn: "1 / -1" }}>
           {message}
         </span>
       )}

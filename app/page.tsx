@@ -27,7 +27,7 @@ export default async function HomePage() {
 
   return (
     <main className="page-main wrapper">
-      {/* Hero Section */}
+{/* Hero Section */}
       <section className="home-hero">
         <div className="home-hero-content">
           <div className="home-hero-text">
@@ -59,14 +59,6 @@ export default async function HomePage() {
                 <span className="stat-num">Weekly</span>
                 <span className="stat-label">Updates</span>
               </div>
-            </div>
-          </div>
-          <div className="home-hero-visual">
-            <div className="hero-illustration">
-              <span className="hero-icon">⚡</span>
-              <div className="hero-wave"></div>
-              <div className="hero-wave wave-2"></div>
-              <div className="hero-wave wave-3"></div>
             </div>
           </div>
         </div>
@@ -154,22 +146,21 @@ export default async function HomePage() {
 
       {/* Calculators Section */}
       <section className="sec-head">
-        <h2 className="sec-title">⚡ EV Battery Calculators</h2>
+        <h2 className="sec-title">Battery Design Tools</h2>
         <Link href="/calculators" className="sec-link">
           View all {"->"}
         </Link>
       </section>
       <section className="calc-grid-home">
         {[
-          { name: "Pack Designer", slug: "pack-size", icon: "🔋" },
-          { name: "Thermal Load", slug: "heat-generation", icon: "🌡️" },
-          { name: "Cooling Sizing", slug: "cooling-plate", icon: "❄️" },
-          { name: "Bus Bar", slug: "bus-bar", icon: "⚡" },
-          { name: "SOC Estimator", slug: "soc-estimator", icon: "📊" },
-          { name: "Charging Time", slug: "charging-time", icon: "⏱️" },
+          { name: "Pack Designer", slug: "pack-size" },
+          { name: "Thermal Load", slug: "heat-generation" },
+          { name: "Cooling Sizing", slug: "cooling-plate" },
+          { name: "Bus Bar", slug: "bus-bar" },
+          { name: "SOC Estimator", slug: "soc-estimator" },
+          { name: "Charging Time", slug: "charging-time" },
         ].map((calc) => (
           <Link key={calc.slug} href={`/calculators/${calc.slug}`} className="calc-card-home">
-            <span className="calc-icon">{calc.icon}</span>
             <span className="calc-name">{calc.name}</span>
           </Link>
         ))}
@@ -205,7 +196,7 @@ export default async function HomePage() {
           )}
         </div>
         <aside className="trending-panel">
-          <h3 className="sec-title">🔥 Trending</h3>
+          <h3 className="sec-title">Trending</h3>
           <div className="trending-list">
             {(trending.length ? trending : [null, null, null, null]).map((post, idx) => (
               <Link key={post?.id ?? `tr-${idx}`} href={post ? `/blog/${post.slug}` : "#"} className="trending-item">
@@ -217,16 +208,16 @@ export default async function HomePage() {
         </aside>
       </section>
 
-      {/* Newslettercta Section */}
+      {/* Newsletter CTA Section */}
       <section className="nl-cta">
         <div className="nl-cta-content">
           <div className="nl-cta-text">
-            <h2 className="nl-cta-title">⚡ Stay Ahead in EV Engineering</h2>
+            <h2 className="nl-cta-title">Stay Ahead in EV Engineering</h2>
             <p className="nl-cta-desc">
-              Get weekly technical insights, battery design patterns, and engineering tools delivered to your inbox every Tuesday.
+              Get weekly technical insights, battery design patterns, and engineering tools delivered to your inbox.
             </p>
             <div className="nl-cta-stats">
-              <span>📬 Join 500+ EV engineers</span>
+              <span>Join 500+ EV engineers</span>
             </div>
           </div>
           <NewsletterForm />

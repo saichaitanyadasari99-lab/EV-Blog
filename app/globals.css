@@ -1003,9 +1003,17 @@ a {
 
 .home-hero-content {
   display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 40px;
+  grid-template-columns: 1fr;
+  gap: 32px;
   align-items: center;
+}
+
+.home-hero-text {
+  max-width: 100%;
+}
+
+.home-hero-visual {
+  display: none;
 }
 
 .home-hero-text {
@@ -1351,6 +1359,47 @@ a {
   grid-template-columns: 1fr auto;
   gap: 32px;
   align-items: center;
+}
+
+.nl-form-stack {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.nl-form-stack input {
+  background: var(--surface3);
+  border: 1px solid var(--border2);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 13px;
+  height: 40px;
+  padding: 0 14px;
+}
+
+.nl-form-stack input[type="text"] {
+  flex: 0 0 140px;
+  min-width: 100px;
+}
+
+.nl-form-stack input[type="email"] {
+  flex: 1 0 200px;
+  min-width: 150px;
+}
+
+.nl-form-stack button {
+  background: var(--accent);
+  border: none;
+  border-radius: 8px;
+  color: #000;
+  cursor: pointer;
+  font-family: var(--font-ibm-mono);
+  font-size: 12px;
+  font-weight: 700;
+  height: 40px;
+  letter-spacing: 0.6px;
+  padding: 0 20px;
+  white-space: nowrap;
 }
 
 .nl-cta-title {
@@ -4916,6 +4965,20 @@ tr.winner-row {
   .nl-cta-content {
     grid-template-columns: 1fr;
     text-align: center;
+  }
+  
+  .nl-form-stack {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .nl-form-stack input {
+    width: 100% !important;
+    flex: none !important;
+  }
+  
+  .nl-form-stack button {
+    width: 100%;
   }
   
   .home-grid {
