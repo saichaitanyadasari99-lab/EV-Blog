@@ -6,9 +6,10 @@ import { getCategoryTone } from "@/lib/category-theme";
 
 type Props = {
   post: PostRecord;
+  featured?: boolean;
 };
 
-export function PostCard({ post }: Props) {
+export function PostCard({ post, featured = false }: Props) {
   const tone = getCategoryTone(post.category);
   const coverUrl = post.cover_url;
   const showImage = coverUrl && (coverUrl.startsWith('http') || coverUrl.startsWith('/'));
@@ -22,18 +23,22 @@ export function PostCard({ post }: Props) {
   };
   
   return (
-    <article className="a-card">
+    <article className={`a-card ${featured ? 'featured-card-item' : ''}`}>
       {showImage ? (
-        <img 
-          src={coverUrl} 
-          alt={post.title}
-          className="a-card-img"
-          onError={handleImageError}
-        />
+        <Link href={`/blog/${post.slug}`} className="a-card-link">
+          <img 
+            src={coverUrl} 
+            alt={post.title}
+            className="a-card-img"
+            onError={handleImageError}
+          />
+        </Link>
       ) : (
-        <div className="a-card-img" style={{
-          background: "linear-gradient(135deg,#091830 0%,#0F2A4A 40%,#072038 100%)"
-        }} />
+        <Link href={`/blog/${post.slug}`} className="a-card-link">
+          <div className="a-card-img" style={{
+            background: "linear-gradient(135deg,#091830 0%,#0F2A4A 40%,#072038 100%)"
+          }} />
+        </Link>
       )}
       <div className="a-card-body">
         <span className="a-badge" style={{ background: tone + '22', color: tone }}>
@@ -43,7 +48,11 @@ export function PostCard({ post }: Props) {
           <Link href={`/blog/${post.slug}`}>{post.title}</Link>
         </h3>
         <p className="a-excerpt">{post.excerpt ?? "Technical update from EVPulse."}</p>
-        <div className="a-footer">{new Date(post.created_at).toLocaleDateString()}  |  {post.reading_time ?? 1} min read</div>
+        <div className="a-footer">
+          <span className="a-date">{new Date(post.created_at).toLocaleDateString()}</span>
+          <span className="a-dot">·</span>
+          <span className="a-readtime">{post.reading_time ?? 1} min read</span>
+        </div>
       </div>
     </article>
   );
