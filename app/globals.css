@@ -2436,6 +2436,38 @@ a {
   padding: 0;
 }
 
+/* KaTeX equation fix - use theme colors instead of dark background */
+.katex {
+  background: transparent !important;
+  color: var(--text) !important;
+  font-size: 1.1em;
+}
+
+.katex-display {
+  background: var(--surface2) !important;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin: 16px 0;
+  overflow-x: auto;
+  padding: 16px;
+}
+
+.katex-display > .katex {
+  background: transparent !important;
+}
+
+/* All KaTeX elements use theme text color */
+.katex .mord,
+.katex .mbin,
+.katex .mrel,
+.katex .mop,
+.katex .mclose,
+.katex .minner,
+.katex .mfrac > span > span,
+.katex .mstack > .mord {
+  color: var(--text) !important;
+}
+
 .prose table {
   border-collapse: collapse;
   margin: 16px 0 24px;
