@@ -196,7 +196,7 @@ export default async function HomePage() {
       </section>
 
       {/* Newsletter CTA Section */}
-      <section className="nl-cta">
+      <section id="newsletter" className="nl-cta">
         <div className="nl-cta-content">
           <div className="nl-cta-text">
             <h2 className="nl-cta-title">Stay Ahead in EV Engineering</h2>
