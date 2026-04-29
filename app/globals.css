@@ -2409,23 +2409,23 @@ a {
 }
 
 .prose .math-inline {
-  background: var(--surface2);
+  background: var(--surface2) !important;
   border: 1px solid var(--border);
   border-radius: 4px;
-  color: var(--text);
+  color: var(--text) !important;
   display: inline-block;
   font-family: var(--font-ibm-mono), monospace;
   padding: 2px 8px;
 }
 
 .prose .math-block {
-  background: var(--surface2);
+  background: var(--surface2) !important;
   border: 1px solid var(--border);
   border-radius: 10px;
   margin: 16px 0;
   overflow-x: auto;
   padding: 16px;
-  white-space: pre-wrap;
+  color: var(--text) !important;
 }
 
 .prose .math-block code {
@@ -2443,6 +2443,11 @@ a {
   font-size: 1.1em;
 }
 
+.katex * {
+  background: transparent !important;
+  color: var(--text) !important;
+}
+
 .katex-display {
   background: var(--surface2) !important;
   border: 1px solid var(--border);
@@ -2450,21 +2455,42 @@ a {
   margin: 16px 0;
   overflow-x: auto;
   padding: 16px;
+  color: var(--text) !important;
 }
 
 .katex-display > .katex {
   background: transparent !important;
+  color: var(--text) !important;
 }
 
-/* All KaTeX elements use theme text color */
-.katex .mord,
-.katex .mbin,
-.katex .mrel,
-.katex .mop,
-.katex .mclose,
-.katex .minner,
-.katex .mfrac > span > span,
-.katex .mstack > .mord {
+/* Block math fallback - also use theme colors */
+.prose .math-block {
+  background: var(--surface2) !important;
+  color: var(--text) !important;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px;
+  margin: 16px 0;
+  overflow-x: auto;
+}
+
+.prose .math-block code {
+  background: transparent !important;
+  color: var(--text) !important;
+  font-family: var(--font-ibm-mono), monospace;
+  font-size: 15px;
+}
+
+/* Code blocks in prose should adapt to theme */
+.prose pre {
+  background: var(--surface2) !important;
+  color: var(--text) !important;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.prose code {
+  background: var(--surface2) !important;
   color: var(--text) !important;
 }
 
