@@ -1,0 +1,49 @@
+# EVPulse - EV Battery Technology Resource
+
+EVPulse (www.evpulse.co.in) is a technical resource for battery systems engineers, EV professionals, and enthusiasts.
+
+## About
+
+Deep-dive technical analysis on EV battery technology, BMS design, cell chemistry, thermal management, and charging infrastructure.
+
+Author: Sai Chaitanya Dasari - Battery Systems Engineer with 3+ years at Volvo Eicher Commercial Vehicles
+
+## Core Content
+
+### Articles & Blog Posts
+- /blogs - All technical articles
+- /category/cell-chemistry - LFP, NMC, NMC 811, Na-ion cell analysis
+- /category/bms-design - Battery management systems, SOC/SOH algorithms
+- /category/thermal - Thermal management, immersion cooling
+- /category/charging - Charging infrastructure, CCS, CHAdeMO, ISO 15118
+
+### Interactive Tools
+- /calculators - EV battery design calculators
+- /calculators/pack-size - Battery pack designer
+- /calculators/heat-generation - Thermal load analyzer
+- /calculators/cooling-plate - Cooling system sizing
+- /calculators/bus-bar - Bus bar & fusing calculator
+- /calculators/soc-estimator - SOC estimator tool
+- /calculators/charging-time - Charging time calculator
+
+### About & Contact
+- /about - About the author and EVPulse mission
+- /contact - Contact form
+
+## Expertise Areas
+
+- BMS Algorithm Design (SOC, SOH estimation)
+- Cell Chemistry Analysis (LFP, NMC, Na-ion)
+- Thermal Management Systems
+- EV Charging Infrastructure
+- Battery Pack Design
+- UN ECE R100, UL 2580, AIS-156 Compliance
+
+## Update Frequency
+
+New articles published 2+ times weekly covering latest in EV battery technology.
+
+## Contact
+
+Email: chaitanya_dasari@evpulse.co.in
+LinkedIn: https://www.linkedin.com/in/dasarisaisrinivasachaitanya

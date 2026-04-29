@@ -29,8 +29,9 @@ export function getArticleSchema(article: {
   category?: string | null | undefined;
   tags?: string[] | null | undefined;
   reading_time?: number | null | undefined;
+  faqs?: Array<{ question: string; answer: string }> | null | undefined;
 }) {
-  return {
+  const schema: Record<string, unknown> = {
     "@context": "https://schema.org",
     "@type": "Article",
     headline: article.title,
@@ -41,7 +42,9 @@ export function getArticleSchema(article: {
     dateModified: article.modifiedAt,
     author: {
       "@type": "Person",
-      name: article.author || "EVPulse Team",
+      name: article.author || "Sai Chaitanya Dasari",
+      jobTitle: "Battery Systems Engineer",
+      url: "https://www.linkedin.com/in/dasarisaisrinivasachaitanya",
     },
     publisher: {
       "@type": "Organization",
@@ -59,6 +62,22 @@ export function getArticleSchema(article: {
     keywords: article.tags?.join(", "),
     timeRequired: article.reading_time ? `PT${article.reading_time}M` : undefined,
   };
+
+  if (article.faqs && article.faqs.length > 0) {
+    schema.about = {
+      "@type": "FAQPage",
+      mainEntity: article.faqs.map((faq) => ({
+        "@type": "Question",
+        name: faq.question,
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: faq.answer,
+        },
+      })),
+    };
+  }
+
+  return schema;
 }
 
 export function getBreadcrumbSchema(items: Array<{ name: string; url: string }>) {

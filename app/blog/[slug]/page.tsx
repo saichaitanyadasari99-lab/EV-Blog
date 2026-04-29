@@ -102,12 +102,13 @@ export default async function BlogPostPage({ params }: Params) {
     description: post.excerpt ?? "",
     slug: post.slug,
     cover_url: post.cover_url ?? undefined,
-    author: "EVPulse Team",
+    author: "Sai Chaitanya Dasari",
     publishedAt: post.created_at ?? undefined,
     modifiedAt: post.updated_at ?? undefined,
     category: post.category ?? undefined,
     tags: post.tags ?? undefined,
     reading_time: post.reading_time ?? undefined,
+    faqs: post.faqs ?? undefined,
   });
 
   return (
@@ -143,6 +144,34 @@ export default async function BlogPostPage({ params }: Params) {
         <div className="post-layout">
           <div className="post-main">
             <section className="article-content prose" dangerouslySetInnerHTML={{ __html: html }} />
+
+            {/* Author Bio - E-E-A-T Signal */}
+            <section className="author-bio">
+              <div className="author-avatar">
+                <span className="author-initials">SD</span>
+              </div>
+              <div className="author-info">
+                <p className="author-label">Written by</p>
+                <h4 className="author-name">Sai Chaitanya Dasari</h4>
+                <p className="author-title">Battery Systems Engineer | Volvo Eicher Commercial Vehicles</p>
+                <p className="author-desc">3+ years in commercial EV pack development. Writing about real battery engineering from the bench.</p>
+              </div>
+            </section>
+
+            {/* FAQ Section - AI Discoverable */}
+            {post.faqs && post.faqs.length > 0 && (
+              <section className="article-faqs" aria-labelledby="faq-heading">
+                <h2 id="faq-heading">Frequently Asked Questions</h2>
+                <div className="faq-list">
+                  {post.faqs.map((faq, idx) => (
+                    <details key={idx} className="faq-item">
+                      <summary className="faq-question">{faq.question}</summary>
+                      <p className="faq-answer">{faq.answer}</p>
+                    </details>
+                  ))}
+                </div>
+              </section>
+            )}
 
             {references.length ? (
               <section className="references-card" aria-labelledby="references-heading">

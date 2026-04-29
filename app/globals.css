@@ -1850,6 +1850,128 @@ a {
   line-height: 1.5;
 }
 
+/* Author Bio - E-E-A-T Signal */
+.author-bio {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  display: flex;
+  gap: 16px;
+  margin: 32px 0;
+  padding: 20px;
+}
+
+.author-avatar {
+  flex-shrink: 0;
+}
+
+.author-initials {
+  background: var(--accent);
+  border-radius: 50%;
+  color: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-syne), sans-serif;
+  font-size: 18px;
+  font-weight: 800;
+  height: 56px;
+  width: 56px;
+}
+
+.author-info {
+  flex: 1;
+}
+
+.author-label {
+  color: var(--text2);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin: 0 0 4px;
+}
+
+.author-name {
+  color: var(--text);
+  font-family: var(--font-syne), sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0 0 4px;
+}
+
+.author-title {
+  color: var(--accent);
+  font-size: 13px;
+  margin: 0 0 8px;
+}
+
+.author-desc {
+  color: var(--text2);
+  font-size: 14px;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* FAQ Section - AI Discoverable */
+.article-faqs {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  margin: 24px 0;
+  padding: 24px;
+}
+
+.article-faqs h2 {
+  font-family: var(--font-syne), sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0 0 16px;
+}
+
+.faq-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.faq-item {
+  background: var(--surface2);
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+
+.faq-question {
+  color: var(--text);
+  cursor: pointer;
+  font-weight: 600;
+  padding: 14px 16px;
+  list-style: none;
+}
+
+.faq-question::-webkit-details-marker {
+  display: none;
+}
+
+.faq-question::after {
+  content: "+";
+  float: right;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.faq-item[open] .faq-question::after {
+  content: "-";
+}
+
+.faq-answer {
+  color: var(--text2);
+  font-size: 15px;
+  line-height: 1.6;
+  margin: 0;
+  padding: 0 16px 16px;
+}
+
 .post-layout {
   align-items: start;
   display: grid;
