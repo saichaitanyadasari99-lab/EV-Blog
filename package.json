@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "newsletter": "npx tsx scripts/generate-newsletter.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.10.0",
