@@ -1010,25 +1010,24 @@ a {
 
 .home-hero-content {
   display: grid;
-  grid-template-columns: 1fr 340px;
+  grid-template-columns: 1fr 1fr;
   gap: 48px;
   align-items: center;
 }
 
 .home-hero-text {
-  max-width: 560px;
+  max-width: 500px;
 }
 
 .home-hero-visual {
   display: flex;
   align-items: center;
   justify-content: center;
-  position: relative;
 }
 
 .ev-ecosystem {
   width: 100%;
-  max-width: 320px;
+  max-width: 500px;
 }
 
 .ev-svg {
@@ -1036,109 +1035,132 @@ a {
   height: auto;
 }
 
-/* Car Animation */
-.car-body {
+/* Drone Animations */
+.drone-1 {
+  animation: drone-fly-1 8s ease-in-out infinite;
+}
+
+@keyframes drone-fly-1 {
+  0%, 100% { transform: translate(0, 0); }
+  25% { transform: translate(15px, -10px); }
+  50% { transform: translate(30px, 5px); }
+  75% { transform: translate(15px, 10px); }
+}
+
+.drone-2 {
+  animation: drone-fly-2 6s ease-in-out infinite;
+  animation-delay: 1s;
+}
+
+@keyframes drone-fly-2 {
+  0%, 100% { transform: translate(0, 0); }
+  33% { transform: translate(10px, -8px); }
+  66% { transform: translate(-5px, 5px); }
+}
+
+.drone-3 {
+  animation: drone-fly-3 7s ease-in-out infinite;
+  animation-delay: 2s;
+}
+
+@keyframes drone-fly-3 {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(-15px, 12px); }
+}
+
+/* Tower Light Blink */
+.tower-light {
+  animation: blink 1s ease-in-out infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+/* Charging Indicators */
+.charge-indicator {
+  animation: charge-blink 0.8s ease-in-out infinite;
+}
+
+.charge-indicator:nth-child(1) { animation-delay: 0s; }
+.charge-indicator:nth-child(2) { animation-delay: 0.2s; }
+.charge-indicator:nth-child(3) { animation-delay: 0.4s; }
+.charge-indicator:nth-child(4) { animation-delay: 0.6s; }
+
+@keyframes charge-blink {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+
+/* Charging Cable Flow */
+.charging-cable {
+  stroke-dasharray: 3 2;
+  animation: cable-flow 0.5s linear infinite;
+}
+
+@keyframes cable-flow {
+  from { stroke-dashoffset: 0; }
+  to { stroke-dashoffset: -5; }
+}
+
+/* Charger Glow */
+.charger-1, .charger-2, .charger-3, .charger-4 {
+  animation: charger-pulse 1.5s ease-in-out infinite;
+}
+
+.charger-1 { animation-delay: 0s; }
+.charger-2 { animation-delay: 0.3s; }
+.charger-3 { animation-delay: 0.6s; }
+.charger-4 { animation-delay: 0.9s; }
+
+@keyframes charger-pulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+/* Power Line */
+.power-line {
+  stroke-dasharray: 5 3;
+  animation: power-flow 2s linear infinite;
+}
+
+@keyframes power-flow {
+  from { stroke-dashoffset: 0; }
+  to { stroke-dashoffset: -16; }
+}
+
+/* Tree Sway */
+.tree-left, .tree-right {
+  animation: tree-sway 4s ease-in-out infinite;
+  transform-origin: bottom center;
+}
+
+.tree-right {
+  animation-delay: 2s;
+}
+
+@keyframes tree-sway {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(2deg); }
+}
+
+/* Car body bounce */
+.car-charging {
   animation: car-bounce 2s ease-in-out infinite;
 }
 
 @keyframes car-bounce {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-2px); }
+  50% { transform: translateY(-1px); }
 }
 
-/* Wheel Spin */
-.wheel {
-  animation: wheel-spin 1s linear infinite;
+.semi-truck {
+  animation: car-bounce 2.5s ease-in-out infinite;
 }
 
-.wheel-hub {
-  animation: wheel-spin 1s linear infinite;
-}
-
-@keyframes wheel-spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-/* Battery Cell Charging Animation */
-.cell {
-  animation: cell-charge 1.5s ease-in-out infinite;
-}
-
-.cell-1 { animation-delay: 0s; }
-.cell-2 { animation-delay: 0.15s; }
-.cell-3 { animation-delay: 0.3s; }
-.cell-4 { animation-delay: 0.45s; }
-.cell-5 { animation-delay: 0.6s; }
-
-@keyframes cell-charge {
-  0%, 100% { opacity: 0.3; }
-  50% { opacity: 1; }
-}
-
-/* Stack Cell Animation */
-.stack-cell {
-  animation: stack-pulse 2s ease-in-out infinite;
-}
-
-.stack-cell:nth-child(1) { animation-delay: 0s; }
-.stack-cell:nth-child(2) { animation-delay: 0.3s; }
-.stack-cell:nth-child(3) { animation-delay: 0.6s; }
-.stack-cell:nth-child(4) { animation-delay: 0.9s; }
-
-@keyframes stack-pulse {
-  0%, 100% { opacity: 0.4; }
-  50% { opacity: 1; }
-}
-
-/* Energy Flow */
-.energy-flow {
-  stroke-dasharray: 4 2;
-  animation: energy-flow 1s linear infinite;
-}
-
-.flow-2 {
-  animation-delay: 0.5s;
-}
-
-@keyframes energy-flow {
-  from { stroke-dashoffset: 0; }
-  to { stroke-dashoffset: -6; }
-}
-
-/* Charging Lightning Bolt */
-.bolt {
-  animation: bolt-flash 1s ease-in-out infinite;
-}
-
-@keyframes bolt-flash {
-  0%, 100% { opacity: 0.7; }
-  50% { opacity: 1; }
-}
-
-/* Heat Waves */
-.heat-wave {
-  stroke-dasharray: 3 2;
-  animation: heat-rise 2s ease-out infinite;
-}
-
-.wave-heat-2 {
-  animation-delay: 0.5s;
-}
-
-@keyframes heat-rise {
-  0% { transform: translateY(0); opacity: 0.4; }
-  100% { transform: translateY(-15px); opacity: 0; }
-}
-
-/* Road Dashes Moving */
-.road-dash {
-  animation: road-move 0.5s linear infinite;
-}
-
-@keyframes road-move {
-  from { stroke-dashoffset: 0; }
-  to { stroke-dashoffset: -12; }
+.volvo-truck {
+  animation: car-bounce 2.2s ease-in-out infinite;
 }
 
 .home-hero-label {
