@@ -64,17 +64,61 @@ export default async function HomePage() {
             </div>
           </div>
           <div className="home-hero-visual">
-            <div className="battery-visual">
-              <svg viewBox="0 0 200 100" className="battery-svg">
-                <rect x="10" y="30" width="140" height="50" rx="4" fill="none" stroke="var(--accent)" strokeWidth="2" className="battery-body"/>
-                <rect x="150" y="45" width="10" height="20" rx="2" fill="var(--accent)" className="battery-terminal"/>
-                <rect x="15" y="35" width="40" height="40" rx="2" fill="var(--accent)" opacity="0.3" className="charge charge-1"/>
-                <rect x="60" y="35" width="40" height="40" rx="2" fill="var(--accent)" opacity="0.5" className="charge charge-2"/>
-                <rect x="105" y="35" width="40" height="40" rx="2" fill="var(--accent)" opacity="0.7" className="charge charge-3"/>
-                <path d="M70 85 Q90 75 100 85 Q110 95 130 85" fill="none" stroke="var(--accent)" strokeWidth="1.5" opacity="0.6" className="wave-line"/>
-                <path d="M70 90 Q90 80 100 90 Q110 100 130 90" fill="none" stroke="var(--accent)" strokeWidth="1" opacity="0.4" className="wave-line wave-2"/>
+            <div className="ev-ecosystem">
+              <svg viewBox="0 0 300 180" className="ev-svg">
+                {/* Road */}
+                <line x1="0" y1="150" x2="300" y2="150" stroke="var(--border)" strokeWidth="2" className="road-line"/>
+                <line x1="0" y1="155" x2="300" y2="155" stroke="var(--border)" strokeWidth="1" strokeDasharray="8 4" className="road-dash"/>
+                
+                {/* EV Car Body */}
+                <path d="M60 120 L80 120 L90 100 L150 95 L200 95 L220 100 L240 115 L250 120 L250 135 L60 135 Z" 
+                      fill="none" stroke="var(--accent)" strokeWidth="2" className="car-body"/>
+                
+                {/* Wheels */}
+                <circle cx="90" cy="135" r="12" fill="none" stroke="var(--accent)" strokeWidth="2" className="wheel"/>
+                <circle cx="90" cy="135" r="5" fill="var(--accent)" className="wheel-hub"/>
+                <circle cx="210" cy="135" r="12" fill="none" stroke="var(--accent)" strokeWidth="2" className="wheel"/>
+                <circle cx="210" cy="135" r="5" fill="var(--accent)" className="wheel-hub"/>
+                
+                {/* Battery Pack in Car */}
+                <rect x="100" y="115" width="100" height="15" rx="2" fill="none" stroke="var(--accent)" strokeWidth="1.5" className="battery-pack"/>
+                <rect x="105" y="118" width="15" height="9" fill="var(--accent)" opacity="0.3" className="cell cell-1"/>
+                <rect x="125" y="118" width="15" height="9" fill="var(--accent)" opacity="0.5" className="cell cell-2"/>
+                <rect x="145" y="118" width="15" height="9" fill="var(--accent)" opacity="0.7" className="cell cell-3"/>
+                <rect x="165" y="118" width="15" height="9" fill="var(--accent)" opacity="0.9" className="cell cell-4"/>
+                <rect x="185" y="118" width="15" height="9" fill="var(--accent)" opacity="1" className="cell cell-5"/>
+                
+                {/* Energy Flow Lines */}
+                <path d="M250 125 Q270 125 275 110 Q280 95 270 85" fill="none" stroke="var(--accent)" strokeWidth="1.5" 
+                      opacity="0.6" className="energy-flow flow-1"/>
+                <path d="M250 130 Q275 130 280 115 Q285 100 275 90" fill="none" stroke="var(--accent)" strokeWidth="1" 
+                      opacity="0.4" className="energy-flow flow-2"/>
+                
+                {/* Charging Station */}
+                <rect x="20" y="80" width="15" height="70" rx="2" fill="none" stroke="var(--accent)" strokeWidth="2" className="charger-body"/>
+                <rect x="23" y="60" width="9" height="20" rx="1" fill="var(--accent)" className="charger-head"/>
+                <rect x="25" y="50" width="5" height="10" rx="1" fill="var(--accent)" className="charger-tip"/>
+                
+                {/* Lightning Bolt on Charger */}
+                <path d="M27 35 L32 45 L28 45 L31 55 L25 45 L29 45 Z" fill="var(--accent)" className="bolt"/>
+                
+                {/* Battery Cell Stack */}
+                <rect x="20" y="170" width="30" height="50" rx="3" fill="none" stroke="var(--accent)" strokeWidth="1.5" className="cell-stack"/>
+                <rect x="23" y="175" width="24" height="8" fill="var(--accent)" opacity="0.4" className="stack-cell"/>
+                <rect x="23" y="186" width="24" height="8" fill="var(--accent)" opacity="0.6" className="stack-cell"/>
+                <rect x="23" y="197" width="24" height="8" fill="var(--accent)" opacity="0.8" className="stack-cell"/>
+                <rect x="23" y="208" width="24" height="8" fill="var(--accent)" opacity="1" className="stack-cell"/>
+                
+                {/* Connection Lines */}
+                <path d="M35 90 Q50 90 60 110" fill="none" stroke="var(--accent)" strokeWidth="1.5" opacity="0.5" className="connect-line"/>
+                <path d="M35 195 Q50 165 60 125" fill="none" stroke="var(--accent)" strokeWidth="1" opacity="0.3" className="connect-line"/>
+                
+                {/* Heat Waves from Battery */}
+                <path d="M150 80 Q155 70 150 60 Q145 50 150 40" fill="none" stroke="var(--accent)" strokeWidth="1.5" 
+                      opacity="0.4" className="heat-wave wave-heat-1"/>
+                <path d="M165 85 Q170 75 165 65 Q160 55 165 45" fill="none" stroke="var(--accent)" strokeWidth="1" 
+                      opacity="0.3" className="heat-wave wave-heat-2"/>
               </svg>
-              <div className="pulse-ring"></div>
             </div>
           </div>
         </div>
