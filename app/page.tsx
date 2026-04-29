@@ -26,8 +26,8 @@ export default async function HomePage() {
     : [];
 
   return (
-    <main className="page-main wrapper">
-{/* Hero Section */}
+<main className="page-main wrapper">
+      {/* Hero Section */}
       <section className="home-hero">
         <div className="home-hero-content">
           <div className="home-hero-text">
@@ -43,7 +43,7 @@ export default async function HomePage() {
                 Explore Articles
               </Link>
               <Link href="/calculators" className="hero-btn secondary">
-                Battery Tools
+                Try Calculators
               </Link>
             </div>
             <div className="home-hero-stats">
@@ -51,14 +51,30 @@ export default async function HomePage() {
                 <span className="stat-num">{posts.length}+</span>
                 <span className="stat-label">Technical Articles</span>
               </div>
+              <span className="stat-divider">|</span>
               <div className="stat-item">
                 <span className="stat-num">6</span>
                 <span className="stat-label">Calculators</span>
               </div>
+              <span className="stat-divider">|</span>
               <div className="stat-item">
                 <span className="stat-num">Weekly</span>
                 <span className="stat-label">Updates</span>
               </div>
+            </div>
+          </div>
+          <div className="home-hero-visual">
+            <div className="battery-visual">
+              <svg viewBox="0 0 200 100" className="battery-svg">
+                <rect x="10" y="30" width="140" height="50" rx="4" fill="none" stroke="var(--accent)" strokeWidth="2" className="battery-body"/>
+                <rect x="150" y="45" width="10" height="20" rx="2" fill="var(--accent)" className="battery-terminal"/>
+                <rect x="15" y="35" width="40" height="40" rx="2" fill="var(--accent)" opacity="0.3" className="charge charge-1"/>
+                <rect x="60" y="35" width="40" height="40" rx="2" fill="var(--accent)" opacity="0.5" className="charge charge-2"/>
+                <rect x="105" y="35" width="40" height="40" rx="2" fill="var(--accent)" opacity="0.7" className="charge charge-3"/>
+                <path d="M70 85 Q90 75 100 85 Q110 95 130 85" fill="none" stroke="var(--accent)" strokeWidth="1.5" opacity="0.6" className="wave-line"/>
+                <path d="M70 90 Q90 80 100 90 Q110 100 130 90" fill="none" stroke="var(--accent)" strokeWidth="1" opacity="0.4" className="wave-line wave-2"/>
+              </svg>
+              <div className="pulse-ring"></div>
             </div>
           </div>
         </div>
