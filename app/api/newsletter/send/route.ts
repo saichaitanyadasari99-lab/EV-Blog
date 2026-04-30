@@ -25,6 +25,7 @@ type Post = {
   tags: string[] | null;
   pullquote: string | null;
   stats: Array<{ value: string; label: string }> | null;
+  created_at: string | null;
 };
 
 const CALCULATOR_LIST = [
@@ -246,175 +247,202 @@ function extractSectionsFromPost(post: Post | null): { heading: string; body: st
 }
 
 function getEmailHtml(posts: Post[], unsubUrl: string) {
-  const now = new Date();
   const issueNum = getIssueNumber();
-  const month = getMonthName(now);
-  const year = getYear(now);
   
-  const mainPost = posts[0];
+  const post0 = posts[0] || null;
+  const post1 = posts[1] || null;
+  const post2 = posts[2] || null;
+  const post3 = posts[3] || null;
   
-  const articleUrl = mainPost ? `${BASE_URL}/blog/${mainPost.slug}` : "#";
-  const readingTime = mainPost?.reading_time || 5;
-  const category = mainPost?.category?.toUpperCase() || "DEEPDIVE";
-  const pullQuote = getPullQuote(mainPost);
-  const stats = getStatsForPost(mainPost);
-  const sections = extractSectionsFromPost(mainPost);
+  const heroCategory = post0?.category?.toUpperCase() || "DEEP DIVE";
+  const heroTitle = post0?.title || "Your EV Battery Guide";
+  const heroCover = post0?.cover_url || "";
+  const heroExcerpt = post0?.excerpt?.slice(0, 200) || "Deep dive into EV battery technology and engineering analysis.";
+  const heroDate = post0?.created_at ? new Date(post0.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : "April 2026";
+  const heroReadTime = post0?.reading_time || 5;
+  const heroUrl = post0 ? `${BASE_URL}/blog/${post0.slug}` : "#";
   
-  const statCards = stats.length > 0 
-    ? stats.map(s => `
-      <div style="flex:1;background:#F0FDF4;border:1px solid #BBF7D0;border-radius:8px;padding:14px 12px;text-align:center;">
-        <div style="font-size:22px;font-weight:700;color:#166534;line-height:1;">${s.value}</div>
-        <div style="font-size:10px;color:#6B7280;margin-top:4px;letter-spacing:0.3px;">${s.label}</div>
-      </div>
-    `).join('')
-    : '';
+  const getCardData = (post: Post | null, idx: number) => {
+    if (!post) return { category: "ARTICLE", title: "Article Title", excerpt: "Article description", cover: "", slug: "blogs" };
+    return {
+      category: post.category?.toUpperCase() || "ARTICLE",
+      title: post.title || "Article",
+      excerpt: post.excerpt?.slice(0, 120) || "Article description",
+      cover: post.cover_url || "",
+      slug: post.slug,
+    };
+  };
   
-  const sectionBlocks = sections.length > 0
-    ? sections.map((s, i) => `
-      <div style="margin:20px 0;">
-        <h2 style="font-family:Georgia,serif;font-size:17px;font-weight:bold;color:#14532D;margin-bottom:8px;padding-bottom:6px;border-bottom:2px solid #DCFCE7;">
-          0${i + 1}/ ${s.heading}
-        </h2>
-        <p style="font-size:15px;line-height:1.75;color:#374151;">${s.body}</p>
-      </div>
-    `).join('')
-    : '';
+  const card1 = getCardData(post1, 1);
+  const card2 = getCardData(post2, 2);
+  const card3 = getCardData(post3, 3);
+
+  const fp = "-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif";
 
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
-<title>EVPulse – #${issueNum} | ${mainPost?.title || 'Newsletter'}</title>
-<style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body, table, td, p, a, li, blockquote { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
-table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-collapse: collapse; }
-img { border: 0; outline: none; text-decoration: none; -ms-interpolation-mode: bicubic; display: block; }
-a { color: inherit; }
-body { background-color: #E8F5E9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; color: #374151; }
-.email-wrapper { width: 100%; background-color: #E8F5E9; padding: 24px 0 40px; }
-.email-container { max-width: 600px; margin: 0 auto; background-color: #FAFAF7; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 24px rgba(22, 101, 52, 0.10); }
-.header { background-color: #166534; padding: 0; text-align: center; }
-.header-top-stripe { background-color: #4ADE80; height: 3px; }
-.header-inner { padding: 22px 32px 18px; }
-.header-logo { font-family: Georgia, 'Times New Roman', serif; font-size: 32px; font-weight: bold; color: #FFFFFF; letter-spacing: -1px; text-decoration: none; display: inline-block; line-height: 1; }
-.header-logo span { color: #4ADE80; }
-.header-tagline { font-size: 10px; letter-spacing: 2.5px; color: #86EFAC; text-transform: uppercase; margin-top: 6px; }
-.header-meta { margin-top: 12px; border-top: 1px solid rgba(74, 222, 128, 0.25); padding-top: 10px; display: flex; justify-content: center; gap: 24px; flex-wrap: wrap; }
-.header-meta a { font-size: 11px; color: #86EFAC; text-decoration: none; letter-spacing: 0.5px; }
-.intro-banner { background-color: #DCFCE7; border-left: 4px solid #16A34A; margin: 24px 28px 0; border-radius: 0 8px 8px 0; padding: 12px 16px; }
-.intro-banner-title { font-size: 12px; font-weight: 600; color: #166534; letter-spacing: 0.5px; text-transform: uppercase; }
-.intro-banner-text { font-size: 14px; color: #374151; margin-top: 3px; line-height: 1.5; }
-.intro-banner-text em { color: #16A34A; font-style: italic; }
-.article-section { padding: 24px 28px 0; }
-.article-tag { display: inline-block; background-color: #DCFCE7; color: #166534; font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; padding: 4px 10px; border-radius: 4px; }
-.article-headline { font-family: Georgia, 'Times New Roman', serif; font-size: 26px; font-weight: bold; color: #14532D; line-height: 1.25; margin-top: 12px; letter-spacing: -0.3px; }
-.article-meta { font-size: 11px; color: #9CA3AF; margin-top: 8px; letter-spacing: 0.5px; }
-.article-divider { border: none; border-top: 1px solid #D1FAE5; margin: 16px 0; }
-.article-intro { font-size: 15px; line-height: 1.7; color: #374151; }
-.pull-quote { background-color: #F0FDF4; border-left: 4px solid #16A34A; border-radius: 0 8px 8px 0; padding: 14px 18px; margin: 20px 0; }
-.pull-quote-text { font-family: Georgia, 'Times New Roman', serif; font-size: 16px; font-style: italic; color: #14532D; line-height: 1.6; }
-.pull-quote-attr { font-size: 11px; color: #6B7280; margin-top: 8px; }
-.stats-row { display: flex; gap: 12px; margin: 20px 0; }
-.stat-card { flex: 1; background-color: #F0FDF4; border: 1px solid #BBF7D0; border-radius: 8px; padding: 14px 12px; text-align: center; }
-.stat-value { font-size: 22px; font-weight: 700; color: #166534; line-height: 1; }
-.stat-label { font-size: 10px; color: #6B7280; margin-top: 4px; letter-spacing: 0.3px; }
-.cta-wrap { text-align: center; margin: 28px 0 8px; }
-.cta-btn { display: inline-block; background-color: #166534; color: #FFFFFF !important; font-size: 14px; font-weight: 700; letter-spacing: 0.5px; text-decoration: none; padding: 14px 32px; border-radius: 6px; }
-.cta-btn:hover { background-color: #14532D; }
-.cta-secondary { display: inline-block; margin-top: 10px; font-size: 13px; color: #16A34A; text-decoration: underline; }
-.footer { background-color: #166534; padding: 24px 28px; margin-top: 28px; }
-.footer-logo { font-family: Georgia, 'Times New Roman', serif; font-size: 20px; font-weight: bold; color: #FFFFFF; text-decoration: none; }
-.footer-logo span { color: #4ADE80; }
-.footer-tagline { font-size: 11px; color: #86EFAC; margin-top: 4px; }
-.footer-links { margin-top: 16px; border-top: 1px solid rgba(74, 222, 128, 0.2); padding-top: 14px; display: flex; gap: 20px; flex-wrap: wrap; }
-.footer-links a { font-size: 11px; color: #86EFAC; text-decoration: none; }
-.footer-legal { font-size: 10px; color: rgba(134, 239, 172, 0.6); margin-top: 14px; line-height: 1.6; }
-.footer-legal a { color: rgba(134, 239, 172, 0.8); text-decoration: underline; }
-@media screen and (max-width: 640px) {
-  .email-wrapper { padding: 0 !important; }
-  .email-container { border-radius: 0 !important; box-shadow: none !important; }
-  .header-inner { padding: 18px 20px 14px !important; }
-  .header-logo { font-size: 26px !important; }
-  .intro-banner { margin: 16px 16px 0 !important; }
-  .article-section { padding: 18px 16px 0 !important; }
-  .article-headline { font-size: 22px !important; }
-  .stats-row { flex-direction: column !important; }
-  .footer { padding: 20px 16px !important; }
-  .cta-btn { display: block !important; text-align: center !important; padding: 14px 20px !important; }
-}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>EVPulse Weekly — Issue #${issueNum}</title>
+  <style>
+    body { margin: 0; padding: 0; background-color: #f0efea; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; }
+    a { text-decoration: none; }
+    img { border: 0; display: block; }
+    @media only screen and (max-width: 600px) {
+      .wrapper { padding: 16px 12px !important; }
+      .card { padding: 24px 20px !important; }
+      .hero-visual { display: none !important; }
+      .split-left, .split-right { display: block !important; width: 100% !important; }
+      .split-img { width: 100% !important; height: 180px !important; margin-bottom: 20px !important; }
+      .split-text { padding: 0 !important; }
+      .btn { display: block !important; text-align: center !important; width: auto !important; }
+      h1.hero-title { font-size: 26px !important; }
+      .footer-socials td { padding: 0 8px !important; }
+    }
+  </style>
 </head>
 <body>
-<div class="email-wrapper">
-<div class="email-container">
-  <div class="header">
-    <div class="header-top-stripe"></div>
-    <div class="header-inner">
-      <a href="${BASE_URL}" class="header-logo">EV<span>Pulse</span></a>
-      <p class="header-tagline">Engineering Clarity for the EV Era</p>
-      <div class="header-meta">
-        <a href="${BASE_URL}/battery">Battery Status</a>
-        <a href="${BASE_URL}/charging">Charging</a>
-        <a href="${BASE_URL}/policy">Policy</a>
-        <a href="${BASE_URL}/tools">Tools</a>
-      </div>
-    </div>
-  </div>
-
-  <div class="intro-banner">
-    <div class="intro-banner-title">#${issueNum} · ${month} ${year}</div>
-    <div class="intro-banner-text">
-      ${mainPost?.excerpt?.slice(0, 120) || 'Thanks for being part of EVPulse. This week we dive into something that matters for every EV engineer.'}...
-      <em>Stick around for stats that might surprise you.</em>
-    </div>
-  </div>
-
-  <div class="article-section">
-    <span class="article-tag">${category}</span>
-    <h1 class="article-headline">${mainPost?.title || 'EVPulse Newsletter'}</h1>
-    <p class="article-meta">${readingTime} MIN READ &nbsp;·&nbsp; BY CHAITANYA, EV BATTERY ENGINEER</p>
-    <hr class="article-divider">
-    <p class="article-intro">
-      Hey — thanks for being part of EVPulse. ${mainPost?.excerpt?.slice(0, 150) || 'This week we explore the latest in EV battery technology and engineering.'}...
-    </p>
-
-    <div class="pull-quote">
-      <p class="pull-quote-text">"${pullQuote}"</p>
-      <p class="pull-quote-attr">— Chaitanya, EV Battery Engineer</p>
-    </div>
-
-    ${sectionBlocks}
-
-    ${statCards ? `<div class="stats-row">${statCards}</div>` : ''}
-
-    <div class="cta-wrap">
-      <a href="${articleUrl}" class="cta-btn">Read Full Article →</a>
-      <br>
-      <a href="${BASE_URL}/blog" class="cta-secondary">Browse all articles</a>
-    </div>
-  </div>
-
-  <div class="footer">
-    <a href="${BASE_URL}" class="footer-logo">EV<span>Pulse</span></a>
-    <p class="footer-tagline">Engineering clarity for the EV era · evpulse.co.in</p>
-    <div class="footer-links">
-      <a href="${BASE_URL}">Website</a>
-      <a href="${BASE_URL}/blog">Articles</a>
-      <a href="${BASE_URL}/tools">Tools</a>
-      <a href="${BASE_URL}/policy">Policy</a>
-      <a href="mailto:hello@evpulse.co.in">Contact</a>
-    </div>
-    <p class="footer-legal">
-      You're receiving this because you subscribed at evpulse.co.in.<br>
-      <a href="${unsubUrl}">Unsubscribe</a> &nbsp;·&nbsp;
-      <a href="${BASE_URL}/privacy">Privacy Policy</a> &nbsp;·&nbsp;
-      © 2026 EVPulse. All rights reserved.
-    </p>
-  </div>
-</div>
+<div style="background-color:#f0efea; padding:0; margin:0;">
+  <table class="wrapper" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f0efea; padding:32px 16px;">
+    <tr>
+      <td align="center">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;">
+        <tr>
+          <td style="padding: 0 0 20px 0;">
+            <a href="${BASE_URL}" target="_blank" style="font-size:17px; font-weight:700; color:#0a0a0a; letter-spacing:-0.02em; font-family:${fp}; text-decoration:none;">
+              ⚡ EVPulse
+            </a>
+          </td>
+        </tr>
+        <tr>
+          <td class="card" style="background-color:#ffffff; border-radius:16px; padding:32px; margin-bottom:16px; display:block;">
+            <div style="margin-bottom:16px;">
+              <span style="background-color:#ecfdf5; color:#065f46; font-size:11px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; padding:4px 12px; border-radius:20px; font-family:${fp};">
+                ${heroCategory}
+              </span>
+            </div>
+            <h1 class="hero-title" style="margin:0 0 16px 0; font-size:30px; font-weight:700; line-height:1.2; letter-spacing:-0.025em; color:#0a0a0a; font-family:${fp};">
+              ${heroTitle}
+            </h1>
+            <div class="hero-visual" style="border-radius:12px; overflow:hidden; margin-bottom:20px; background-color:#f0fafb; height:220px; text-align:center; line-height:220px;">
+              ${heroCover ? `<img src="${heroCover}" alt="Article cover" width="100%" style="width:100%; height:220px; object-fit:cover; border-radius:12px; display:block;" />` : ''}
+            </div>
+            <p style="margin:0 0 24px 0; font-size:15px; line-height:1.65; color:#4b5563; font-family:${fp};">
+              ${heroExcerpt}
+            </p>
+            <p style="margin:0 0 24px 0; font-size:12px; color:#9ca3af; font-family:${fp};">
+              ${heroDate} &nbsp;·&nbsp; ${heroReadTime} min read
+            </p>
+            <table cellpadding="0" cellspacing="0" border="0">
+              <tr>
+                <td style="padding-right:10px;">
+                  <a class="btn" href="${heroUrl}" target="_blank" style="display:inline-block; background-color:#0a0a0a; color:#ffffff; font-size:14px; font-weight:600; padding:12px 22px; border-radius:8px; font-family:${fp};">
+                    Read article →
+                  </a>
+                </td>
+                <td>
+                  <a class="btn" href="${BASE_URL}/blogs" target="_blank" style="display:inline-block; background-color:#ffffff; color:#0a0a0a; font-size:14px; font-weight:600; padding:12px 22px; border-radius:8px; border:1.5px solid #e5e7eb; font-family:${fp};">
+                    All articles
+                  </a>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+        <tr><td style="height:12px;"></td></tr>
+        <tr>
+          <td class="card" style="background-color:#ffffff; border-radius:16px; padding:24px;">
+            <table width="100%" cellpadding="0" cellspacing="0" border="0">
+              <tr>
+                <td class="split-left split-img" valign="top" style="width:160px; padding-right:20px;">
+                  ${card1.cover ? `<img src="${card1.cover}" alt="Article thumbnail" width="160" style="width:160px; height:120px; object-fit:cover; border-radius:10px; display:block;" />` : `<div style="width:160px; height:120px; background:linear-gradient(135deg,#E8F5E9,#DCFCE7); border-radius:10px;"></div>`}
+                </td>
+                <td class="split-right split-text" valign="top">
+                  <p style="margin:0 0 8px 0; font-size:10px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:#0e7490; font-family:${fp};">${card1.category}</p>
+                  <h2 style="margin:0 0 8px 0; font-size:18px; font-weight:700; line-height:1.3; color:#0a0a0a; font-family:${fp};">${card1.title}</h2>
+                  <p style="margin:0 0 14px 0; font-size:13px; line-height:1.6; color:#6b7280; font-family:${fp};">${card1.excerpt}</p>
+                  <a href="${BASE_URL}/blog/${card1.slug}" target="_blank" style="display:inline-block; background-color:#ffffff; color:#0a0a0a; font-size:13px; font-weight:600; padding:9px 18px; border-radius:7px; border:1.5px solid #e5e7eb; font-family:${fp};">Read more →</a>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+        <tr><td style="height:12px;"></td></tr>
+        <tr>
+          <td class="card" style="background-color:#ffffff; border-radius:16px; padding:24px;">
+            <table width="100%" cellpadding="0" cellspacing="0" border="0">
+              <tr>
+                <td class="split-left split-text" valign="top" style="padding-right:20px;">
+                  <p style="margin:0 0 8px 0; font-size:10px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:#0e7490; font-family:${fp};">${card2.category}</p>
+                  <h2 style="margin:0 0 8px 0; font-size:18px; font-weight:700; line-height:1.3; color:#0a0a0a; font-family:${fp};">${card2.title}</h2>
+                  <p style="margin:0 0 14px 0; font-size:13px; line-height:1.6; color:#6b7280; font-family:${fp};">${card2.excerpt}</p>
+                  <a href="${BASE_URL}/blog/${card2.slug}" target="_blank" style="display:inline-block; background-color:#ffffff; color:#0a0a0a; font-size:13px; font-weight:600; padding:9px 18px; border-radius:7px; border:1.5px solid #e5e7eb; font-family:${fp};">Read now →</a>
+                </td>
+                <td class="split-right split-img" valign="top" style="width:160px;">
+                  ${card2.cover ? `<img src="${card2.cover}" alt="Article thumbnail" width="160" style="width:160px; height:120px; object-fit:cover; border-radius:10px; display:block;" />` : `<div style="width:160px; height:120px; background:linear-gradient(135deg,#E8F5E9,#DCFCE7); border-radius:10px;"></div>`}
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+        <tr><td style="height:12px;"></td></tr>
+        <tr>
+          <td class="card" style="background-color:#ffffff; border-radius:16px; padding:24px;">
+            <table width="100%" cellpadding="0" cellspacing="0" border="0">
+              <tr>
+                <td class="split-left split-img" valign="top" style="width:160px; padding-right:20px;">
+                  ${card3.cover ? `<img src="${card3.cover}" alt="Article thumbnail" width="160" style="width:160px; height:120px; object-fit:cover; border-radius:10px; display:block;" />` : `<div style="width:160px; height:120px; background:linear-gradient(135deg,#E8F5E9,#DCFCE7); border-radius:10px;"></div>`}
+                </td>
+                <td class="split-right split-text" valign="top">
+                  <p style="margin:0 0 8px 0; font-size:10px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:#0e7490; font-family:${fp};">${card3.category}</p>
+                  <h2 style="margin:0 0 8px 0; font-size:18px; font-weight:700; line-height:1.3; color:#0a0a0a; font-family:${fp};">${card3.title}</h2>
+                  <p style="margin:0 0 14px 0; font-size:13px; line-height:1.6; color:#6b7280; font-family:${fp};">${card3.excerpt}</p>
+                  <a href="${BASE_URL}/blog/${card3.slug}" target="_blank" style="display:inline-block; background-color:#ffffff; color:#0a0a0a; font-size:13px; font-weight:600; padding:9px 18px; border-radius:7px; border:1.5px solid #e5e7eb; font-family:${fp};">Read more →</a>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+        <tr><td style="height:12px;"></td></tr>
+        <tr>
+          <td class="card" style="background-color:#0a0a0a; border-radius:16px; padding:32px; text-align:center;">
+            <p style="margin:0 0 6px 0; font-size:12px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:#0e7490; font-family:${fp};">FREE TOOLS</p>
+            <h2 style="margin:0 0 12px 0; font-size:24px; font-weight:700; line-height:1.25; color:#ffffff; font-family:${fp};">6 free EV engineering calculators</h2>
+            <p style="margin:0 0 24px 0; font-size:14px; line-height:1.65; color:#9ca3af; max-width:400px; margin-left:auto; margin-right:auto; font-family:${fp};">Battery pack designer, thermal load analyzer, SOC estimator, cooling system sizing, bus bar &amp; fusing, charging time — all free, all in your browser.</p>
+            <a href="${BASE_URL}/calculators" target="_blank" style="display:inline-block; background-color:#ffffff; color:#0a0a0a; font-size:14px; font-weight:700; padding:13px 28px; border-radius:8px; font-family:${fp};">Try the calculators →</a>
+          </td>
+        </tr>
+        <tr><td style="height:24px;"></td></tr>
+        <tr>
+          <td style="text-align:center; padding-bottom:16px;">
+            <table class="footer-socials" cellpadding="0" cellspacing="0" border="0" align="center" style="margin-bottom:20px;">
+              <tr>
+                <td style="padding:0 10px;">
+                  <a href="${BASE_URL}" target="_blank" style="display:inline-block; width:36px; height:36px; background-color:#e5e7eb; border-radius:50%; text-align:center; line-height:36px; font-size:13px; font-weight:700; color:#374151; font-family:${fp};">W</a>
+                </td>
+                <td style="padding:0 10px;">
+                  <a href="https://www.linkedin.com/company/evpulse" target="_blank" style="display:inline-block; width:36px; height:36px; background-color:#e5e7eb; border-radius:50%; text-align:center; line-height:36px; font-size:13px; font-weight:700; color:#374151; font-family:${fp};">in</a>
+                </td>
+                <td style="padding:0 10px;">
+                  <a href="https://x.com/evpulse" target="_blank" style="display:inline-block; width:36px; height:36px; background-color:#e5e7eb; border-radius:50%; text-align:center; line-height:36px; font-size:13px; font-weight:700; color:#374151; font-family:${fp};">X</a>
+                </td>
+              </tr>
+            </table>
+            <p style="margin:0 0 6px 0; font-size:12px; color:#9ca3af; font-family:${fp};">
+              <a href="${unsubUrl}" style="color:#9ca3af; text-decoration:underline;">Manage preferences</a>
+              &nbsp;&nbsp;
+              <a href="${unsubUrl}" style="color:#9ca3af; text-decoration:underline;">Unsubscribe</a>
+            </p>
+            <p style="margin:0 0 20px 0; font-size:11px; color:#d1d5db; font-family:${fp};">© 2026 EVPulse. All rights reserved.<br/>evpulse.co.in</p>
+            <a href="${BASE_URL}" target="_blank" style="font-size:14px; font-weight:700; color:#374151; letter-spacing:-0.02em; font-family:${fp}; text-decoration:none;">⚡ EVPulse</a>
+          </td>
+        </tr>
+      </table>
+      </td>
+    </tr>
+  </table>
 </div>
 </body>
 </html>`;
