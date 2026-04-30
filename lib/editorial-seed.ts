@@ -435,5 +435,8 @@ export const EDITORIAL_SEED_POSTS: PostRecord[] = seed.map((item, index) => ({
   tags: item.tags,
   published: true,
   reading_time: item.readingTime,
+  tier: 'intermediate',
+  pullquote: null,
+  stats: null,
   references: refsFor(item),
 }));
