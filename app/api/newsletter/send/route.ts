@@ -23,6 +23,8 @@ type Post = {
   reading_time: number | null;
   content: string | null;
   tags: string[] | null;
+  pullquote: string | null;
+  stats: Array<{ value: string; label: string }> | null;
 };
 
 const CALCULATOR_LIST = [
@@ -53,7 +55,7 @@ async function getLatestPosts() {
   const supabase = await getServerSupabaseClient();
   const { data } = await supabase
     .from("posts")
-    .select("id, title, slug, excerpt, cover_url, category, reading_time, content, tags")
+    .select("id, title, slug, excerpt, cover_url, category, reading_time, content, tags, pullquote, stats")
     .eq("published", true)
     .order("updated_at", { ascending: false })
     .limit(5);
@@ -132,8 +134,12 @@ function extractTextFromContent(content: string | null): string {
   }
 }
 
-function getPullQuote(content: string | null): string {
-  const text = extractTextFromContent(content);
+function getPullQuote(post: Post | null): string {
+  if (post?.pullquote) {
+    return post.pullquote;
+  }
+  
+  const text = extractTextFromContent(post?.content || null);
   if (text.length < 50) {
     return "The future of EV batteries lies in the balance between energy density and thermal stability.";
   }
@@ -179,6 +185,13 @@ function getCalculatorForPost(post: Post): { url: string; name: string; descript
   };
 }
 
+function getStatsForPost(post: Post | null): { value: string; label: string } | null {
+  if (post?.stats && post.stats.length > 0) {
+    return post.stats[0];
+  }
+  return null;
+}
+
 function getEmailHtml(posts: Post[], unsubUrl: string) {
   const now = new Date();
   const issueNum = getIssueNumber();
@@ -197,7 +210,9 @@ function getEmailHtml(posts: Post[], unsubUrl: string) {
   const articleUrl = mainPost ? `${BASE_URL}/blog/${mainPost.slug}` : "#";
   const readingTime = mainPost?.reading_time || 5;
   const category = mainPost?.category?.toUpperCase() || "BATTERY TECH";
-  const pullQuote = getPullQuote(mainPost?.content || null);
+  const pullQuote = getPullQuote(mainPost);
+  
+  const stat = getStatsForPost(mainPost);
   
   const calc = getCalculatorForPost(mainPost);
   const calculatorUrl = calc.url;
@@ -327,13 +342,13 @@ a:hover { text-decoration: none; }
 <tr>
 <td class="wrapper" style="padding: 40px 44px; text-align: center;">
   <p style="margin: 0 0 12px; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: #78716C;">
-    THIS WEEK'S NUMBER
+    ${stat ? 'KEY STAT' : 'THIS WEEK\'S NUMBER'}
   </p>
   <p style="margin: 0 0 12px; font-family: Georgia, serif; font-size: 64px; font-weight: 700; color: #C2410C; line-height: 1;">
-    ${(issueNum * 7) + 12}%
+    ${stat ? stat.value : (issueNum * 7) + 12 + '%'}
   </p>
   <p style="margin: 0; font-size: 14px; font-style: italic; color: #78716C; line-height: 1.65; max-width: 320px; margin-left: auto; margin-right: auto;">
-    of EV battery research now focuses on thermal management — a 12% shift from last quarter's focus on cell chemistry.
+    ${stat ? stat.label : 'of EV battery research now focuses on thermal management — a 12% shift from last quarter\'s focus on cell chemistry.'}
   </p>
 </td>
 </tr>
