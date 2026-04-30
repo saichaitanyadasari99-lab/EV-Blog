@@ -41,7 +41,9 @@ function getIssueNumber(): string {
   const now = new Date();
   const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
   const monthYear = `${months[now.getMonth()]} ${now.getFullYear()}`;
-  return `#${Math.floor((now.getTime() - new Date('2026', '3', 1).getTime()) / (1000 * 60 * 60 * 24 * 30)) + 10}`;
+  const startDate = new Date(2026, 3, 1);
+  const monthsDiff = (now.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24 * 30);
+  return `#${Math.floor(monthsDiff) + 10}`;
 }
 
 async function generateNewsletter() {
