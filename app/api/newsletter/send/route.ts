@@ -185,11 +185,64 @@ function getCalculatorForPost(post: Post): { url: string; name: string; descript
   };
 }
 
-function getStatsForPost(post: Post | null): { value: string; label: string } | null {
+function getStatsForPost(post: Post | null): { value: string; label: string }[] {
   if (post?.stats && post.stats.length > 0) {
-    return post.stats[0];
+    return post.stats.slice(0, 3);
   }
-  return null;
+  return [];
+}
+
+function extractSectionsFromPost(post: Post | null): { heading: string; body: string }[] {
+  const sections: { heading: string; body: string }[] = [];
+  
+  if (!post?.content) {
+    return sections;
+  }
+  
+  try {
+    const parsed = JSON.parse(post.content);
+    const extracts: string[] = [];
+    let currentHeading = '';
+    let currentBody: string[] = [];
+    
+    function traverse(node: Record<string, unknown>) {
+      if (node.type === 'heading' && node.attrs?.level === 2) {
+        if (currentHeading && currentBody.length > 0) {
+          sections.push({
+            heading: currentHeading,
+            body: currentBody.join(' ').slice(0, 200)
+          });
+        }
+        currentHeading = (node.content || []).map((c: Record<string, unknown>) => c.text || '').join('');
+        currentBody = [];
+      } else if (node.type === 'paragraph' && node.content) {
+        const text = (node.content || []).map((c: Record<string, unknown>) => c.text || '').join('');
+        if (currentHeading && text.length > 20) {
+          currentBody.push(text);
+        }
+      }
+      if (node.content && Array.isArray(node.content)) {
+        for (const child of node.content) {
+          if (typeof child === 'object' && child !== null) {
+            traverse(child as Record<string, unknown>);
+          }
+        }
+      }
+    }
+    
+    traverse(parsed);
+    
+    if (currentHeading && currentBody.length > 0 && sections.length < 3) {
+      sections.push({
+        heading: currentHeading,
+        body: currentBody.join(' ').slice(0, 200)
+      });
+    }
+  } catch {
+    // ignore parse errors
+  }
+  
+  return sections.slice(0, 3);
 }
 
 function getEmailHtml(posts: Post[], unsubUrl: string) {
@@ -199,262 +252,170 @@ function getEmailHtml(posts: Post[], unsubUrl: string) {
   const year = getYear(now);
   
   const mainPost = posts[0];
-  const quickBite1 = posts[1];
-  const quickBite2 = posts[2];
-  const quickBite3 = posts[3];
-  
-  const coverImage = mainPost?.cover_url 
-    ? `<img src="${mainPost.cover_url}" alt="${mainPost.title}" style="width:100%;max-width:480px;height:auto;border-radius:4px;margin:16px 0 20px;">`
-    : `<div style="background:linear-gradient(135deg,#E5E1D8,#D5D1C8);height:220px;border-radius:4px;margin:16px 0 20px;display:flex;align-items:center;justify-content:center;color:#78716C;font-size:12px;font-style:italic;">[ Cover Image ]</div>`;
   
   const articleUrl = mainPost ? `${BASE_URL}/blog/${mainPost.slug}` : "#";
   const readingTime = mainPost?.reading_time || 5;
-  const category = mainPost?.category?.toUpperCase() || "BATTERY TECH";
+  const category = mainPost?.category?.toUpperCase() || "DEEPDIVE";
   const pullQuote = getPullQuote(mainPost);
+  const stats = getStatsForPost(mainPost);
+  const sections = extractSectionsFromPost(mainPost);
   
-  const stat = getStatsForPost(mainPost);
+  const statCards = stats.length > 0 
+    ? stats.map(s => `
+      <div style="flex:1;background:#F0FDF4;border:1px solid #BBF7D0;border-radius:8px;padding:14px 12px;text-align:center;">
+        <div style="font-size:22px;font-weight:700;color:#166534;line-height:1;">${s.value}</div>
+        <div style="font-size:10px;color:#6B7280;margin-top:4px;letter-spacing:0.3px;">${s.label}</div>
+      </div>
+    `).join('')
+    : '';
   
-  const calc = getCalculatorForPost(mainPost);
-  const calculatorUrl = calc.url;
-  const calcName = calc.name;
-  const calcDesc = calc.description;
-
-  const bite1Url = quickBite1 ? `${BASE_URL}/blog/${quickBite1.slug}` : "#";
-  const bite1Title = quickBite1?.title || "New solid-state battery breakthrough";
-  const bite1Excerpt = quickBite1?.excerpt?.slice(0, 100) || "Recent developments in solid-state electrolyte technology.";
-
-  const bite2Url = quickBite2 ? `${BASE_URL}/blog/${quickBite2.slug}` : "#";
-  const bite2Title = quickBite2?.title || "New safety standards draft released";
-  const bite2Excerpt = quickBite2?.excerpt?.slice(0, 100) || "Updated thermal runaway requirements for EV packs.";
-
-  const bite3Title = quickBite3?.title || "EV market growth update";
+  const sectionBlocks = sections.length > 0
+    ? sections.map((s, i) => `
+      <div style="margin:20px 0;">
+        <h2 style="font-family:Georgia,serif;font-size:17px;font-weight:bold;color:#14532D;margin-bottom:8px;padding-bottom:6px;border-bottom:2px solid #DCFCE7;">
+          0${i + 1}/ ${s.heading}
+        </h2>
+        <p style="font-size:15px;line-height:1.75;color:#374151;">${s.body}</p>
+      </div>
+    `).join('')
+    : '';
 
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>EVPulse Newsletter</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title>EVPulse – #${issueNum} | ${mainPost?.title || 'Newsletter'}</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Playfair+Display:wght@400;700&display=swap');
-* { box-sizing: border-box; }
-body { margin: 0; padding: 0; background: #E5E1D8; font-family: Georgia, 'Times New Roman', serif; font-size: 15px; line-height: 1.8; color: #1C1917; }
-a { color: #C2410C; text-decoration: underline; }
-a:hover { text-decoration: none; }
-@media only screen and (max-width: 600px) {
-  .wrapper { width: 100% !important; padding-left: 20px !important; padding-right: 20px !important; }
-  .hide-mobile { display: none !important; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body, table, td, p, a, li, blockquote { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-collapse: collapse; }
+img { border: 0; outline: none; text-decoration: none; -ms-interpolation-mode: bicubic; display: block; }
+a { color: inherit; }
+body { background-color: #E8F5E9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; color: #374151; }
+.email-wrapper { width: 100%; background-color: #E8F5E9; padding: 24px 0 40px; }
+.email-container { max-width: 600px; margin: 0 auto; background-color: #FAFAF7; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 24px rgba(22, 101, 52, 0.10); }
+.header { background-color: #166534; padding: 0; text-align: center; }
+.header-top-stripe { background-color: #4ADE80; height: 3px; }
+.header-inner { padding: 22px 32px 18px; }
+.header-logo { font-family: Georgia, 'Times New Roman', serif; font-size: 32px; font-weight: bold; color: #FFFFFF; letter-spacing: -1px; text-decoration: none; display: inline-block; line-height: 1; }
+.header-logo span { color: #4ADE80; }
+.header-tagline { font-size: 10px; letter-spacing: 2.5px; color: #86EFAC; text-transform: uppercase; margin-top: 6px; }
+.header-meta { margin-top: 12px; border-top: 1px solid rgba(74, 222, 128, 0.25); padding-top: 10px; display: flex; justify-content: center; gap: 24px; flex-wrap: wrap; }
+.header-meta a { font-size: 11px; color: #86EFAC; text-decoration: none; letter-spacing: 0.5px; }
+.intro-banner { background-color: #DCFCE7; border-left: 4px solid #16A34A; margin: 24px 28px 0; border-radius: 0 8px 8px 0; padding: 12px 16px; }
+.intro-banner-title { font-size: 12px; font-weight: 600; color: #166534; letter-spacing: 0.5px; text-transform: uppercase; }
+.intro-banner-text { font-size: 14px; color: #374151; margin-top: 3px; line-height: 1.5; }
+.intro-banner-text em { color: #16A34A; font-style: italic; }
+.article-section { padding: 24px 28px 0; }
+.article-tag { display: inline-block; background-color: #DCFCE7; color: #166534; font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; padding: 4px 10px; border-radius: 4px; }
+.article-headline { font-family: Georgia, 'Times New Roman', serif; font-size: 26px; font-weight: bold; color: #14532D; line-height: 1.25; margin-top: 12px; letter-spacing: -0.3px; }
+.article-meta { font-size: 11px; color: #9CA3AF; margin-top: 8px; letter-spacing: 0.5px; }
+.article-divider { border: none; border-top: 1px solid #D1FAE5; margin: 16px 0; }
+.article-intro { font-size: 15px; line-height: 1.7; color: #374151; }
+.pull-quote { background-color: #F0FDF4; border-left: 4px solid #16A34A; border-radius: 0 8px 8px 0; padding: 14px 18px; margin: 20px 0; }
+.pull-quote-text { font-family: Georgia, 'Times New Roman', serif; font-size: 16px; font-style: italic; color: #14532D; line-height: 1.6; }
+.pull-quote-attr { font-size: 11px; color: #6B7280; margin-top: 8px; }
+.stats-row { display: flex; gap: 12px; margin: 20px 0; }
+.stat-card { flex: 1; background-color: #F0FDF4; border: 1px solid #BBF7D0; border-radius: 8px; padding: 14px 12px; text-align: center; }
+.stat-value { font-size: 22px; font-weight: 700; color: #166534; line-height: 1; }
+.stat-label { font-size: 10px; color: #6B7280; margin-top: 4px; letter-spacing: 0.3px; }
+.cta-wrap { text-align: center; margin: 28px 0 8px; }
+.cta-btn { display: inline-block; background-color: #166534; color: #FFFFFF !important; font-size: 14px; font-weight: 700; letter-spacing: 0.5px; text-decoration: none; padding: 14px 32px; border-radius: 6px; }
+.cta-btn:hover { background-color: #14532D; }
+.cta-secondary { display: inline-block; margin-top: 10px; font-size: 13px; color: #16A34A; text-decoration: underline; }
+.footer { background-color: #166534; padding: 24px 28px; margin-top: 28px; }
+.footer-logo { font-family: Georgia, 'Times New Roman', serif; font-size: 20px; font-weight: bold; color: #FFFFFF; text-decoration: none; }
+.footer-logo span { color: #4ADE80; }
+.footer-tagline { font-size: 11px; color: #86EFAC; margin-top: 4px; }
+.footer-links { margin-top: 16px; border-top: 1px solid rgba(74, 222, 128, 0.2); padding-top: 14px; display: flex; gap: 20px; flex-wrap: wrap; }
+.footer-links a { font-size: 11px; color: #86EFAC; text-decoration: none; }
+.footer-legal { font-size: 10px; color: rgba(134, 239, 172, 0.6); margin-top: 14px; line-height: 1.6; }
+.footer-legal a { color: rgba(134, 239, 172, 0.8); text-decoration: underline; }
+@media screen and (max-width: 640px) {
+  .email-wrapper { padding: 0 !important; }
+  .email-container { border-radius: 0 !important; box-shadow: none !important; }
+  .header-inner { padding: 18px 20px 14px !important; }
+  .header-logo { font-size: 26px !important; }
+  .intro-banner { margin: 16px 16px 0 !important; }
+  .article-section { padding: 18px 16px 0 !important; }
+  .article-headline { font-size: 22px !important; }
+  .stats-row { flex-direction: column !important; }
+  .footer { padding: 20px 16px !important; }
+  .cta-btn { display: block !important; text-align: center !important; padding: 14px 20px !important; }
 }
 </style>
 </head>
 <body>
-<table width="100%" bgcolor="#E5E1D8" cellpadding="0" cellspacing="0">
-<tr><td align="center" style="padding: 32px 16px;">
+<div class="email-wrapper">
+<div class="email-container">
+  <div class="header">
+    <div class="header-top-stripe"></div>
+    <div class="header-inner">
+      <a href="${BASE_URL}" class="header-logo">EV<span>Pulse</span></a>
+      <p class="header-tagline">Engineering Clarity for the EV Era</p>
+      <div class="header-meta">
+        <a href="${BASE_URL}/battery">Battery Status</a>
+        <a href="${BASE_URL}/charging">Charging</a>
+        <a href="${BASE_URL}/policy">Policy</a>
+        <a href="${BASE_URL}/tools">Tools</a>
+      </div>
+    </div>
+  </div>
 
-<!-- ==== BLOCK 1: HEADER ==== -->
-<table class="wrapper" width="600" cellpadding="0" cellspacing="0" style="background: #1C1917;">
-<tr>
-<td class="wrapper" style="padding: 40px 44px 32px; text-align: center;">
-  <p style="margin: 0 0 16px; font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; color: #C2410C;">
-    Issue #${issueNum} · ${month} ${year}
-  </p>
-  <h1 style="margin: 0 0 10px; font-family: Georgia, serif; font-size: 42px; font-weight: 700; color: #FFFFFF; line-height: 1.1;">
-    EV<span style="color: #C2410C;">Pulse</span>
-  </h1>
-  <p style="margin: 0 0 20px; font-family: Lora, Georgia, serif; font-size: 14px; font-style: italic; color: #A8A29E;">
-    Engineering clarity for the EV era
-  </p>
-  <p style="margin: 0; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: #78716C;">
-    Battery Systems · Charging · Policy · Tools
-  </p>
-</td>
-</tr>
-</table>
+  <div class="intro-banner">
+    <div class="intro-banner-title">#${issueNum} · ${month} ${year}</div>
+    <div class="intro-banner-text">
+      ${mainPost?.excerpt?.slice(0, 120) || 'Thanks for being part of EVPulse. This week we dive into something that matters for every EV engineer.'}...
+      <em>Stick around for stats that might surprise you.</em>
+    </div>
+  </div>
 
-<!-- ==== BLOCK 2: INTRO ==== -->
-<table class="wrapper" width="600" cellpadding="0" cellspacing="0" style="background: #F7F5F0;">
-<tr>
-<td class="wrapper" style="padding: 36px 44px 28px; border-bottom: 1px solid #E5E1D8;">
-  <p style="margin: 0 0 14px; font-size: 15px; line-height: 1.85; color: #1C1917;">
-    Hey there — thanks for being part of EVPulse. This week I'm diving deep into something that matters for every EV engineer: ${mainPost?.title || "the latest battery technology developments"}. Stick around for a stat that might surprise you.
-  </p>
-  <p style="margin: 0; font-size: 14px; font-style: italic; color: #78716C;">
-    — Chaitanya, EV Battery Engineer
-  </p>
-</td>
-</tr>
-</table>
+  <div class="article-section">
+    <span class="article-tag">${category}</span>
+    <h1 class="article-headline">${mainPost?.title || 'EVPulse Newsletter'}</h1>
+    <p class="article-meta">${readingTime} MIN READ &nbsp;·&nbsp; BY CHAITANYA, EV BATTERY ENGINEER</p>
+    <hr class="article-divider">
+    <p class="article-intro">
+      Hey — thanks for being part of EVPulse. ${mainPost?.excerpt?.slice(0, 150) || 'This week we explore the latest in EV battery technology and engineering.'}...
+    </p>
 
-<!-- ==== BLOCK 3: MAIN STORY ==== -->
-<table class="wrapper" width="600" cellpadding="0" cellspacing="0" style="background: #F7F5F0;">
-<tr>
-<td class="wrapper" style="padding: 36px 44px 32px; border-bottom: 1px solid #E5E1D8;">
-  <p style="margin: 0 0 12px; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: #C2410C;">
-    MAIN STORY
-  </p>
-  <h2 style="margin: 0 0 8px; font-family: Georgia, serif; font-size: 26px; font-weight: 700; color: #1C1917; line-height: 1.25;">
-    ${mainPost?.title || "Your EV Battery Guide"}
-  </h2>
-  <p style="margin: 0 0 18px; font-size: 10px; letter-spacing: 0.06em; color: #A8A29E;">
-    ${readingTime} MIN READ · ${category}
-  </p>
-  ${coverImage}
-  <p style="margin: 0 0 16px; font-size: 15px; line-height: 1.85; color: #292524;">
-    ${mainPost?.excerpt || "Deep dive into EV battery technology and engineering analysis."}
-  </p>
-</td>
-</tr>
-</table>
+    <div class="pull-quote">
+      <p class="pull-quote-text">"${pullQuote}"</p>
+      <p class="pull-quote-attr">— Chaitanya, EV Battery Engineer</p>
+    </div>
 
-<!-- ==== BLOCK 4: PULL QUOTE ==== -->
-<table class="wrapper" width="600" cellpadding="0" cellspacing="0" style="background: #FBF5EF;">
-<tr>
-<td class="wrapper" style="padding: 28px 44px; border-left: 3px solid #C2410C; border-top: 1px solid #E5E1D8; border-bottom: 1px solid #E5E1D8;">
-  <p style="margin: 0; font-family: Georgia, serif; font-size: 18px; font-style: italic; color: #1C1917; line-height: 1.6;">
-    "${pullQuote}"
-  </p>
-</td>
-</tr>
-</table>
+    ${sectionBlocks}
 
-<!-- ==== BLOCK 5: ARTICLE EXCERPT + CTA ==== -->
-<table class="wrapper" width="600" cellpadding="0" cellspacing="0" style="background: #F7F5F0;">
-<tr>
-<td class="wrapper" style="padding: 32px 44px 36px; border-bottom: 1px solid #E5E1D8;">
-  <p style="margin: 0 0 20px; font-size: 15px; line-height: 1.85; color: #292524;">
-    This analysis breaks down the core engineering principles, real-world test data, and practical implications for battery system design. Whether you're sizing a pack or evaluating cell chemistry, here's what the numbers tell us.
-  </p>
-  <table cellpadding="0" cellspacing="0" style="margin: 8px 0 0;">
-  <tr>
-    <td style="background: #C2410C; border-radius: 6px; padding: 0;">
-      <a href="${articleUrl}" target="_blank" style="display: block; padding: 14px 28px; font-size: 14px; font-weight: 600; color: #FFFFFF; text-decoration: none; border-radius: 6px;">
-        Read Full Article →
-      </a>
-    </td>
-  </tr>
-  </table>
-</td>
-</tr>
-</table>
+    ${statCards ? `<div class="stats-row">${statCards}</div>` : ''}
 
-<!-- ==== BLOCK 6: STAT CALLOUT ==== -->
-<table class="wrapper" width="600" cellpadding="0" cellspacing="0" style="background: #1C1917;">
-<tr>
-<td class="wrapper" style="padding: 40px 44px; text-align: center;">
-  <p style="margin: 0 0 12px; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: #78716C;">
-    ${stat ? 'KEY STAT' : 'THIS WEEK\'S NUMBER'}
-  </p>
-  <p style="margin: 0 0 12px; font-family: Georgia, serif; font-size: 64px; font-weight: 700; color: #C2410C; line-height: 1;">
-    ${stat ? stat.value : (issueNum * 7) + 12 + '%'}
-  </p>
-  <p style="margin: 0; font-size: 14px; font-style: italic; color: #78716C; line-height: 1.65; max-width: 320px; margin-left: auto; margin-right: auto;">
-    ${stat ? stat.label : 'of EV battery research now focuses on thermal management — a 12% shift from last quarter\'s focus on cell chemistry.'}
-  </p>
-</td>
-</tr>
-</table>
+    <div class="cta-wrap">
+      <a href="${articleUrl}" class="cta-btn">Read Full Article →</a>
+      <br>
+      <a href="${BASE_URL}/blog" class="cta-secondary">Browse all articles</a>
+    </div>
+  </div>
 
-<!-- ==== BLOCK 7: QUICK BITES ==== -->
-<table class="wrapper" width="600" cellpadding="0" cellspacing="0" style="background: #F7F5F0;">
-<tr>
-<td class="wrapper" style="padding: 36px 44px;">
-  <p style="margin: 0 0 20px; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: #C2410C;">
-    QUICK BITES
-  </p>
-  
-  <!-- Bite 1 -->
-  <table width="100%" cellpadding="0" cellspacing="0" style="border-bottom: 1px solid #E5E1D8; padding-bottom: 16px; margin-bottom: 16px;">
-  <tr>
-    <td width="62" valign="top">
-      <span style="display: inline-block; background: #E5E1D8; color: #78716C; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; padding: 4px 10px; border-radius: 3px;">
-        TECH
-      </span>
-    </td>
-    <td style="padding-left: 14px; font-size: 14px; line-height: 1.7; color: #292524;">
-      <a href="${bite1Url}" target="_blank" style="color: #1C1917; text-decoration: none; font-weight: 600;">
-        ${bite1Title || "New solid-state battery breakthrough"}
-      </a>
-      <br><span style="font-size: 13px; color: #57534E;">${bite1Excerpt || "Recent developments in solid-state electrolyte technology."}</span>
-    </td>
-  </tr>
-  </table>
-  
-  <!-- Bite 2 -->
-  <table width="100%" cellpadding="0" cellspacing="0" style="border-bottom: 1px solid #E5E1D8; padding-bottom: 16px; margin-bottom: 16px;">
-  <tr>
-    <td width="62" valign="top">
-      <span style="display: inline-block; background: #E5E1D8; color: #78716C; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; padding: 4px 10px; border-radius: 3px;">
-        POLICY
-      </span>
-    </td>
-    <td style="padding-left: 14px; font-size: 14px; line-height: 1.7; color: #292524;">
-      <a href="${bite2Url}" target="_blank" style="color: #1C1917; text-decoration: none; font-weight: 600;">
-        ${bite2Title || "New safety standards draft released"}
-      </a>
-      <br><span style="font-size: 13px; color: #57534E;">${bite2Excerpt || "Updated thermal runaway requirements."}</span>
-    </td>
-  </tr>
-  </table>
-  
-  <!-- Bite 3 -->
-  <table width="100%" cellpadding="0" cellspacing="0;">
-  <tr>
-    <td width="62" valign="top">
-      <span style="display: inline-block; background: #E5E1D8; color: #78716C; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; padding: 4px 10px; border-radius: 3px;">
-        MARKET
-      </span>
-    </td>
-    <td style="padding-left: 14px; font-size: 14px; line-height: 1.7; color: #292524;">
-      <a href="${bite2Url}" target="_blank" style="color: #1C1917; text-decoration: none; font-weight: 600;">
-        ${quickBite3?.title || "EV market growth update"}
-      </a>
-      <br><span style="font-size: 13px; color: #57534E;">Global EV sales continue upward trajectory.</span>
-    </td>
-  </tr>
-  </table>
-</td>
-</tr>
-</table>
-
-<!-- ==== BLOCK 8: TOOL OF THE WEEK ==== -->
-<table class="wrapper" width="600" cellpadding="0" cellspacing="0" style="background: #FBF5EF;">
-<tr>
-<td class="wrapper" style="padding: 32px 44px; border-bottom: 1px solid #E5E1D8;">
-  <p style="margin: 0 0 14px; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: #C2410C;">
-    TOOL OF THE WEEK
-  </p>
-  <h3 style="margin: 0 0 8px; font-family: Georgia, serif; font-size: 20px; font-weight: 700; color: #1C1917;">
-    ${calcName}
-  </h3>
-  <p style="margin: 0 0 14px; font-size: 14px; line-height: 1.75; color: #57534E;">
-    ${calcDesc} This calculator handles all the key calculations you need — voltage, thermal load, and power analysis. Free to use, no sign-up required.
-  </p>
-  <a href="${calculatorUrl}" target="_blank" style="font-size: 13px; color: #C2410C; text-decoration: underline;">
-    Try it here →
-  </a>
-</td>
-</tr>
-</table>
-
-<!-- ==== BLOCK 9: FOOTER ==== -->
-<table class="wrapper" width="600" cellpadding="0" cellspacing="0" style="background: #1C1917;">
-<tr>
-<td class="wrapper" style="padding: 32px 44px; text-align: center;">
-  <p style="margin: 0 0 6px; font-size: 12px; color: #78716C;">
-    <a href="${BASE_URL}" style="color: #A8A29E; text-decoration: none;">evpulse.co.in</a>
-  </p>
-  <p style="margin: 0 0 8px; font-size: 11px; color: #57534E;">
-    <a href="${unsubUrl}" style="color: #78716C; text-decoration: underline;">Unsubscribe</a> · <a href="${BASE_URL}" style="color: #78716C; text-decoration: underline;">View in browser</a>
-  </p>
-  <p style="margin: 0; font-size: 10px; color: #44403C;">
-    EVPulse · Visakhapatnam, India
-  </p>
-</td>
-</tr>
-</table>
-
-</td></tr>
-</table>
+  <div class="footer">
+    <a href="${BASE_URL}" class="footer-logo">EV<span>Pulse</span></a>
+    <p class="footer-tagline">Engineering clarity for the EV era · evpulse.co.in</p>
+    <div class="footer-links">
+      <a href="${BASE_URL}">Website</a>
+      <a href="${BASE_URL}/blog">Articles</a>
+      <a href="${BASE_URL}/tools">Tools</a>
+      <a href="${BASE_URL}/policy">Policy</a>
+      <a href="mailto:hello@evpulse.co.in">Contact</a>
+    </div>
+    <p class="footer-legal">
+      You're receiving this because you subscribed at evpulse.co.in.<br>
+      <a href="${unsubUrl}">Unsubscribe</a> &nbsp;·&nbsp;
+      <a href="${BASE_URL}/privacy">Privacy Policy</a> &nbsp;·&nbsp;
+      © 2026 EVPulse. All rights reserved.
+    </p>
+  </div>
+</div>
+</div>
 </body>
 </html>`;
 }
