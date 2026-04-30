@@ -1,10 +1,13 @@
 import { createClient } from '@supabase/supabase-js';
 import fs from 'fs';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://emzrbrlfgkxsyogogjbn.supabase.co';
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'sb_publishable_Pmm0so8jZCCcz5d7zAFssA__2l9Emf0';
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const brevoApiKey = process.env.BREVO_API_KEY;
+const senderEmail = process.env.NEWSLETTER_SENDER_EMAIL || 'your-email@domain.com';
+const senderName = process.env.NEWSLETTER_SENDER_NAME || 'EVPulse';
 
-const supabase = createClient(supabaseUrl, supabaseKey);
+const supabase = createClient(supabaseUrl!, supabaseKey!);
 
 interface PostRecord {
   id: string;

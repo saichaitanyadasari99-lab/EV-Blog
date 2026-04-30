@@ -298,6 +298,7 @@ export function Editor({ initialPost }: Props) {
   const [excerpt, setExcerpt] = useState(initialPost?.excerpt ?? "");
   const [coverUrl, setCoverUrl] = useState(initialPost?.cover_url ?? "");
   const [category, setCategory] = useState(initialPost?.category ?? "cell-chemistry");
+  const [tier, setTier] = useState(initialPost?.tier ?? "intermediate");
   const [tags, setTags] = useState((initialPost?.tags ?? []).join(", "));
   const [published, setPublished] = useState(initialPost?.published ?? false);
   const [status, setStatus] = useState("");
@@ -380,6 +381,7 @@ export function Editor({ initialPost }: Props) {
       excerpt,
       cover_url: coverUrl || undefined,
       category,
+      tier,
       tags: tags
         .split(",")
         .map((tag) => tag.trim())
@@ -531,6 +533,16 @@ export function Editor({ initialPost }: Props) {
               ))}
             </datalist>
           </div>
+          <select
+            className="rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 py-2"
+            value={tier}
+            onChange={(event) => setTier(event.target.value as 'basic' | 'intermediate' | 'advanced' | 'expert')}
+          >
+            <option value="basic">Basic - For new EV engineers</option>
+            <option value="intermediate">Intermediate - 1-3 years experience</option>
+            <option value="advanced">Advanced - Experienced engineers</option>
+            <option value="expert">Expert - Domain specialists</option>
+          </select>
           <input
             className="rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 py-2"
             placeholder="Tags (comma separated)"

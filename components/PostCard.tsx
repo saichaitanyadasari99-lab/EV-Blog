@@ -14,6 +14,15 @@ export function PostCard({ post, featured = false }: Props) {
   const coverUrl = post.cover_url;
   const showImage = coverUrl && (coverUrl.startsWith('http') || coverUrl.startsWith('/'));
   
+  const tierColors: Record<string, string> = {
+    basic: '#22c55e',
+    intermediate: '#3b82f6',
+    advanced: '#f59e0b',
+    expert: '#ef4444',
+  };
+  const tier = post.tier || 'intermediate';
+  const tierColor = tierColors[tier] || tierColors.intermediate;
+  
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
     const img = e.currentTarget;
     img.style.display = 'none';
@@ -45,6 +54,18 @@ export function PostCard({ post, featured = false }: Props) {
         <span className="a-badge" style={{ background: tone + '22', color: tone }}>
           {post.category ?? "article"}
         </span>
+        <span 
+          className="a-badge" 
+          style={{ 
+            background: tierColor + '15', 
+            color: tierColor,
+            marginLeft: post.tags?.length ? '6px' : '0',
+            fontSize: '9px',
+            padding: '2px 6px' 
+          }}
+        >
+          {tier}
+        </span>
         <h3 className="a-title">
           <Link href={`/blog/${post.slug}`}>{post.title}</Link>
         </h3>
@@ -53,6 +74,12 @@ export function PostCard({ post, featured = false }: Props) {
           <span className="a-date">{new Date(post.created_at).toLocaleDateString()}</span>
           <span className="a-dot">·</span>
           <span className="a-readtime">{post.reading_time ?? 1} min read</span>
+          {post.tags?.length ? (
+            <>
+              <span className="a-dot">·</span>
+              <span className="a-tags">{post.tags.slice(0, 2).join(', ')}</span>
+            </>
+          ) : null}
         </div>
       </div>
     </article>
