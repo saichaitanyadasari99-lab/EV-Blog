@@ -201,22 +201,22 @@ function extractSectionsFromPost(post: Post | null): { heading: string; body: st
   
   try {
     const parsed = JSON.parse(post.content);
-    const extracts: string[] = [];
     let currentHeading = '';
     let currentBody: string[] = [];
     
-    function traverse(node: Record<string, unknown>) {
-      if (node.type === 'heading' && node.attrs?.level === 2) {
+    function traverse(node: { type?: string; attrs?: Record<string, unknown>; content?: unknown[] }) {
+      const nodeAny = node as Record<string, unknown>;
+      if (node.type === 'heading' && (nodeAny.attrs as Record<string, unknown>)?.level === 2) {
         if (currentHeading && currentBody.length > 0) {
           sections.push({
             heading: currentHeading,
             body: currentBody.join(' ').slice(0, 200)
           });
         }
-        currentHeading = (node.content || []).map((c: Record<string, unknown>) => c.text || '').join('');
+        currentHeading = (node.content || []).map((c: unknown) => (c as Record<string, unknown>)?.text || '').join('');
         currentBody = [];
       } else if (node.type === 'paragraph' && node.content) {
-        const text = (node.content || []).map((c: Record<string, unknown>) => c.text || '').join('');
+        const text = (node.content || []).map((c: unknown) => (c as Record<string, unknown>)?.text || '').join('');
         if (currentHeading && text.length > 20) {
           currentBody.push(text);
         }
@@ -224,7 +224,7 @@ function extractSectionsFromPost(post: Post | null): { heading: string; body: st
       if (node.content && Array.isArray(node.content)) {
         for (const child of node.content) {
           if (typeof child === 'object' && child !== null) {
-            traverse(child as Record<string, unknown>);
+            traverse(child as { type?: string; attrs?: Record<string, unknown>; content?: unknown[] });
           }
         }
       }
