@@ -28,10 +28,14 @@ No. Your EV is fine. The battery is fine.
 
 The problem is that cold weather makes lithium-ion batteries lie about their capacity — not by cheating, but by following the laws of thermodynamics.
 
-[IMAGE_SEARCH]
-lithium ion battery cold temperature internal resistance
-The graph shows how internal resistance (IR) of a lithium-ion cell increases as temperature drops from 25°C to -10°C. Notice the steep rise below 10°C.
-[/IMAGE_SEARCH]
+[FIGURE]
+src: https://upload.wikimedia.org/wikipedia/commons/7/79/Electrical_Resistance_Vs_Temperature.png
+alt: Graph showing electrical resistance vs temperature curve for metals and semiconductors
+caption: The graph shows how electrical resistance changes with temperature, illustrating the physics behind increased internal resistance in lithium-ion batteries at cold temperatures.
+credit: Heike Kamerlingh Onnes
+creditUrl: https://commons.wikimedia.org/wiki/File:Electrical_Resistance_Vs_Temperature.png
+license: Public Domain
+[/FIGURE]
 
 ## The Physics Nobody Talks About
 
@@ -44,10 +48,14 @@ When this resistance is high, two things happen:
 1. **Voltage sag under load** — The terminal voltage drops when you draw current
 2. **Capacity appears lower** — The BMS interprets the lower voltage as lower SoC
 
-[IMAGE_SEARCH]
-voltage sag lithium ion battery discharge curve
-A discharge curve showing how the voltage profile changes at different temperatures. At -20°C, the voltage sags significantly compared to 25°C, causing the BMS to calculate a lower remaining capacity.
-[/IMAGE_SEARCH]
+[FIGURE]
+src: https://upload.wikimedia.org/wikipedia/commons/f/f3/LIC-und-LI-Akku-Spannungsverlauf.png
+alt: Comparison of charge and discharge voltage curves between lithium-ion batteries and lithium-ion capacitors
+caption: Voltage discharge curves show how lithium-ion cells experience voltage sag at different temperatures, causing BMS to calculate lower remaining capacity.
+credit: Elcap
+creditUrl: https://commons.wikimedia.org/wiki/File:LIC-und-LI-Akku-Spannungsverlauf.png
+license: CC0 1.0
+[/FIGURE]
 
 ## Why Morning Is Worse
 
@@ -57,10 +65,14 @@ But morning load — the HVAC system, seat heaters, the screen waking up — dra
 
 Cold resistance + high current = voltage sag = BMS sees "low voltage" = "low SoC."
 
-[IMAGE_SEARCH]
-battery management system SOC estimation algorithm
-A simplified flowchart of how a BMS calculates State of Charge, showing the voltage measurement → OCV lookup → resistance compensation → final SoC display pipeline.
-[/IMAGE_SEARCH]
+[FIGURE]
+src: https://upload.wikimedia.org/wikipedia/commons/6/6e/Schematic_of_a_Li-ion_battery.jpg
+alt: Schematic diagram of a Lithium Ion Battery showing anode, cathode, separator, and electrolyte
+caption: A simplified schematic of a Li-ion battery showing the core components that a BMS monitors and manages for SoC estimation.
+credit: Materialsgrp
+creditUrl: https://commons.wikimedia.org/wiki/File:Schematic_of_a_Li-ion_battery.jpg
+license: CC BY-SA 4.0
+[/FIGURE]
 
 ## What Your BMS Is Actually Doing
 
@@ -73,10 +85,14 @@ The Battery Management System doesn't measure capacity directly. It measures:
 
 The SoC algorithm uses all four inputs to estimate remaining charge. At cold temperatures, OCV-to-SoC lookup tables shift because the cell's voltage-electrochemistry relationship changes.
 
-[IMAGE_SEARCH]
-electric vehicle BMS hardware module cell monitoring
-A BMS PCB with a microcontroller, current sense resistor, and cell balancing circuits. The hardware that implements the algorithms discussed above.
-[/IMAGE_SEARCH]
+[FIGURE]
+src: https://upload.wikimedia.org/wikipedia/commons/8/8e/IEC-60086--battery-code.svg
+alt: Diagram of IEC 60086-1 standard for battery and cell identification and naming
+caption: Standardized battery nomenclature and identification codes used in BMS hardware documentation and cell monitoring systems.
+credit: Lead holder
+creditUrl: https://commons.wikimedia.org/wiki/File:IEC-60086--battery-code.svg
+license: CC BY-SA 4.0
+[/FIGURE]
 
 ## What You Can Actually Do
 

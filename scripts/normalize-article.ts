@@ -3,12 +3,12 @@
  * EVPulse Article Normalizer
  * 
  * Processes markdown articles to standardize format, fix image blocks, and prepare for publishing.
- * Handles [IMAGE_SEARCH], [FIGURE], COVER blocks per EVPulse standards.
+ * Handles [IMAGE_ SEARCH], [FIGURE], COVER blocks per EVPulse standards.
  * 
  * Usage:
- *   npx tsx scripts/normalize-article..ts articles/my-article.md
+ *   npx tsx scripts/normalize-article.ts articles/my-article.md
  *   npm run normalize articles/my-article.md
- */ 
+ */  
 import fs from 'fs';
 import path from 'path';
 
@@ -19,8 +19,8 @@ interface NormalizeOptions {
 }
 
 const IMAGE_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.webp', '.svg'];
-const VALID_LICENSES = [
-  'CC0', 'CC BY', 'CC BY-SA', 'Public Domain',
+const VALID_ LICENSES = [
+  'CC0', 'CC BY', 'CC BY- SA', 'Public Domain',
   'Unsplash License', 'Pexels License', 'MIT'
 ];
 
@@ -28,10 +28,10 @@ function parseFrontmatter(content: string): { meta: Record<string, any>; body: s
   const match = content.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
   if (!match) return null;
   
-  const metaLines = match[1].split('\n');
   const meta: Record<string, any> = {};
+  const lines = match[1].split('\n');
   
-  for (const line of metaLines) {
+  for (const line of lines) {
     const colonIdx = line.indexOf(':');
     if (colonIdx === -1) continue;
     const key = line.substring(0, colonIdx).trim();
@@ -47,55 +47,114 @@ function parseFrontmatter(content: string): { meta: Record<string, any>; body: s
   return { meta, body: match[2] };
 }
 
-function findImageBlocks(content: string): { type: string; block: string; start: number; end: number }[] {
-  const blocks: { type: string; block: string; start: number; end: number }[] = [];
-  
-  const patterns = [
-    { type: 'IMAGE_SEARCH', regex: /\[IMAGE_SEARCH\][\s\S]*?\[\/IMAGE_SEARCH\]/gi },
-    { type: 'FIGURE', regex: /\[FIGURE\][\s\S]*?\[\/FIGURE\]/gi },
-    { type: 'COVER', regex: /COVER URL:\s*\[SEARCH:[^\]]+\]/gi },
-  ];
-  
-  for (const { type, regex } of patterns) {
-    let match;
-    regex.lastIndex = 0;
-    while ((match = regex.exec(content)) !== null) {
-      blocks.push({ type, block: match[0], start: match.index, end: match.index + match[0].length });
-    }
-  }
-  
-  return blocks.sort((a, b) => a.start - b.start);
+interface ImageSearchBlock {
+  keyword: string;
+  context: string;
+  placement: string;
+  full: string;
+  start: number;
+  end: number;
+  line: number;
 }
 
-function validateFigureBlock(block: string): { valid: boolean; errors: string[] } {
+function findImageSearchBlocks(content: string): ImageSearchBlock[] {
+  const blocks: ImageSearchBlock[] = [];
+  const regex = /\[IMAGE_SEARCH\]([\s\S]*?)\[\/IMAGE_SEARCH]/gi;
+  let match;
+
+  while ((match = regex.exec(content)) !== null) {
+    const block = match[1];
+    const keywordMatch = block.match(/keyword:\s*(.+)/i);
+    const contextMatch = block.match(/context:\s*(.+)/i);
+    const placementMatch = block.match(/placement:\s*(.+)/i);
+
+    blocks.push({
+      keyword: keywordMatch ? keywordMatch[1].trim() : '',
+      context: contextMatch ? contextMatch[1].trim() : '',
+      placement: placementMatch ? placementMatch[1].trim() : '',
+      full: match[0],
+      start: match.index,
+      end: match.index + match[0].length,
+      line: content.substring(0, match.index).split('\n').length,
+    });
+  }
+
+  return blocks;
+}
+
+interface FigureBlock {
+  src: string;
+  alt: string;
+  caption: string;
+  credit: string;
+  creditUrl: string;
+  license: string;
+  full: string;
+  start: number;
+  end: number;
+  line: number;
+}
+
+function findFigureBlocks(content: string): FigureBlock[] {
+  const blocks: FigureBlock[] = [];
+  const regex = /\[FIGURE\]([\s\S]*?)\[\/FIGURE\]/gi;
+  let match;
+
+  while ((match = regex.exec(content)) !== null) {
+    const block = match[1];
+    const srcMatch = block.match(/src:\s*(https?:\/\/[^\s]+)/i);
+    const altMatch = block.match(/alt:\s*(.+)/i);
+    const captionMatch = block.match(/caption:\s*(.+)/i);
+    const creditMatch = block.match(/credit:\s*(.+)/i);
+    const creditUrlMatch = block.match(/creditUrl:\s*(https?:\/\/[^\s]+)/i);
+    const licenseMatch = block.match(/license:\s*(.+)/i);
+
+    blocks.push({
+      src: srcMatch ? srcMatch[1].trim() : '',
+      alt: altMatch ? altMatch[1].trim() : '',
+      caption: captionMatch ? captionMatch[1].trim() : '',
+      credit: creditMatch ? creditMatch[1].trim() : '',
+      creditUrl: creditUrlMatch ? creditUrlMatch[1].trim() : '',
+      license: licenseMatch ? licenseMatch[1].trim() : '',
+      full: match[0],
+      start: match.index,
+      end: match.index + match[0].length,
+      line: content.substring(0, match.index).split('\n').length,
+    });
+  }
+
+  return blocks;
+}
+
+function validateFigureBlock(block: FigureBlock): { valid: boolean; errors: string[] } {
   const errors: string[] = [];
-  const fields = ['src', 'alt', 'caption', 'credit', 'creditUrl', 'license'];
-  
-  for (const field of fields) {
-    if (!block.includes(`${field}:`)) {
+  const required = ['src', 'alt', 'caption', 'credit', 'creditUrl', 'license'];
+
+  for (const field of required) {
+    if (!block[field as keyof FigureBlock]) {
       errors.push(`Missing ${field}`);
     }
   }
-  
-  const srcMatch = block.match(/src:\s*(https?:\/\/[^\s]+)/i);
+
+  const srcMatch = block.src.match(/https?:\/\/[^\s]+/i);
   if (srcMatch) {
     try {
-      const ext = path.extname(new URL(srcMatch[1]).pathname).toLowerCase();
+      const ext = path.extname(new URL(srcMatch[0]).pathname).toLowerCase();
       if (!IMAGE_EXTENSIONS.some(e => ext.endsWith(e))) {
         errors.push(`Invalid image extension: ${ext}`);
       }
     } catch { errors.push('Invalid URL'); }
   }
-  
-  const licenseMatch = block.match(/license:\s*(.+)/i);
+
+  const licenseMatch = block.license.match(/(.+)/i);
   if (licenseMatch) {
     const license = licenseMatch[1].trim();
     if (!VALID_LICENSES.some(l => license.toLowerCase().includes(l.toLowerCase()))) {
       errors.push(`Unknown license: ${license}`);
     }
   }
-  
-  return { valid: errors.length === 0, errors };
+
+  return { valid: errors. length === 0, errors };
 }
 
 async function checkImageUrl(url: string): Promise<{ accessible: boolean; status: number }> {
@@ -106,101 +165,106 @@ async function checkImageUrl(url: string): Promise<{ accessible: boolean; status
 }
 
 async function processFile(filePath: string, options: NormalizeOptions): Promise<void> {
-  console.log(`\nProcessing: ${filePath}\n${'='.repeat(50)}`);
-  
+  console.log(`\nProcessing: ${filePath}`);
+  console.log('='.repeat(60));
+
   if (!fs.existsSync(filePath)) {
     console.error(`File not found: ${filePath}`);
     return;
   }
-  
+
   const content = fs.readFileSync(filePath, 'utf-8');
-  const blocks = findImageBlocks(content);
-  
-  console.log(`Found ${blocks.length} image-related blocks:\n`);
-  
+  const searchBlocks = findImageSearchBlocks(content);
+  const figureBlocks = findFigureBlocks(content);
+
+  console.log(`\nFound ${searchBlocks.length} [IMAGE_SEARCH] blocks`);
+  console.log(`Found ${figureBlocks.length} [FIGURE] blocks\n`);
+
   let hasIssues = false;
-  let processed = 0;
-  
-  for (const { type, block, start } of blocks) {
-    const lineNum = content.substring(0, start).split('\n').length;
-    
-    if (type === 'IMAGE_SEARCH') {
-      console.log(`  Line ${lineNum}: [IMAGE_SEARCH] - needs image search`);
-      console.log(`    ${block.replace(/\n/g, ' ').slice(0, 80)}...`);
-      processed++;
-    } else if (type === 'FIGURE') {
-      const validation = validateFigureBlock(block);
-      console.log(`  Line ${lineNum}: [FIGURE]`);
-      
-      if (validation.errors.length > 0) {
+  let pendingImages = 0;
+
+  // Report IMAGE_SEARCH blocks
+  for (const block of searchBlocks) {
+    console.log(`  Line ${block.line}: [IMAGE_SEARCH]`);
+    console.log(`    keyword: ${block.keyword}`);
+    console.log(`    context: ${block.context.slice(0, 80)}...`);
+    if (block.placement) {
+      console.log(`    placement: ${block.placement}`);
+    }
+    pendingImages++;
+  }
+
+  // Validate FIGURE blocks
+  for (const block of figureBlocks) {
+    console.log(`  Line ${block.line}: [FIGURE]`);
+    console.log(`    src: ${block.src.slice(0, 60)}...`);
+    console.log(`    alt: ${block.alt.slice(0, 50)}...`);
+
+    const validation = validateFigureBlock(block);
+
+    if (validation.errors. length > 0) {
+      hasIssues = true;
+      console.log(`    ERRORS:`);
+      for (const err of validation.errors) {
+        console.log(`      - ${err}`);
+      }
+    } else if (options.checkImages) {
+      const check = await checkImageUrl(block.src);
+      if (!check.accessible) {
         hasIssues = true;
-        console.log(`    ERRORS:`);
-        for (const err of validation.errors) {
-          console.log(`      - ${err}`);
-        }
+        console.log(`    ERROR: Image not accessible (${check.status})`);
       } else {
-        const srcMatch = block.match(/src:\s*(https?:\/\/[^\s]+)/i);
-        if (srcMatch && options.checkImages) {
-          const check = await checkImageUrl(srcMatch[1]);
-          if (!check.accessible) {
-            hasIssues = true;
-            console.log(`    ERROR: Image not accessible (${check.status})`);
-          } else {
-            console.log(`    ✓ Valid and accessible`);
-          }
-        } else {
-          console.log(`    ✓ Structure valid`);
-        }
+        console.log(`    ✓ Valid and accessible`);
       }
-      processed++;
-    } else if (type === 'COVER') {
-      const coverMatch = block.match(/COVER URL:\s*\[SEARCH:([^\]]+)\]/i);
-      if (coverMatch) {
-        console.log(`  Line ${lineNum}: COVER URL [SEARCH] - needs image search`);
-        console.log(`    Keyword: ${coverMatch[1]}`);
-      }
-      processed++;
+    } else {
+      console.log(`    ✓ Structure valid`);
     }
   }
-  
-  if (processed > 0) {
-    console.log(`\n${'─'.repeat(50)}`);
-    console.log(`Total blocks: ${processed}`);
-    console.log(`Issues: ${hasIssues ? 'YES' : 'None'}`);
+
+  // Check COVER URL
+  const coverMatch = content.match(/COVER URL:\s*\[SEARCH:([^\]]+)\]/i);
+  if (coverMatch) {
+    console.log(`\nCover image: [SEARCH: ${coverMatch[1]}]`);
+    pendingImages++;
   }
+
+  console.log(`\n${'-'.repeat(60)}`);
+  console.log(`Total [IMAGE_SEARCH] blocks: ${pendingImages}`);
+  console.log(`Total [FIGURE] blocks: ${figureBlocks. length}`);
+  console.log(`Image status: ${hasIssues ? 'ISSUES FOUND' : 'PENDING SEARCH'}`);
 }
 
 function main() {
   const args = process.argv.slice(2);
-  
-  if (args.length === 0) {
+
+  if (args. length === 0) {
     console.log(`
 EVPulse Article Normalizer
 ========================
 Processes markdown articles for EVPulse blog standards.
 
 Usage:
-  npx tsx scripts/normalize-article..ts [file.md]
-  npx tsx scripts/normalize-article..ts --all
-  
-  Checks:        --check (-c)     Verify image URLs are accessible
-  Dry run:       --dry (-d)      Don't write changes
-  All files:     --all         Process all .md files
+  npx tsx scripts/normalize-article.ts articles/file.md
+  npm run normalize articles/file.md
+
+  --check         Verify image URLs are accessible
+  --dry           Dry run (don't write changes)
+  --all           Process all .md files
     `);
     process.exit(0);
   }
-  
+
   const options: NormalizeOptions = {
-    checkImages: args.includes('--check') || args.includes('-c'),
+    checkImages: args.includes('--check'),
     fixFormatting: false,
-    dryRun: args.includes('--dry') || args.includes('-d'),
+    dryRun: args.includes('--dry'),
   };
-  
+
   const allMode = args.includes('--all');
   const files = allMode
     ? fs.readdirSync('.').filter(f => f.endsWith('.md') && !f.includes('.processed.'))
     : args.filter(f => !f.startsWith('--'));
-  
+
   for (const file of files) {
     processFile(file, options).catch(console.error);
   }
