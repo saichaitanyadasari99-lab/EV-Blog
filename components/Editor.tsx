@@ -41,11 +41,96 @@ function buildUploadPath(prefix: string, fileName: string) {
 function slugifyHeading(text: string) {
   return text
     .toLowerCase()
-    .replace(/[*_`[\]]/g, "")        // strip markdown formatting chars
+    .replace(/[*_`$$$$]/g, "")        // strip markdown formatting chars
     .replace(/[^\w\s-]/g, "")        // strip non-word chars
     .replace(/\s+/g, "-")            // spaces → hyphens
     .replace(/-+/g, "-")             // collapse multiple hyphens
     .trim();
+}
+
+interface ImageResult {
+  src: string;
+  alt: string;
+  caption: string;
+  credit: string;
+  creditUrl: string;
+  license: string;
+}
+
+async function autoSearchImage(keyword: string, context: string): Promise<ImageResult | null> {
+  try {
+    const searchUrl = `https://commons.wikimedia.org/w/api.php?action=query&generator=search&gsrsearch=${encodeURIComponent(keyword)}&gsrnamespace=6&gsrlimit=10&prop=imageinfo&iiprop=url|extmetadata&format=json&origin=*`;
+    const response = await fetch(searchUrl);
+    const data = await response.json();
+
+    if (!data.query?.pages) return null;
+
+    const pages = Object.values(data.query.pages) as Array<{
+      title: string;
+      imageinfo?: Array<{ url: string; extmetadata?: Record<string, string> }>;
+    }>;
+
+    for (const page of pages) {
+      const info = page.imageinfo?.[0];
+      if (!info?.url) continue;
+
+      const ext = info.url.split('.').pop()?.toLowerCase();
+      if (!['jpg', 'jpeg', 'png', 'webp', 'svg'].includes(ext || '')) continue;
+
+      const metadata = info.extmetadata as Record<string, string>;
+      const license = metadata?.License || metadata?.UsageTerms || '';
+      const validLicenses = ['CC0', 'CC BY', 'CC BY-SA', 'CC0 1.0', 'CC BY 4.0', 'CC BY-SA 4.0', 'Public Domain'];
+
+      if (!validLicenses.some(l => license.includes(l))) continue;
+
+      const artistValue = metadata?.Artist || '';
+      const credit = artistValue.replace(/<[^>]+>/g, '') || page.title.replace('File:', '').replace(/\.[^.]+$/, '');
+      const creditUrlLink = `https://commons.wikimedia.org/wiki/${page.title.replace(/ /g, '_')}`;
+
+      return {
+        src: info.url,
+        alt: keyword,
+        caption: context.slice(0, 100) || `Illustration related to ${keyword}`,
+        credit: credit.slice(0, 100),
+        creditUrl: creditUrlLink,
+        license: license.includes('CC BY-SA') ? 'CC BY-SA 4.0' : license.includes('CC0') ? 'CC0 1.0' : 'CC BY 4.0',
+      };
+    }
+  } catch (error) {
+    console.error('Image search failed:', error);
+  }
+  return null;
+}
+
+async function processMarkdownImages(markdown: string): Promise<string> {
+  const regex = /\[IMAGE_SEARCH\]([\s\S]*?)\[\/IMAGE_SEARCH\]/gi;
+  let match;
+  const blocks: string[] = [];
+  while ((match = regex.exec(markdown)) !== null) {
+    blocks.push(match[0]);
+  }
+
+  let processed = markdown;
+  for (const block of blocks) {
+    const keywordMatch = block.match(/\[IMAGE_SEARCH\]\s*([^\n]+)/);
+    const contextMatch = block.match(/\n([^\n]+)\n/);
+    const kw = keywordMatch?.[1]?.trim() || '';
+    const context = contextMatch?.[1]?.trim() || '';
+
+    if (!kw) continue;
+
+    const image = await autoSearchImage(kw, context);
+    if (!image) {
+      processed = processed.replace(block, `<!-- IMAGE_NOT_FOUND: ${kw} -->`);
+      continue;
+    }
+
+    const figureBlock = `[FIGURE]\nsrc: ${image.src}\nalt: ${image.alt}\ncaption: ${image.caption}\ncredit: ${image.credit}\ncreditUrl: ${image.creditUrl}\nlicense: ${image.license}\n[\/FIGURE]`;
+
+    processed = processed.replace(block, figureBlock);
+  }
+
+  return processed;
 }
 
 function formatInline(text: string) {
@@ -463,6 +548,62 @@ export function Editor({ initialPost }: Props) {
     setStatus("Markdown imported. Review and click Save Post.");
   };
 
+  const importJson = async (jsonText: string) => {
+    try {
+      const data = JSON.parse(jsonText);
+
+      if (!data.title) {
+        setStatus("Invalid JSON: missing title.");
+        return;
+      }
+
+      // Fill form fields
+      setTitle(data.title || "");
+      setSlug(data.slug || "");
+      setExcerpt(data.excerpt || "");
+      setTags((data.tags || []).join(", "));
+      setTier(data.tier || "intermediate");
+      setPublished(data.published || false);
+
+      const mappedCategory =
+        data.category?.toLowerCase().includes("bms")
+          ? "bms-design"
+          : data.category?.toLowerCase().includes("benchmark")
+            ? "ev-benchmarks"
+            : data.category?.toLowerCase().includes("review")
+              ? "vehicle-reviews"
+              : data.category?.toLowerCase().includes("standard")
+                ? "standards"
+                : data.category?.toLowerCase().includes("news")
+                  ? "news"
+                  : "cell-chemistry";
+      setCategory(mappedCategory);
+
+      // Auto-fetch cover image
+      if (data.cover?.search) {
+        setStatus("Fetching cover image...");
+        const coverImage = await autoSearchImage(data.cover.search, "Cover image for " + data.title);
+        if (coverImage) {
+          setCoverUrl(coverImage.src);
+          setStatus("Cover image fetched successfully.");
+        }
+      }
+
+      // Process markdown with auto-image search
+      if (data.markdown) {
+        setStatus("Processing markdown and fetching images...");
+        const processedMarkdown = await processMarkdownImages(data.markdown);
+        const meta = parseMarkdownMetadata(processedMarkdown);
+        editor.commands.setContent(markdownToHtml(meta.body));
+        setStatus("JSON imported successfully. Review and click Save Post.");
+      } else {
+        setStatus("JSON imported. No markdown content found.");
+      }
+    } catch (error) {
+      setStatus("Invalid JSON format: " + String(error));
+    }
+  };
+
   return (
     <section className="mx-auto w-full max-w-6xl px-4 py-8">
       <div className="panel p-5 shadow-sm">
@@ -552,13 +693,13 @@ export function Editor({ initialPost }: Props) {
         </div>
 
         <div className="mt-4 rounded-xl border border-[var(--border)] bg-[var(--surface2)] p-4">
-          <p className="text-sm font-semibold">Import from .md</p>
+          <p className="text-sm font-semibold">Import from JSON</p>
           <p className="mt-1 text-xs text-[var(--ink-soft)]">
-            Paste markdown or upload a local .md file to auto-fill the editor.
+            Paste JSON or upload a local .json file to auto-fill all fields and fetch images automatically.
           </p>
           <textarea
-            className="mt-3 min-h-[140px] w-full rounded-lg border border-[var(--border)] bg-[var(--surface)] p-3 text-sm"
-            placeholder="Paste markdown content here... Use ## References heading for links."
+            className="mt-3 min-h-[140px] w-full rounded-lg border border-[var(--border)] bg-[var(--surface)] p-3 text-sm font-mono"
+            placeholder='Paste JSON content here... {"title": "Post Title", "markdown": "# Content..."}'
             value={markdownInput}
             onChange={(event) => setMarkdownInput(event.target.value)}
           />
@@ -568,25 +709,25 @@ export function Editor({ initialPost }: Props) {
               className="rounded-lg border border-[var(--border)] px-3 py-2 text-sm"
               onClick={() => {
                 if (!markdownInput.trim()) {
-                  setStatus("Paste markdown first.");
+                  setStatus("Paste JSON first.");
                   return;
                 }
-                importMarkdown(markdownInput);
+                void importJson(markdownInput);
               }}
             >
-              Import Pasted Markdown
+              Import Pasted JSON
             </button>
             <button
               type="button"
               className="rounded-lg border border-[var(--border)] px-3 py-2 text-sm"
               onClick={() => markdownFileRef.current?.click()}
             >
-              Upload .md File
+              Upload .json File
             </button>
               <input
               ref={markdownFileRef}
               type="file"
-              accept=".md,text/markdown"
+              accept=".json,application/json"
               className="hidden"
               onChange={(event) => {
                 const file = event.target.files?.[0];
@@ -595,7 +736,7 @@ export function Editor({ initialPost }: Props) {
                 reader.onload = () => {
                   const text = String(reader.result ?? "");
                   setMarkdownInput(text);
-                  importMarkdown(text);
+                  void importJson(text);
                 };
                 reader.readAsText(file);
               }}
