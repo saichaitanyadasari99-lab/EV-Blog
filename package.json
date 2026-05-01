@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "newsletter": "npx tsx scripts/generate-newsletter.ts"
+    "newsletter": "npx tsx scripts/normalize-article.ts",
+    "normalize": "npx tsx scripts/normalize-article.ts",
+    "image-agent": "npx tsx scripts/normalize-article.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.10.0",
