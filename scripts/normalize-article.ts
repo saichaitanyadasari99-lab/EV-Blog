@@ -19,8 +19,8 @@ interface NormalizeOptions {
 }
 
 const IMAGE_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.webp', '.svg'];
-const VALID_ LICENSES = [
-  'CC0', 'CC BY', 'CC BY- SA', 'Public Domain',
+const VALID_LICENSES = [
+  'CC0', 'CC BY', 'CC BY-SA', 'Public Domain',
   'Unsplash License', 'Pexels License', 'MIT'
 ];
 
