@@ -31,4 +31,5 @@ export type SavePostInput = {
   tier?: 'basic' | 'intermediate' | 'advanced' | 'expert';
   pullquote?: string;
   stats?: Array<{ value: string; label: string }>;
+  faqs?: Array<{ question: string; answer: string }>;
 };

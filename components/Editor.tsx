@@ -14,6 +14,11 @@ type Props = {
   initialPost?: PostRecord | null;
 };
 
+type FaqItem = {
+  question: string;
+  answer: string;
+};
+
 function escapeHtml(input: string) {
   return input
     .replaceAll("&", "&amp;")
@@ -33,11 +38,6 @@ function normalizeEncoding(input: string) {
     .replaceAll("Î©", "Ω");
 }
 
-function buildUploadPath(prefix: string, fileName: string) {
-  const ext = fileName.split(".").pop() || "bin";
-  return `${prefix}-${crypto.randomUUID()}.${ext}`;
-}
-
 function slugifyHeading(text: string) {
   return text
     .toLowerCase()
@@ -46,91 +46,6 @@ function slugifyHeading(text: string) {
     .replace(/\s+/g, "-")            // spaces → hyphens
     .replace(/-+/g, "-")             // collapse multiple hyphens
     .trim();
-}
-
-interface ImageResult {
-  src: string;
-  alt: string;
-  caption: string;
-  credit: string;
-  creditUrl: string;
-  license: string;
-}
-
-async function autoSearchImage(keyword: string, context: string): Promise<ImageResult | null> {
-  try {
-    const searchUrl = `https://commons.wikimedia.org/w/api.php?action=query&generator=search&gsrsearch=${encodeURIComponent(keyword)}&gsrnamespace=6&gsrlimit=10&prop=imageinfo&iiprop=url|extmetadata&format=json&origin=*`;
-    const response = await fetch(searchUrl);
-    const data = await response.json();
-
-    if (!data.query?.pages) return null;
-
-    const pages = Object.values(data.query.pages) as Array<{
-      title: string;
-      imageinfo?: Array<{ url: string; extmetadata?: Record<string, string> }>;
-    }>;
-
-    for (const page of pages) {
-      const info = page.imageinfo?.[0];
-      if (!info?.url) continue;
-
-      const ext = info.url.split('.').pop()?.toLowerCase();
-      if (!['jpg', 'jpeg', 'png', 'webp', 'svg'].includes(ext || '')) continue;
-
-      const metadata = info.extmetadata as Record<string, string>;
-      const license = metadata?.License || metadata?.UsageTerms || '';
-      const validLicenses = ['CC0', 'CC BY', 'CC BY-SA', 'CC0 1.0', 'CC BY 4.0', 'CC BY-SA 4.0', 'Public Domain'];
-
-      if (!validLicenses.some(l => license.includes(l))) continue;
-
-      const artistValue = metadata?.Artist || '';
-      const credit = artistValue.replace(/<[^>]+>/g, '') || page.title.replace('File:', '').replace(/\.[^.]+$/, '');
-      const creditUrlLink = `https://commons.wikimedia.org/wiki/${page.title.replace(/ /g, '_')}`;
-
-      return {
-        src: info.url,
-        alt: keyword,
-        caption: context.slice(0, 100) || `Illustration related to ${keyword}`,
-        credit: credit.slice(0, 100),
-        creditUrl: creditUrlLink,
-        license: license.includes('CC BY-SA') ? 'CC BY-SA 4.0' : license.includes('CC0') ? 'CC0 1.0' : 'CC BY 4.0',
-      };
-    }
-  } catch (error) {
-    console.error('Image search failed:', error);
-  }
-  return null;
-}
-
-async function processMarkdownImages(markdown: string): Promise<string> {
-  const regex = /\[IMAGE_SEARCH\]([\s\S]*?)\[\/IMAGE_SEARCH\]/gi;
-  let match;
-  const blocks: string[] = [];
-  while ((match = regex.exec(markdown)) !== null) {
-    blocks.push(match[0]);
-  }
-
-  let processed = markdown;
-  for (const block of blocks) {
-    const keywordMatch = block.match(/\[IMAGE_SEARCH\]\s*([^\n]+)/);
-    const contextMatch = block.match(/\n([^\n]+)\n/);
-    const kw = keywordMatch?.[1]?.trim() || '';
-    const context = contextMatch?.[1]?.trim() || '';
-
-    if (!kw) continue;
-
-    const image = await autoSearchImage(kw, context);
-    if (!image) {
-      processed = processed.replace(block, `<!-- IMAGE_NOT_FOUND: ${kw} -->`);
-      continue;
-    }
-
-    const figureBlock = `[FIGURE]\nsrc: ${image.src}\nalt: ${image.alt}\ncaption: ${image.caption}\ncredit: ${image.credit}\ncreditUrl: ${image.creditUrl}\nlicense: ${image.license}\n[\/FIGURE]`;
-
-    processed = processed.replace(block, figureBlock);
-  }
-
-  return processed;
 }
 
 function formatInline(text: string) {
@@ -195,7 +110,7 @@ function parseTable(lines: string[], start: number) {
     .join("");
 
   return {
-    html: `<table><thead><tr>${headerCells}</tr></thead><tbody>${rows}</tbody></table>`,
+    html: `<div class="table-wrap"><table><thead><tr>${headerCells}</tr></thead><tbody>${rows}</tbody></table></div>`,
     next: idx,
   };
 }
@@ -408,6 +323,16 @@ function parseMarkdownMetadata(markdown: string) {
   };
 }
 
+function mapCategory(category: string) {
+  const lower = category?.toLowerCase() ?? "";
+  if (lower.includes("bms")) return "bms-design";
+  if (lower.includes("benchmark")) return "ev-benchmarks";
+  if (lower.includes("review")) return "vehicle-reviews";
+  if (lower.includes("standard")) return "standards";
+  if (lower.includes("news")) return "news";
+  return "cell-chemistry";
+}
+
 export function Editor({ initialPost }: Props) {
   const [title, setTitle] = useState(initialPost?.title ?? "");
   const [slug, setSlug] = useState(initialPost?.slug ?? "");
@@ -421,9 +346,15 @@ export function Editor({ initialPost }: Props) {
   const [saving, setSaving] = useState(false);
   const [uploadingCover, setUploadingCover] = useState(false);
   const [markdownInput, setMarkdownInput] = useState("");
+  const [importTab, setImportTab] = useState<"json" | "markdown">("json");
+  const [showPreview, setShowPreview] = useState(false);
+  const [previewHtml, setPreviewHtml] = useState("");
+  const [faqs, setFaqs] = useState<FaqItem[]>(
+    initialPost?.faqs ? [...initialPost.faqs] : []
+  );
   const [categories, setCategories] = useState<Array<{ slug: string; name: string }>>([]);
   const coverFileRef = useRef<HTMLInputElement | null>(null);
-  const markdownFileRef = useRef<HTMLInputElement | null>(null);
+  const importFileRef = useRef<HTMLInputElement | null>(null);
 
   const { startUpload: uploadToEditor, isUploading: isUploadingEditor } = useUploadThing("media", {
     onClientUploadComplete: (res) => {
@@ -504,6 +435,7 @@ export function Editor({ initialPost }: Props) {
         .filter(Boolean),
       published,
       content: editor.getJSON(),
+      faqs: faqs.length > 0 ? faqs : undefined,
     };
 
     setSaving(true);
@@ -529,27 +461,25 @@ export function Editor({ initialPost }: Props) {
     setSaving(false);
   };
 
-  const embedFromUpload = (url: string, type: "image" | "video" | "pdf" | "doc") => {
-    if (type === "image") {
-      editor.chain().focus().setImage({ src: url }).run();
-      return;
-    }
-    if (type === "video") {
-      editor.chain().focus().insertContent(`[[VIDEO:${url}]]`).run();
-      return;
-    }
-    if (type === "pdf") {
-      editor.chain().focus().insertContent(`[[PDF:${url}]]`).run();
-      return;
-    }
-    editor.chain().focus().insertContent(`[[DOC:${url}]]`).run();
-  };
-
   const uploadCover = async (file: File) => {
     setUploadingCover(true);
     setStatus("Uploading cover image...");
     await uploadCoverToUt([file]);
     setUploadingCover(false);
+  };
+
+  const addFaq = () => {
+    setFaqs([...faqs, { question: "", answer: "" }]);
+  };
+
+  const updateFaq = (index: number, field: "question" | "answer", value: string) => {
+    const updated = [...faqs];
+    updated[index] = { ...updated[index], [field]: value };
+    setFaqs(updated);
+  };
+
+  const removeFaq = (index: number) => {
+    setFaqs(faqs.filter((_, i) => i !== index));
   };
 
   const importMarkdown = (markdown: string) => {
@@ -561,25 +491,15 @@ export function Editor({ initialPost }: Props) {
     if (meta.excerpt) setExcerpt(meta.excerpt);
     if (meta.coverUrl) setCoverUrl(meta.coverUrl);
 
-    const mappedCategory = 
-      meta.category === "bms design" || meta.category?.includes("bms")
-        ? "bms-design"
-        : meta.category?.includes("benchmark")
-          ? "ev-benchmarks"
-          : meta.category?.includes("review")
-            ? "vehicle-reviews"
-            : meta.category?.includes("standard")
-              ? "standards"
-              : meta.category?.includes("news")
-                ? "news"
-                : "cell-chemistry";
-    setCategory(mappedCategory);
+    setCategory(mapCategory(meta.category));
 
+    const html = markdownToHtml(markdown);
     editor.commands.setContent(markdownToHtml(meta.body));
+    setPreviewHtml(html);
     setStatus("Markdown imported. Review and click Save Post.");
   };
 
-  const importJson = async (jsonText: string) => {
+  const importJson = (jsonText: string) => {
     try {
       const data = JSON.parse(jsonText);
 
@@ -588,45 +508,32 @@ export function Editor({ initialPost }: Props) {
         return;
       }
 
-      // Fill form fields
       setTitle(data.title || "");
       setSlug(data.slug || "");
       setExcerpt(data.excerpt || "");
       setTags((data.tags || []).join(", "));
       setTier(data.tier || "intermediate");
       setPublished(data.published || false);
+      setCategory(mapCategory(data.category || "cell-chemistry"));
 
-      const mappedCategory =
-        data.category?.toLowerCase().includes("bms")
-          ? "bms-design"
-          : data.category?.toLowerCase().includes("benchmark")
-            ? "ev-benchmarks"
-            : data.category?.toLowerCase().includes("review")
-              ? "vehicle-reviews"
-              : data.category?.toLowerCase().includes("standard")
-                ? "standards"
-                : data.category?.toLowerCase().includes("news")
-                  ? "news"
-                  : "cell-chemistry";
-      setCategory(mappedCategory);
-
-      // Auto-fetch cover image
-      if (data.cover?.search) {
-        setStatus("Fetching cover image...");
-        const coverImage = await autoSearchImage(data.cover.search, "Cover image for " + data.title);
-        if (coverImage) {
-          setCoverUrl(coverImage.src);
-          setStatus("Cover image fetched successfully.");
-        }
+      if (data.cover_url) {
+        setCoverUrl(data.cover_url);
+      } else if (data.cover?.url) {
+        setCoverUrl(data.cover.url);
       }
 
-      // Process markdown with auto-image search
+      if (data.faqs && Array.isArray(data.faqs)) {
+        setFaqs(data.faqs.map((f: { question: string; answer: string }) => ({
+          question: f.question || "",
+          answer: f.answer || "",
+        })));
+      }
+
       if (data.markdown) {
-        setStatus("Processing markdown and fetching images...");
-        const processedMarkdown = await processMarkdownImages(data.markdown);
-        const meta = parseMarkdownMetadata(processedMarkdown);
+        const meta = parseMarkdownMetadata(data.markdown);
         editor.commands.setContent(markdownToHtml(meta.body));
-        setStatus("JSON imported successfully. Review and click Save Post.");
+        setPreviewHtml(markdownToHtml(data.markdown));
+        setStatus("JSON imported successfully. Review content and FAQs, then click Save Post.");
       } else {
         setStatus("JSON imported. No markdown content found.");
       }
@@ -724,41 +631,92 @@ export function Editor({ initialPost }: Props) {
         </div>
 
         <div className="mt-4 rounded-xl border border-[var(--border)] bg-[var(--surface2)] p-4">
-          <p className="text-sm font-semibold">Import from JSON</p>
-          <p className="mt-1 text-xs text-[var(--ink-soft)]">
-            Paste JSON or upload a local .json file to auto-fill all fields and fetch images automatically.
-          </p>
+          <div className="flex items-center justify-between flex-wrap gap-2">
+            <div>
+              <p className="text-sm font-semibold">Import Content</p>
+              <p className="text-xs text-[var(--ink-soft)]">
+                Paste JSON or Markdown to auto-fill all fields.
+              </p>
+            </div>
+            <div className="flex gap-1 bg-[var(--surface)] rounded-lg p-1 border border-[var(--border)]">
+              <button
+                type="button"
+                className={`px-3 py-1.5 text-xs rounded-md transition ${
+                  importTab === "json"
+                    ? "bg-[var(--accent)] text-black font-semibold"
+                    : "text-[var(--ink-soft)] hover:text-[var(--text)]"
+                }`}
+                onClick={() => setImportTab("json")}
+              >
+                JSON
+              </button>
+              <button
+                type="button"
+                className={`px-3 py-1.5 text-xs rounded-md transition ${
+                  importTab === "markdown"
+                    ? "bg-[var(--accent)] text-black font-semibold"
+                    : "text-[var(--ink-soft)] hover:text-[var(--text)]"
+                }`}
+                onClick={() => setImportTab("markdown")}
+              >
+                Markdown
+              </button>
+            </div>
+          </div>
+
           <textarea
             className="mt-3 min-h-[140px] w-full rounded-lg border border-[var(--border)] bg-[var(--surface)] p-3 text-sm font-mono"
-            placeholder='Paste JSON content here... {"title": "Post Title", "markdown": "# Content..."}'
+            placeholder={
+              importTab === "json"
+                ? '{"title": "Post Title", "markdown": "# Content..."}'
+                : "# Title\n\n**Category:** ...\n\n## Introduction\n\nContent here..."
+            }
             value={markdownInput}
             onChange={(event) => setMarkdownInput(event.target.value)}
           />
+
           <div className="mt-3 flex flex-wrap gap-2">
+            <button
+              type="button"
+              className="rounded-lg bg-[var(--accent)] text-black px-4 py-2 text-sm font-semibold hover:bg-[var(--accent-strong)]"
+              onClick={() => {
+                if (!markdownInput.trim()) {
+                  setStatus("Paste content first.");
+                  return;
+                }
+                if (importTab === "json") {
+                  importJson(markdownInput);
+                } else {
+                  importMarkdown(markdownInput);
+                }
+              }}
+            >
+              Import {importTab === "json" ? "JSON" : "Markdown"}
+            </button>
+            <button
+              type="button"
+              className="rounded-lg border border-[var(--border)] px-3 py-2 text-sm"
+              onClick={() => importFileRef.current?.click()}
+            >
+              Upload File
+            </button>
             <button
               type="button"
               className="rounded-lg border border-[var(--border)] px-3 py-2 text-sm"
               onClick={() => {
-                if (!markdownInput.trim()) {
-                  setStatus("Paste JSON first.");
-                  return;
+                if (previewHtml) {
+                  setShowPreview(!showPreview);
+                } else {
+                  setStatus("Import content first to see preview.");
                 }
-                void importJson(markdownInput);
               }}
             >
-              Import Pasted JSON
+              {showPreview ? "Hide Preview" : "Show Preview"}
             </button>
-            <button
-              type="button"
-              className="rounded-lg border border-[var(--border)] px-3 py-2 text-sm"
-              onClick={() => markdownFileRef.current?.click()}
-            >
-              Upload .json File
-            </button>
-              <input
-              ref={markdownFileRef}
+            <input
+              ref={importFileRef}
               type="file"
-              accept=".json,application/json"
+              accept=".json,.md,.txt,application/json"
               className="hidden"
               onChange={(event) => {
                 const file = event.target.files?.[0];
@@ -767,12 +725,22 @@ export function Editor({ initialPost }: Props) {
                 reader.onload = () => {
                   const text = String(reader.result ?? "");
                   setMarkdownInput(text);
-                  void importJson(text);
+                  if (file.name.endsWith(".json")) {
+                    setImportTab("json");
+                    importJson(text);
+                  } else {
+                    setImportTab("markdown");
+                    importMarkdown(text);
+                  }
                 };
                 reader.readAsText(file);
               }}
             />
           </div>
+
+          {showPreview && previewHtml && (
+            <div className="mt-4 editor-full-preview prose" dangerouslySetInnerHTML={{ __html: previewHtml }} />
+          )}
         </div>
 
         {coverUrl ? (
@@ -781,42 +749,63 @@ export function Editor({ initialPost }: Props) {
 
         <div className="mt-4 flex flex-wrap gap-2">
           <button
-            className="rounded-lg border border-[var(--border)] px-3 py-1 text-sm"
-            onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
-          >
-            H1
-          </button>
-          <button
-            className="rounded-lg border border-[var(--border)] px-3 py-1 text-sm"
+            className="rounded-lg border border-[var(--border)] px-3 py-1.5 text-sm"
             onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
           >
             H2
           </button>
           <button
-            className="rounded-lg border border-[var(--border)] px-3 py-1 text-sm"
+            className="rounded-lg border border-[var(--border)] px-3 py-1.5 text-sm"
+            onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
+          >
+            H3
+          </button>
+          <button
+            className="rounded-lg border border-[var(--border)] px-3 py-1.5 text-sm"
             onClick={() => editor.chain().focus().toggleBold().run()}
           >
             Bold
           </button>
           <button
-            className="rounded-lg border border-[var(--border)] px-3 py-1 text-sm"
+            className="rounded-lg border border-[var(--border)] px-3 py-1.5 text-sm"
             onClick={() => editor.chain().focus().toggleItalic().run()}
           >
             Italic
           </button>
           <button
-            className="rounded-lg border border-[var(--border)] px-3 py-1 text-sm"
+            className="rounded-lg border border-[var(--border)] px-3 py-1.5 text-sm"
             onClick={() => editor.chain().focus().toggleCodeBlock().run()}
           >
             Code
           </button>
           <button
-            className="rounded-lg border border-[var(--border)] px-3 py-1 text-sm"
+            className="rounded-lg border border-[var(--border)] px-3 py-1.5 text-sm"
             onClick={() => editor.chain().focus().setHorizontalRule().run()}
           >
             Divider
           </button>
-          <label className="rounded-lg border border-[var(--border)] px-3 py-1 text-sm cursor-pointer hover:bg-[var(--surface2)]">
+          <button
+            className="rounded-lg border border-[var(--border)] px-3 py-1.5 text-sm"
+            onClick={() =>
+              editor
+                .chain()
+                .focus()
+                .insertTable({ rows: 3, cols: 3, withHeaderRow: true })
+                .run()
+            }
+          >
+            Table
+          </button>
+          <button
+            className="rounded-lg border border-[var(--border)] px-3 py-1.5 text-sm"
+            onClick={() => {
+              const href = window.prompt("Link URL");
+              if (href) editor.chain().focus().setLink({ href }).run();
+            }}
+          >
+            Link
+          </button>
+          <label className="rounded-lg border border-[var(--border)] px-3 py-1.5 text-sm cursor-pointer hover:bg-[var(--surface2)]">
             Add Image
             <input
               type="file"
@@ -831,52 +820,7 @@ export function Editor({ initialPost }: Props) {
             />
           </label>
           <button
-            type="button"
-            className="rounded-lg border border-[var(--border)] px-3 py-1 text-sm"
-            onClick={() => {
-              const attrs = editor.getAttributes("image");
-              if (attrs.src) {
-                const newUrl = window.prompt("Replace with new image URL:", attrs.src);
-                if (newUrl) editor.chain().focus().setImage({ src: newUrl }).run();
-              } else {
-                setStatus("Select an image first, then use Replace.");
-              }
-            }}
-          >
-            Replace Image
-          </button>
-          <button
-            type="button"
-            className="rounded-lg border border-[var(--border)] px-3 py-1 text-sm text-[var(--red)]"
-            onClick={() => {
-              editor.chain().focus().deleteSelection().run();
-            }}
-          >
-            Delete Image
-          </button>
-          <button
-            className="rounded-lg border border-[var(--border)] px-3 py-1 text-sm"
-            onClick={() =>
-              editor
-                .chain()
-                .focus()
-                .insertTable({ rows: 3, cols: 3, withHeaderRow: true })
-                .run()
-            }
-          >
-            Table
-          </button>
-          <button
-            className="rounded-lg border border-[var(--border)] px-3 py-1 text-sm"
-            onClick={() => {
-              const href = window.prompt("Link URL");
-              if (href) editor.chain().focus().setLink({ href }).run();
-            }}
-          >
-            Link
-          </button>
-          <button
-            className="rounded-lg border border-[var(--border)] px-3 py-1 text-sm"
+            className="rounded-lg border border-[var(--border)] px-3 py-1.5 text-sm"
             onClick={() => {
               const url = window.prompt("YouTube URL");
               if (url) editor.commands.setYoutubeVideo({ src: url });
@@ -887,13 +831,99 @@ export function Editor({ initialPost }: Props) {
         </div>
 
         <div className="mt-4">
-          <MediaUpload onUploaded={embedFromUpload} />
+          <MediaUpload onUploaded={(url, type) => {
+            if (type === "image") {
+              editor.chain().focus().setImage({ src: url }).run();
+            } else if (type === "video") {
+              editor.chain().focus().insertContent(`[[VIDEO:${url}]]`).run();
+            } else if (type === "pdf") {
+              editor.chain().focus().insertContent(`[[PDF:${url}]]`).run();
+            } else {
+              editor.chain().focus().insertContent(`[[DOC:${url}]]`).run();
+            }
+          }} />
         </div>
 
         <div className="mt-4 overflow-x-auto">
           <EditorContent editor={editor} />
         </div>
 
+        {/* FAQ / Q&A Section */}
+        <div className="mt-6 rounded-xl border border-[var(--border)] bg-[var(--surface2)] p-4">
+          <div className="flex items-center justify-between flex-wrap gap-2">
+            <div>
+              <p className="text-sm font-semibold">Q&A Section (FAQs)</p>
+              <p className="text-xs text-[var(--ink-soft)]">
+                Add questions that appear as collapsible FAQs on the published blog post.
+              </p>
+            </div>
+            <button
+              type="button"
+              className="rounded-lg bg-[var(--accent)] text-black px-3 py-1.5 text-sm font-semibold hover:bg-[var(--accent-strong)]"
+              onClick={addFaq}
+            >
+              + Add Question
+            </button>
+          </div>
+
+          {faqs.length === 0 && (
+            <p className="mt-3 text-xs text-[var(--text3)]">
+              No questions yet. Click &quot;+ Add Question&quot; to start.
+            </p>
+          )}
+
+          <div className="mt-3 grid gap-3">
+            {faqs.map((faq, idx) => (
+              <div
+                key={idx}
+                className="rounded-lg border border-[var(--border)] bg-[var(--surface)] p-3"
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-xs font-semibold text-[var(--accent)]">
+                    Q{idx + 1}
+                  </span>
+                  <button
+                    type="button"
+                    className="text-xs text-[var(--red)] hover:underline"
+                    onClick={() => removeFaq(idx)}
+                  >
+                    Remove
+                  </button>
+                </div>
+                <input
+                  className="mt-2 w-full rounded-lg border border-[var(--border)] bg-[var(--surface2)] px-3 py-2 text-sm"
+                  placeholder="Question..."
+                  value={faq.question}
+                  onChange={(e) => updateFaq(idx, "question", e.target.value)}
+                />
+                <textarea
+                  className="mt-2 w-full rounded-lg border border-[var(--border)] bg-[var(--surface2)] px-3 py-2 text-sm min-h-[80px]"
+                  placeholder="Answer..."
+                  value={faq.answer}
+                  onChange={(e) => updateFaq(idx, "answer", e.target.value)}
+                />
+              </div>
+            ))}
+          </div>
+
+          {faqs.length > 0 && (
+            <details className="mt-4 faq-list">
+              <summary className="text-xs text-[var(--ink-soft)] cursor-pointer hover:text-[var(--text)]">
+                Preview {faqs.length} FAQ{faqs.length > 1 ? "s" : ""}
+              </summary>
+              <div className="mt-2 space-y-2">
+                {faqs.map((faq, idx) => (
+                  <details key={idx} className="faq-item">
+                    <summary className="faq-question">{faq.question || "(empty question)"}</summary>
+                    <p className="faq-answer">{faq.answer || "(empty answer)"}</p>
+                  </details>
+                ))}
+              </div>
+            </details>
+          )}
+        </div>
+
+        {/* Save */}
         <div className="mt-4 flex flex-wrap items-center gap-3">
           <label className="inline-flex items-center gap-2 text-sm">
             <input

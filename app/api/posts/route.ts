@@ -98,7 +98,6 @@ export async function POST(request: Request) {
 
   // If body.id exists, it's an update - use upsert. Otherwise, insert new
   if (body.id) {
-    // Update existing post
     const { data, error } = await auth.supabase.from("posts").update({
       title: body.title.trim(),
       slug,
@@ -110,6 +109,7 @@ export async function POST(request: Request) {
       published: isPublished,
       reading_time: readingTime,
       tier: body.tier ?? 'intermediate',
+      faqs: body.faqs ?? null,
       updated_at: new Date().toISOString(),
     }).eq("id", body.id).select().single();
 
@@ -119,7 +119,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ post: data }, { status: 200 });
   }
 
-  // Create new post
   const { data, error } = await auth.supabase.from("posts").insert({
     author_id: auth.user.id,
     title: body.title.trim(),
@@ -132,6 +131,7 @@ export async function POST(request: Request) {
     published: isPublished,
     reading_time: readingTime,
     tier: body.tier ?? 'intermediate',
+    faqs: body.faqs ?? null,
   }).select().single();
 
   if (error) {
