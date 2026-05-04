@@ -69,10 +69,10 @@ function formatInline(text: string) {
 
   // Apply inline markdown formatting to the escaped text.
   value = value.replace(/`([^`]+)`/g, "<code>$1</code>");
-  // Inline math: $...$ → styled code span so it looks distinct from regular code
   value = value.replace(/\$([^$\n]+)\$/g, '<code class="math-inline">$1</code>');
   value = value.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
   value = value.replace(/\*([^*]+)\*/g, "<em>$1</em>");
+  value = value.replace(/==([^=]+)==/g, '<mark class="inline-highlight">$1</mark>');
 
   // Restore URL tokens.
   return value.replace(/\x00(\d+)\x00/g, (_, i) => tokens[Number(i)]);
@@ -283,6 +283,111 @@ function markdownToHtml(markdown: string) {
     if (imageNoteMatch) {
       flushAll();
       blocks.push(`<blockquote><p><strong>Image note:</strong> ${formatInline(imageNoteMatch[1])}</p></blockquote>`);
+      continue;
+    }
+
+    if (line.startsWith("[!NOTE]")) {
+      flushAll();
+      const noteLines: string[] = [];
+      i += 1;
+      while (i < lines.length && !lines[i].trim().startsWith("[/!NOTE]")) {
+        noteLines.push(lines[i].trim());
+        i += 1;
+      }
+      const content = noteLines.join(" ").trim();
+      blocks.push(`<div class="callout callout-note"><div class="callout-icon">💡</div><div class="callout-body">${formatInline(content)}</div></div>`);
+      continue;
+    }
+
+    if (line.startsWith("[!WARNING]")) {
+      flushAll();
+      const warnLines: string[] = [];
+      i += 1;
+      while (i < lines.length && !lines[i].trim().startsWith("[/!WARNING]")) {
+        warnLines.push(lines[i].trim());
+        i += 1;
+      }
+      const content = warnLines.join(" ").trim();
+      blocks.push(`<div class="callout callout-warning"><div class="callout-icon">⚠️</div><div class="callout-body">${formatInline(content)}</div></div>`);
+      continue;
+    }
+
+    if (line.startsWith("[!KEY]")) {
+      flushAll();
+      const keyLines: string[] = [];
+      i += 1;
+      while (i < lines.length && !lines[i].trim().startsWith("[/!KEY]")) {
+        keyLines.push(lines[i].trim());
+        i += 1;
+      }
+      const content = keyLines.join(" ").trim();
+      blocks.push(`<div class="callout callout-key"><div class="callout-icon">🔑</div><div class="callout-body">${formatInline(content)}</div></div>`);
+      continue;
+    }
+
+    if (line.startsWith("[!QUOTE]")) {
+      flushAll();
+      const quoteLines: string[] = [];
+      i += 1;
+      while (i < lines.length && !lines[i].trim().startsWith("[/!QUOTE]")) {
+        quoteLines.push(lines[i].trim());
+        i += 1;
+      }
+      const content = quoteLines.join(" ").trim();
+      blocks.push(`<blockquote class="pull-quote"><div class="pull-quote-line"></div><p>${formatInline(content)}</p><div class="pull-quote-line"></div></blockquote>`);
+      continue;
+    }
+
+    if (line.startsWith("[!STAT")) {
+      flushAll();
+      const labelMatch = line.match(/label=([^ \]]+)/);
+      const label = labelMatch ? labelMatch[1] : "";
+      const statLines: string[] = [];
+      i += 1;
+      while (i < lines.length && !lines[i].trim().startsWith("[/!STAT]")) {
+        statLines.push(lines[i].trim());
+        i += 1;
+      }
+      const value = statLines.join(" ").trim();
+      blocks.push(`<div class="stat-card"><span class="stat-value">${formatInline(value)}</span>${label ? `<span class="stat-label">${escapeHtml(label)}</span>` : ""}</div>`);
+      continue;
+    }
+
+    if (line.startsWith("[!EXPAND")) {
+      flushAll();
+      const titleMatch = line.match(/title="([^"]*)"/);
+      const title = titleMatch ? titleMatch[1] : "Expand";
+      const expandLines: string[] = [];
+      i += 1;
+      while (i < lines.length && !lines[i].trim().startsWith("[/!EXPAND]")) {
+        expandLines.push(lines[i].trim());
+        i += 1;
+      }
+      const content = expandLines.join(" ").trim();
+      blocks.push(`<details class="expandable-section"><summary class="expandable-summary">${escapeHtml(title)}</summary><div class="expandable-body">${formatInline(content)}</div></details>`);
+      continue;
+    }
+
+    if (line.startsWith("[!QUIZ")) {
+      flushAll();
+      const qMatch = line.match(/q="([^"]*)"/);
+      const a1Match = line.match(/a1="([^"]*)"/);
+      const a2Match = line.match(/a2="([^"]*)"/);
+      const a3Match = line.match(/a3="([^"]*)"/);
+      const a4Match = line.match(/a4="([^"]*)"/);
+      const cMatch = line.match(/correct=(\d)/);
+      const quizLines: string[] = [];
+      i += 1;
+      while (i < lines.length && !lines[i].trim().startsWith("[/!QUIZ]")) {
+        quizLines.push(lines[i].trim());
+        i += 1;
+      }
+      const explanation = quizLines.join(" ").trim();
+      const question = qMatch ? qMatch[1] : "";
+      const answers = [a1Match?.[1], a2Match?.[1], a3Match?.[1], a4Match?.[1]].filter(Boolean);
+      const correct = cMatch ? parseInt(cMatch[1], 10) - 1 : 0;
+      const answersJson = escapeHtml(JSON.stringify(answers));
+      blocks.push(`<div class="quiz-block" data-question="${escapeHtml(question)}" data-answers="${answersJson}" data-correct="${correct}" data-explanation="${escapeHtml(explanation)}"><p class="quiz-question">${escapeHtml(question)}</p><div class="quiz-options"></div><div class="quiz-feedback" style="display:none"></div></div>`);
       continue;
     }
 
@@ -828,6 +933,77 @@ export function Editor({ initialPost }: Props) {
           >
             YouTube
           </button>
+        </div>
+
+        {/* Advanced Elements Toolbar */}
+        <div className="mt-3 rounded-lg border border-[var(--border)] bg-[var(--surface2)] p-3">
+          <p className="text-xs font-semibold text-[var(--ink-soft)] mb-2">Advanced Elements</p>
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              className="rounded-md border border-[var(--border)] px-2.5 py-1.5 text-xs hover:bg-[var(--surface)]"
+              onClick={() => editor.commands.insertContent('[!NOTE]\nYour note here\n[/!NOTE]\n\n')}
+              title="Blue info callout"
+            >
+              💡 Note
+            </button>
+            <button
+              type="button"
+              className="rounded-md border border-[var(--border)] px-2.5 py-1.5 text-xs hover:bg-[var(--surface)]"
+              onClick={() => editor.commands.insertContent('[!WARNING]\nYour warning here\n[/!WARNING]\n\n')}
+              title="Orange warning callout"
+            >
+              ⚠️ Warning
+            </button>
+            <button
+              type="button"
+              className="rounded-md border border-[var(--border)] px-2.5 py-1.5 text-xs hover:bg-[var(--surface)]"
+              onClick={() => editor.commands.insertContent('[!KEY]\nKey takeaway here\n[/!KEY]\n\n')}
+              title="Green key takeaway"
+            >
+              🔑 Key
+            </button>
+            <button
+              type="button"
+              className="rounded-md border border-[var(--border)] px-2.5 py-1.5 text-xs hover:bg-[var(--surface)]"
+              onClick={() => editor.commands.insertContent('[!QUOTE]\nPull quote text here\n[/!QUOTE]\n\n')}
+              title="Serif pull quote"
+            >
+              ❝ Quote
+            </button>
+            <button
+              type="button"
+              className="rounded-md border border-[var(--border)] px-2.5 py-1.5 text-xs hover:bg-[var(--surface)]"
+              onClick={() => editor.commands.insertContent('[!STAT label=Label]\nValue\n[/!STAT]\n\n')}
+              title="Big number stat card"
+            >
+              🔢 Stat
+            </button>
+            <button
+              type="button"
+              className="rounded-md border border-[var(--border)] px-2.5 py-1.5 text-xs hover:bg-[var(--surface)]"
+              onClick={() => editor.commands.insertContent('[!EXPAND title="What is this?"]\nExpandable content here\n[/!EXPAND]\n\n')}
+              title="Collapsible expandable section"
+            >
+              ▸ Expand
+            </button>
+            <button
+              type="button"
+              className="rounded-md border border-[var(--border)] px-2.5 py-1.5 text-xs hover:bg-[var(--surface)]"
+              onClick={() => editor.commands.insertContent('[!QUIZ q="Question?" a1="Option A" a2="Option B" a3="Option C" a4="Option D" correct=1]\nExplanation of the answer\n[/!QUIZ]\n\n')}
+              title="Interactive knowledge check quiz"
+            >
+              ❓ Quiz
+            </button>
+            <button
+              type="button"
+              className="rounded-md border border-[var(--border)] px-2.5 py-1.5 text-xs hover:bg-[var(--surface)]"
+              onClick={() => editor.commands.insertContent("==highlighted text==")}
+              title="Inline highlight (yellow)"
+            >
+              🖍️ Highlight
+            </button>
+          </div>
         </div>
 
         <div className="mt-4">

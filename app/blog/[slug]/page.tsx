@@ -10,6 +10,8 @@ import { NewsletterForm } from "@/components/NewsletterForm";
 import { ReadingProgress } from "@/components/ReadingProgress";
 import { TableOfContents } from "@/components/TableOfContents";
 import { getArticleSchema } from "@/lib/schema";
+import { ArticleContent } from "@/components/ArticleContent";
+import { ReactionBar } from "@/components/ReactionBar";
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://www.evpulse.co.in";
 
@@ -29,6 +31,36 @@ function extractHeadings(html: string) {
     .map((match) => ({ text: stripTags(match[1] ?? ""), id: stripTags(match[1] ?? "").toLowerCase().replace(/\s+/g, "-") }))
     .filter(Boolean)
     .slice(0, 8);
+}
+
+type QuizData = {
+  question: string;
+  answers: string[];
+  correct: number;
+  explanation: string;
+};
+
+function extractQuizzes(html: string): QuizData[] {
+  const regex = /<div class="quiz-block"[^>]*data-question="([^"]*)"[^>]*data-answers="([^"]*)"[^>]*data-correct="(\d)"[^>]*data-explanation="([^"]*)"[^>]*>[\s\S]*?<\/div>/gi;
+  const quizzes: QuizData[] = [];
+  let match;
+  while ((match = regex.exec(html)) !== null) {
+    try {
+      quizzes.push({
+        question: match[1] || "",
+        answers: JSON.parse(match[2].replace(/&quot;/g, '"')) as string[],
+        correct: parseInt(match[3], 10),
+        explanation: match[4] || "",
+      });
+    } catch {
+      // skip invalid
+    }
+  }
+  return quizzes;
+}
+
+function stripQuizBlocks(html: string): string {
+  return html.replace(/<div class="quiz-block"[^>]*>[\s\S]*?<\/div>/gi, "");
 }
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
@@ -80,9 +112,11 @@ export default async function BlogPostPage({ params }: Params) {
   if (!post) notFound();
 
   const html = renderTiptapHtml(post?.content ?? null);
+  const quizzes = extractQuizzes(html);
+  const cleanHtml = quizzes.length > 0 ? stripQuizBlocks(html) : html;
   const toneStyle = { ["--tone" as string]: getCategoryTone(post?.category ?? "cell-chemistry") } as CSSProperties;
   const references = (post as PostRecord)?.references ?? [];
-  const headings = extractHeadings(html);
+  const headings = extractHeadings(cleanHtml);
 
   const relatedByCategory = allPosts
     .filter((item) => item.slug !== post?.slug && item.category === post?.category)
@@ -143,7 +177,11 @@ export default async function BlogPostPage({ params }: Params) {
 
         <div className="post-layout">
           <div className="post-main">
-            <section className="article-content prose" dangerouslySetInnerHTML={{ __html: html }} />
+            <section className="article-content prose">
+              <ArticleContent html={cleanHtml} quizzes={quizzes} />
+            </section>
+
+            <ReactionBar />
 
             {/* Author Bio - E-E-A-T Signal */}
             <section className="author-bio">
