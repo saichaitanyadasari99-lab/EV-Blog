@@ -288,6 +288,11 @@ function markdownToHtml(markdown: string) {
 
     if (line.startsWith("[!NOTE]")) {
       flushAll();
+      const inline = line.match(/^\[!NOTE\](.*)\[\/!NOTE\]/);
+      if (inline) {
+        blocks.push(`<div class="callout callout-note"><div class="callout-icon">💡</div><div class="callout-body">${formatInline(inline[1])}</div></div>`);
+        continue;
+      }
       const noteLines: string[] = [];
       i += 1;
       while (i < lines.length && !lines[i].trim().startsWith("[/!NOTE]")) {
@@ -301,6 +306,11 @@ function markdownToHtml(markdown: string) {
 
     if (line.startsWith("[!WARNING]")) {
       flushAll();
+      const inline = line.match(/^\[!WARNING\](.*)\[\/!WARNING\]/);
+      if (inline) {
+        blocks.push(`<div class="callout callout-warning"><div class="callout-icon">⚠️</div><div class="callout-body">${formatInline(inline[1])}</div></div>`);
+        continue;
+      }
       const warnLines: string[] = [];
       i += 1;
       while (i < lines.length && !lines[i].trim().startsWith("[/!WARNING]")) {
@@ -314,6 +324,11 @@ function markdownToHtml(markdown: string) {
 
     if (line.startsWith("[!KEY]")) {
       flushAll();
+      const inline = line.match(/^\[!KEY\](.*)\[\/!KEY\]/);
+      if (inline) {
+        blocks.push(`<div class="callout callout-key"><div class="callout-icon">🔑</div><div class="callout-body">${formatInline(inline[1])}</div></div>`);
+        continue;
+      }
       const keyLines: string[] = [];
       i += 1;
       while (i < lines.length && !lines[i].trim().startsWith("[/!KEY]")) {
@@ -327,6 +342,11 @@ function markdownToHtml(markdown: string) {
 
     if (line.startsWith("[!QUOTE]")) {
       flushAll();
+      const inline = line.match(/^\[!QUOTE\](.*)\[\/!QUOTE\]/);
+      if (inline) {
+        blocks.push(`<blockquote class="pull-quote"><div class="pull-quote-line"></div><p>${formatInline(inline[1])}</p><div class="pull-quote-line"></div></blockquote>`);
+        continue;
+      }
       const quoteLines: string[] = [];
       i += 1;
       while (i < lines.length && !lines[i].trim().startsWith("[/!QUOTE]")) {
@@ -340,8 +360,14 @@ function markdownToHtml(markdown: string) {
 
     if (line.startsWith("[!STAT")) {
       flushAll();
-      const labelMatch = line.match(/label=([^ \]]+)/);
+      const labelMatch = line.match(/label="([^"]*)"/) || line.match(/label=([^ \]]+)/);
       const label = labelMatch ? labelMatch[1] : "";
+      const inline = line.match(/\[\/!STAT\]/);
+      if (inline) {
+        const value = line.match(/\[!STAT.*\](.*)\[\/!STAT\]/)?.[1] || "";
+        blocks.push(`<div class="stat-card"><span class="stat-value">${formatInline(value)}</span>${label ? `<span class="stat-label">${escapeHtml(label)}</span>` : ""}</div>`);
+        continue;
+      }
       const statLines: string[] = [];
       i += 1;
       while (i < lines.length && !lines[i].trim().startsWith("[/!STAT]")) {
@@ -357,6 +383,12 @@ function markdownToHtml(markdown: string) {
       flushAll();
       const titleMatch = line.match(/title="([^"]*)"/);
       const title = titleMatch ? titleMatch[1] : "Expand";
+      const inline = line.match(/\[\/!EXPAND\]/);
+      if (inline) {
+        const content = line.match(/\[!EXPAND.*\](.*)\[\/!EXPAND\]/)?.[1] || "";
+        blocks.push(`<details class="expandable-section"><summary class="expandable-summary">${escapeHtml(title)}</summary><div class="expandable-body">${formatInline(content)}</div></details>`);
+        continue;
+      }
       const expandLines: string[] = [];
       i += 1;
       while (i < lines.length && !lines[i].trim().startsWith("[/!EXPAND]")) {
@@ -376,13 +408,19 @@ function markdownToHtml(markdown: string) {
       const a3Match = line.match(/a3="([^"]*)"/);
       const a4Match = line.match(/a4="([^"]*)"/);
       const cMatch = line.match(/correct=(\d)/);
-      const quizLines: string[] = [];
-      i += 1;
-      while (i < lines.length && !lines[i].trim().startsWith("[/!QUIZ]")) {
-        quizLines.push(lines[i].trim());
+      const inline = line.match(/\[\/!QUIZ\]/);
+      let explanation = "";
+      if (inline) {
+        explanation = line.match(/\[!QUIZ.*\](.*)\[\/!QUIZ\]/)?.[1] || "";
+      } else {
+        const quizLines: string[] = [];
         i += 1;
+        while (i < lines.length && !lines[i].trim().startsWith("[/!QUIZ]")) {
+          quizLines.push(lines[i].trim());
+          i += 1;
+        }
+        explanation = quizLines.join(" ").trim();
       }
-      const explanation = quizLines.join(" ").trim();
       const question = qMatch ? qMatch[1] : "";
       const answers = [a1Match?.[1], a2Match?.[1], a3Match?.[1], a4Match?.[1]].filter(Boolean);
       const correct = cMatch ? parseInt(cMatch[1], 10) - 1 : 0;
@@ -408,8 +446,7 @@ function parseMarkdownMetadata(markdown: string) {
   const tagsMatch = normalized.match(/\*\*Tags:\*\*\s*(.+)$/m);
   const slugMatch = normalized.match(/\*\*Slug:\*\*\s*`?([^`\n]+)`?/m);
 
-  const bodyStart = normalized.indexOf("\n## ");
-  const body = bodyStart >= 0 ? normalized.slice(bodyStart).trim() : normalized.trim();
+  const body = normalized.trim();
   const firstParagraph = body
     .split("\n\n")
     .map((part) => part.replace(/^#+\s+/g, "").trim())
