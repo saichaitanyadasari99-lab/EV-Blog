@@ -115,8 +115,150 @@ function parseTable(lines: string[], start: number) {
   };
 }
 
+function formatBlockContent(content: string): string {
+  const paras = content.trim().split(/\n\n+/);
+  return paras
+    .map((para) => {
+      const lines = para
+        .split("\n")
+        .map((l) => formatInline(l.trim()))
+        .filter(Boolean);
+      return lines.length > 1
+        ? `<p>${lines.join("<br>")}</p>`
+        : `<p>${lines[0] ?? ""}</p>`;
+    })
+    .join("");
+}
+
+function preprocessCustomBlocks(markdown: string): {
+  text: string;
+  map: Record<string, string>;
+} {
+  const map: Record<string, string> = {};
+  let counter = 0;
+  let text = markdown;
+
+  const register = (html: string): string => {
+    const key = `\u0002BLOCK_${counter++}\u0002`;
+    map[key] = html;
+    return key;
+  };
+
+  // [!NOTE]...[/!NOTE]
+  text = text.replace(
+    /\[!NOTE\]([\s\S]*?)\[\/!NOTE\]/g,
+    (_, content) =>
+      register(
+        `<div class="callout callout-note"><span class="callout-icon">ℹ</span><div class="callout-body">${formatBlockContent(
+          content
+        )}</div></div>`
+      )
+  );
+
+  // [!WARNING]...[/!WARNING]
+  text = text.replace(
+    /\[!WARNING\]([\s\S]*?)\[\/!WARNING\]/g,
+    (_, content) =>
+      register(
+        `<div class="callout callout-warning"><span class="callout-icon">⚠</span><div class="callout-body">${formatBlockContent(
+          content
+        )}</div></div>`
+      )
+  );
+
+  // [!KEY]...[/!KEY]
+  text = text.replace(
+    /\[!KEY\]([\s\S]*?)\[\/!KEY\]/g,
+    (_, content) =>
+      register(
+        `<div class="callout callout-key"><span class="callout-icon">🔑</span><div class="callout-body">${formatBlockContent(
+          content
+        )}</div></div>`
+      )
+  );
+
+  // [!QUOTE]...[/!QUOTE]
+  text = text.replace(
+    /\[!QUOTE\]([\s\S]*?)\[\/!QUOTE\]/g,
+    (_, content) =>
+      register(
+        `<blockquote class="pull-quote"><p>${formatInline(
+          content.trim()
+        )}</p></blockquote>`
+      )
+  );
+
+  // [!STAT label="..."]...[/!STAT]
+  text = text.replace(
+    /\[!STAT\s+label="([^"]+)"\]([\s\S]*?)\[\/!STAT\]/g,
+    (_, label, value) =>
+      register(
+        `<div class="stat-card"><div class="stat-label">${escapeHtml(
+          label
+        )}</div><div class="stat-value">${formatInline(
+          value.trim()
+        )}</div></div>`
+      )
+  );
+
+  // [!EXPAND title="..."]...[/!EXPAND]
+  text = text.replace(
+    /\[!EXPAND\s+title="([^"]+)"\]([\s\S]*?)\[\/!EXPAND\]/g,
+    (_, title, content) =>
+      register(
+        `<details class="expand-block"><summary class="expand-title">${escapeHtml(
+          title
+        )}</summary><div class="expand-body">${formatBlockContent(
+          content
+        )}</div></details>`
+      )
+  );
+
+  // [!QUIZ q="..." a1="..." a2="..." a3="..." a4="..." correct=N]...[/!QUIZ]
+  text = text.replace(
+    /\[!QUIZ\s+q="([^"]+)"\s+a1="([^"]+)"\s+a2="([^"]+)"\s+a3="([^"]+)"\s+a4="([^"]+)"\s+correct=(\d+)\]([\s\S]*?)\[\/!QUIZ\]/g,
+    (
+      _match,
+      q,
+      a1,
+      a2,
+      a3,
+      a4,
+      correct,
+      explanation
+    ) => {
+      const answers = [a1, a2, a3, a4];
+      const correctIdx = parseInt(correct, 10) - 1;
+      const id = `quiz_${counter}`;
+      const escapedId = id.replace(/'/g, "\\'");
+      const optionsHtml = answers
+        .map((ans, idx) => {
+          const isCorrect = idx === correctIdx;
+          return `<button class="quiz-option" data-correct="${isCorrect}" data-quiz="${id}" onclick="(function(btn){var all=document.querySelectorAll('[data-quiz=${escapedId}]');all.forEach(function(b){b.disabled=true;b.classList.add(b.dataset.correct==='true'?'quiz-correct':'quiz-wrong')});var exp=document.getElementById('${escapedId}_exp');if(exp)exp.style.display='block'})(this)">${escapeHtml(
+            ans
+          )}</button>`;
+        })
+        .join("");
+      return register(
+        `<div class="quiz-block"><p class="quiz-question"><strong>Q:</strong> ${escapeHtml(
+          q
+        )}</p><div class="quiz-options">${optionsHtml}</div><div class="quiz-explanation" id="${id}_exp" style="display:none"><p>${formatInline(
+          explanation.trim()
+        )}</p></div></div>`
+      );
+    }
+  );
+
+  return { text, map };
+}
+
 function markdownToHtml(markdown: string) {
-  const lines = normalizeEncoding(markdown).replace(/\r\n/g, "\n").split("\n");
+  const { text: preprocessed, map: blockMap } =
+    preprocessCustomBlocks(markdown);
+
+  const lines = normalizeEncoding(preprocessed)
+    .replace(/\r\n/g, "\n")
+    .split("\n");
   const blocks: string[] = [];
   let paragraph: string[] = [];
   let listItems: string[] = [];
@@ -286,146 +428,10 @@ function markdownToHtml(markdown: string) {
       continue;
     }
 
-    if (line.startsWith("[!NOTE]")) {
+    if (line.startsWith("\u0002BLOCK_")) {
       flushAll();
-      const inline = line.match(/^\[!NOTE\](.*)\[\/!NOTE\]/);
-      if (inline) {
-        blocks.push(`<div class="callout callout-note"><div class="callout-icon">💡</div><div class="callout-body">${formatInline(inline[1])}</div></div>`);
-        continue;
-      }
-      const noteLines: string[] = [];
-      i += 1;
-      while (i < lines.length && !lines[i].trim().startsWith("[/!NOTE]")) {
-        noteLines.push(lines[i].trim());
-        i += 1;
-      }
-      const content = noteLines.join(" ").trim();
-      blocks.push(`<div class="callout callout-note"><div class="callout-icon">💡</div><div class="callout-body">${formatInline(content)}</div></div>`);
-      continue;
-    }
-
-    if (line.startsWith("[!WARNING]")) {
-      flushAll();
-      const inline = line.match(/^\[!WARNING\](.*)\[\/!WARNING\]/);
-      if (inline) {
-        blocks.push(`<div class="callout callout-warning"><div class="callout-icon">⚠️</div><div class="callout-body">${formatInline(inline[1])}</div></div>`);
-        continue;
-      }
-      const warnLines: string[] = [];
-      i += 1;
-      while (i < lines.length && !lines[i].trim().startsWith("[/!WARNING]")) {
-        warnLines.push(lines[i].trim());
-        i += 1;
-      }
-      const content = warnLines.join(" ").trim();
-      blocks.push(`<div class="callout callout-warning"><div class="callout-icon">⚠️</div><div class="callout-body">${formatInline(content)}</div></div>`);
-      continue;
-    }
-
-    if (line.startsWith("[!KEY]")) {
-      flushAll();
-      const inline = line.match(/^\[!KEY\](.*)\[\/!KEY\]/);
-      if (inline) {
-        blocks.push(`<div class="callout callout-key"><div class="callout-icon">🔑</div><div class="callout-body">${formatInline(inline[1])}</div></div>`);
-        continue;
-      }
-      const keyLines: string[] = [];
-      i += 1;
-      while (i < lines.length && !lines[i].trim().startsWith("[/!KEY]")) {
-        keyLines.push(lines[i].trim());
-        i += 1;
-      }
-      const content = keyLines.join(" ").trim();
-      blocks.push(`<div class="callout callout-key"><div class="callout-icon">🔑</div><div class="callout-body">${formatInline(content)}</div></div>`);
-      continue;
-    }
-
-    if (line.startsWith("[!QUOTE]")) {
-      flushAll();
-      const inline = line.match(/^\[!QUOTE\](.*)\[\/!QUOTE\]/);
-      if (inline) {
-        blocks.push(`<blockquote class="pull-quote"><div class="pull-quote-line"></div><p>${formatInline(inline[1])}</p><div class="pull-quote-line"></div></blockquote>`);
-        continue;
-      }
-      const quoteLines: string[] = [];
-      i += 1;
-      while (i < lines.length && !lines[i].trim().startsWith("[/!QUOTE]")) {
-        quoteLines.push(lines[i].trim());
-        i += 1;
-      }
-      const content = quoteLines.join(" ").trim();
-      blocks.push(`<blockquote class="pull-quote"><div class="pull-quote-line"></div><p>${formatInline(content)}</p><div class="pull-quote-line"></div></blockquote>`);
-      continue;
-    }
-
-    if (line.startsWith("[!STAT")) {
-      flushAll();
-      const labelMatch = line.match(/label="([^"]*)"/) || line.match(/label=([^ \]]+)/);
-      const label = labelMatch ? labelMatch[1] : "";
-      const inline = line.match(/\[\/!STAT\]/);
-      if (inline) {
-        const value = line.match(/\[!STAT.*\](.*)\[\/!STAT\]/)?.[1] || "";
-        blocks.push(`<div class="stat-card"><span class="stat-value">${formatInline(value)}</span>${label ? `<span class="stat-label">${escapeHtml(label)}</span>` : ""}</div>`);
-        continue;
-      }
-      const statLines: string[] = [];
-      i += 1;
-      while (i < lines.length && !lines[i].trim().startsWith("[/!STAT]")) {
-        statLines.push(lines[i].trim());
-        i += 1;
-      }
-      const value = statLines.join(" ").trim();
-      blocks.push(`<div class="stat-card"><span class="stat-value">${formatInline(value)}</span>${label ? `<span class="stat-label">${escapeHtml(label)}</span>` : ""}</div>`);
-      continue;
-    }
-
-    if (line.startsWith("[!EXPAND")) {
-      flushAll();
-      const titleMatch = line.match(/title="([^"]*)"/);
-      const title = titleMatch ? titleMatch[1] : "Expand";
-      const inline = line.match(/\[\/!EXPAND\]/);
-      if (inline) {
-        const content = line.match(/\[!EXPAND.*\](.*)\[\/!EXPAND\]/)?.[1] || "";
-        blocks.push(`<details class="expandable-section"><summary class="expandable-summary">${escapeHtml(title)}</summary><div class="expandable-body">${formatInline(content)}</div></details>`);
-        continue;
-      }
-      const expandLines: string[] = [];
-      i += 1;
-      while (i < lines.length && !lines[i].trim().startsWith("[/!EXPAND]")) {
-        expandLines.push(lines[i].trim());
-        i += 1;
-      }
-      const content = expandLines.join(" ").trim();
-      blocks.push(`<details class="expandable-section"><summary class="expandable-summary">${escapeHtml(title)}</summary><div class="expandable-body">${formatInline(content)}</div></details>`);
-      continue;
-    }
-
-    if (line.startsWith("[!QUIZ")) {
-      flushAll();
-      const qMatch = line.match(/q="([^"]*)"/);
-      const a1Match = line.match(/a1="([^"]*)"/);
-      const a2Match = line.match(/a2="([^"]*)"/);
-      const a3Match = line.match(/a3="([^"]*)"/);
-      const a4Match = line.match(/a4="([^"]*)"/);
-      const cMatch = line.match(/correct=(\d)/);
-      const inline = line.match(/\[\/!QUIZ\]/);
-      let explanation = "";
-      if (inline) {
-        explanation = line.match(/\[!QUIZ.*\](.*)\[\/!QUIZ\]/)?.[1] || "";
-      } else {
-        const quizLines: string[] = [];
-        i += 1;
-        while (i < lines.length && !lines[i].trim().startsWith("[/!QUIZ]")) {
-          quizLines.push(lines[i].trim());
-          i += 1;
-        }
-        explanation = quizLines.join(" ").trim();
-      }
-      const question = qMatch ? qMatch[1] : "";
-      const answers = [a1Match?.[1], a2Match?.[1], a3Match?.[1], a4Match?.[1]].filter(Boolean);
-      const correct = cMatch ? parseInt(cMatch[1], 10) - 1 : 0;
-      const answersJson = escapeHtml(JSON.stringify(answers));
-      blocks.push(`<div class="quiz-block" data-question="${escapeHtml(question)}" data-answers="${answersJson}" data-correct="${correct}" data-explanation="${escapeHtml(explanation)}"><p class="quiz-question">${escapeHtml(question)}</p><div class="quiz-options"></div><div class="quiz-feedback" style="display:none"></div></div>`);
+      const html = blockMap[line];
+      if (html) blocks.push(html);
       continue;
     }
 
@@ -436,7 +442,8 @@ function markdownToHtml(markdown: string) {
 
   flushAll();
 
-  return blocks.join("");
+  const raw = blocks.join("");
+  return raw.replace(/\u0002BLOCK_\d+\u0002/g, (key) => blockMap[key] ?? "");
 }
 
 function parseMarkdownMetadata(markdown: string) {
@@ -1011,7 +1018,7 @@ export function Editor({ initialPost }: Props) {
             <button
               type="button"
               className="rounded-md border border-[var(--border)] px-2.5 py-1.5 text-xs hover:bg-[var(--surface)]"
-              onClick={() => editor.commands.insertContent('[!STAT label=Label]\nValue\n[/!STAT]\n\n')}
+              onClick={() => editor.commands.insertContent('[!STAT label="Label"]\nValue\n[/!STAT]\n\n')}
               title="Big number stat card"
             >
               🔢 Stat
