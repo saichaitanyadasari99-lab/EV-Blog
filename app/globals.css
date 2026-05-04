@@ -3006,6 +3006,45 @@ a {
   padding: 20px;
 }
 
+.editor-figure {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  margin: 16px 0;
+  overflow: hidden;
+}
+
+.editor-figure img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.editor-figure figcaption {
+  padding: 12px 16px;
+  font-size: 14px;
+  color: var(--text2);
+  line-height: 1.5;
+  background: var(--surface2);
+  border-top: 1px solid var(--border);
+}
+
+.figure-credit {
+  display: block;
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--text3);
+}
+
+.figure-credit a {
+  color: var(--accent);
+  text-decoration: underline;
+}
+
+.figure-credit a:hover {
+  color: var(--text);
+}
+
 .full-preview-cover {
   border-radius: 10px;
   height: 200px;

@@ -333,6 +333,37 @@ function markdownToHtml(markdown: string) {
       continue;
     }
 
+    if (line.startsWith("[FIGURE]")) {
+      flushAll();
+      const figureLines: string[] = [];
+      i += 1;
+      while (i < lines.length && lines[i].trim() !== "[/FIGURE]") {
+        figureLines.push(lines[i].trim());
+        i += 1;
+      }
+      const figureData: Record<string, string> = {};
+      for (const fl of figureLines) {
+        const colonIdx = fl.indexOf(": ");
+        if (colonIdx >= 0) {
+          const key = fl.slice(0, colonIdx).trim();
+          const value = fl.slice(colonIdx + 2).trim();
+          figureData[key] = value;
+        }
+      }
+      const src = figureData.src || "";
+      const alt = figureData.alt || "Figure image";
+      const caption = figureData.caption || "";
+      const credit = figureData.credit || "";
+      const creditUrl = figureData.creditUrl || "";
+      const license = figureData.license || "";
+      const creditHtml = credit
+        ? ` <span class="figure-credit">Credit: <a href="${escapeHtml(creditUrl)}" target="_blank" rel="noreferrer">${escapeHtml(credit)}</a> (${escapeHtml(license)})</span>`
+        : "";
+      const figHtml = `<figure class="editor-figure"><img src="${escapeHtml(src)}" alt="${escapeHtml(alt)}" /><figcaption>${formatInline(caption)}${creditHtml}</figcaption></figure>`;
+      blocks.push(figHtml);
+      continue;
+    }
+
     const imageNoteMatch = line.match(/^\[IMAGE:\s*(.+)\]$/i);
     if (imageNoteMatch) {
       flushAll();
