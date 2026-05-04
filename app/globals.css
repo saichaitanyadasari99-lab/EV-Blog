@@ -2735,69 +2735,68 @@ a {
 }
 
 .prose .math-inline {
-  background: var(--surface2) !important;
-  border: 1px solid var(--border);
+  background: var(--accent-dim);
+  border: 1px solid color-mix(in srgb, var(--accent) 20%, var(--border));
   border-radius: 4px;
-  color: var(--text) !important;
+  color: var(--text);
   display: inline-block;
   font-family: var(--font-ibm-mono), monospace;
-  padding: 2px 8px;
+  font-size: 0.92em;
+  padding: 1px 6px;
+  vertical-align: baseline;
 }
 
-.prose .math-block {
-  background: var(--surface2) !important;
-  border: 1px solid var(--border);
+.katex-display {
+  background: var(--accent-dim);
+  border: 1px solid color-mix(in srgb, var(--accent) 20%, var(--border));
   border-radius: 10px;
-  margin: 16px 0;
+  margin: 20px 0;
   overflow-x: auto;
-  padding: 16px;
-  color: var(--text) !important;
-}
-
-.prose .math-block code {
-  background: transparent;
+  overflow-y: hidden;
+  padding: 20px 16px;
   color: var(--text);
-  font-family: var(--font-ibm-mono), monospace;
-  font-size: 15px;
-  padding: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
-/* KaTeX equation fix - use theme colors instead of dark background */
+.prose .katex-display {
+  background: var(--accent-dim);
+  border: 1px solid color-mix(in srgb, var(--accent) 20%, var(--border));
+  border-radius: 10px;
+  margin: 20px 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 20px 16px;
+  color: var(--text);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.prose .katex-display > .katex {
+  background: transparent !important;
+  color: var(--text) !important;
+  font-size: 1.05em;
+}
+
+.prose .katex,
 .katex {
   background: transparent !important;
   color: var(--text) !important;
-  font-size: 1.1em;
 }
 
+.prose .katex *,
 .katex * {
   background: transparent !important;
   color: var(--text) !important;
 }
 
-.katex-display {
-  background: var(--surface2) !important;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  margin: 16px 0;
-  overflow-x: auto;
-  padding: 16px;
-  color: var(--text) !important;
-}
-
-.katex-display > .katex {
-  background: transparent !important;
-  color: var(--text) !important;
-}
-
-/* Block math fallback - also use theme colors */
 .prose .math-block {
-  background: var(--surface2) !important;
-  color: var(--text) !important;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 16px;
-  margin: 16px 0;
+  background: var(--accent-dim);
+  border: 1px solid color-mix(in srgb, var(--accent) 20%, var(--border));
+  border-radius: 10px;
+  margin: 20px 0;
   overflow-x: auto;
+  padding: 20px 16px;
+  color: var(--text);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 .prose .math-block code {
@@ -2805,6 +2804,7 @@ a {
   color: var(--text) !important;
   font-family: var(--font-ibm-mono), monospace;
   font-size: 15px;
+  padding: 0;
 }
 
 /* Code blocks in prose should adapt to theme */

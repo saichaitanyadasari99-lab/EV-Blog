@@ -11,23 +11,37 @@ import katex from "katex";
 const lowlight = createLowlight(common);
 
 function renderMath(content: string): string {
+  // Block math from markdown parser: <pre class="math-block" data-formula="...">
+  content = content.replace(/<pre[^>]*class="[^"]*math-block[^"]*"[^>]*data-formula="([^"]*)"[^>]*>[\s\S]*?<\/pre>/g, (_, formula) => {
+    const decoded = formula.replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&#39;/g, "'");
+    try {
+      return `<div class="katex-display">${katex.renderToString(decoded, { displayMode: true, throwOnError: false })}</div>`;
+    } catch { return `<div class="katex-display">${formula}</div>`; }
+  });
+
+  // Raw $$...$$ blocks that survived TipTap processing
   content = content.replace(/\$\$([\s\S]*?)\$\$/g, (_, math) => {
     try {
-      return katex.renderToString(math.trim(), { displayMode: true, throwOnError: false });
+      return `<div class="katex-display">${katex.renderToString(math.trim(), { displayMode: true, throwOnError: false })}</div>`;
     } catch { return math; }
   });
+
+  // Inline math: <code class="math-inline">formula</code>
+  content = content.replace(/<code[^>]*class="[^"]*math-inline[^"]*"[^>]*>([\s\S]*?)<\/code>/g, (_, formula) => {
+    const decoded = formula.replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&#39;/g, "'");
+    try {
+      return katex.renderToString(decoded, { displayMode: false, throwOnError: false });
+    } catch { return `<code class="math-inline">${decoded}</code>`; }
+  });
+
+  // Raw $...$ inline that survived processing
   content = content.replace(/\$([^$\n]+?)\$/g, (_, math) => {
     try {
       return katex.renderToString(math.trim(), { displayMode: false, throwOnError: false });
     } catch { return math; }
   });
-  
-  content = content.replace(/<p class="math-block" data-formula="([^"]+)">/g, (_, formula) => {
-    try {
-      return katex.renderToString(formula, { displayMode: true, throwOnError: false });
-    } catch { return `<p>${formula}</p>`; }
-  });
-  
+
+  // Codecogs image fallback
   content = content.replace(/!\[([^\]]*)\]\(https:\/\/latex\.codecogs\.com\/png\.image\?.*?\\bg\{white\}([^)]+)\)/g, (_, alt, latex) => {
     try {
       const displayMode = latex.includes("\\dpi{120}") || latex.includes("\\displaystyle");
@@ -35,7 +49,7 @@ function renderMath(content: string): string {
       return katex.renderToString(cleanLatex, { displayMode, throwOnError: false });
     } catch { return alt || ""; }
   });
-  
+
   return content;
 }
 

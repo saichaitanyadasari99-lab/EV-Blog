@@ -3,6 +3,8 @@
 import { useMemo, useRef, useState, useEffect } from "react";
 import { EditorContent, useEditor } from "@tiptap/react";
 import slugify from "slugify";
+import katex from "katex";
+import "katex/dist/katex.min.css";
 import { tiptapExtensions } from "@/lib/tiptap";
 import { parseTiptapJson } from "@/lib/tiptap";
 import { MediaUpload } from "@/components/MediaUpload";
@@ -442,8 +444,26 @@ function markdownToHtml(markdown: string) {
 
   flushAll();
 
-  const raw = blocks.join("");
-  return raw.replace(/\u0002BLOCK_\d+\u0002/g, (key) => blockMap[key] ?? "");
+  let raw = blocks.join("");
+  raw = raw.replace(/\u0002BLOCK_\d+\u0002/g, (key) => blockMap[key] ?? "");
+
+  // Render KaTeX for block math: <pre class="math-block" data-formula="..."><code>...</code></pre>
+  raw = raw.replace(/<pre[^>]*class="[^"]*math-block[^"]*"[^>]*data-formula="([^"]*)"[^>]*>[\s\S]*?<\/pre>/g, (_, formula) => {
+    const decoded = formula.replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&#39;/g, "'");
+    try {
+      return `<div class="katex-display">${katex.renderToString(decoded, { displayMode: true, throwOnError: false })}</div>`;
+    } catch { return `<div class="katex-display">${formula}</div>`; }
+  });
+
+  // Render KaTeX for inline math: <code class="math-inline">formula</code>
+  raw = raw.replace(/<code[^>]*class="[^"]*math-inline[^"]*"[^>]*>(.*?)<\/code>/g, (_, formula) => {
+    const decoded = formula.replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&#39;/g, "'");
+    try {
+      return katex.renderToString(decoded, { displayMode: false, throwOnError: false });
+    } catch { return `<code class="math-inline">${decoded}</code>`; }
+  });
+
+  return raw;
 }
 
 function parseMarkdownMetadata(markdown: string) {
