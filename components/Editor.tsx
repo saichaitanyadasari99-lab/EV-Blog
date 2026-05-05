@@ -854,7 +854,6 @@ export function Editor({ initialPost }: Props) {
         .filter(Boolean),
       published,
       content: editor.getJSON(),
-      faqs: faqs.length > 0 ? faqs : undefined,
     };
 
     setSaving(true);

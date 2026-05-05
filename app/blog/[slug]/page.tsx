@@ -142,7 +142,6 @@ export default async function BlogPostPage({ params }: Params) {
     category: post.category ?? undefined,
     tags: post.tags ?? undefined,
     reading_time: post.reading_time ?? undefined,
-    faqs: post.faqs ?? undefined,
   });
 
   return (
@@ -197,19 +196,7 @@ export default async function BlogPostPage({ params }: Params) {
             </section>
 
             {/* FAQ Section - AI Discoverable */}
-            {post.faqs && post.faqs.length > 0 && (
-              <section className="article-faqs" aria-labelledby="faq-heading">
-                <h2 id="faq-heading">Frequently Asked Questions</h2>
-                <div className="faq-list">
-                  {post.faqs.map((faq, idx) => (
-                    <details key={idx} className="faq-item">
-                      <summary className="faq-question">{faq.question}</summary>
-                      <p className="faq-answer">{faq.answer}</p>
-                    </details>
-                  ))}
-                </div>
-              </section>
-            )}
+            {/* FAQ support requires adding a 'faqs' JSONB column to the posts table in Supabase */}
 
             {references.length ? (
               <section className="references-card" aria-labelledby="references-heading">
