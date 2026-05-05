@@ -116,6 +116,40 @@ export default function RootLayout({
           {children}
         </main>
         <SiteFooter />
+        <script dangerouslySetInnerHTML={{ __html: `
+window.evpulsePollVote = function(id, idx) {
+  var data = JSON.parse(localStorage.getItem(id) || 'null') || {};
+  if (data.voted) return;
+  data.voted = true;
+  data.counts = data.counts || {};
+  data.counts[idx] = (data.counts[idx] || 0) + 1;
+  localStorage.setItem(id, JSON.stringify(data));
+  var opts = document.querySelectorAll('[id^=' + id + '_opt]');
+  var n = opts.length;
+  evpulseShowPollResults(id, data, n);
+};
+window.evpulseShowPollResults = function(id, data, n) {
+  var total = Object.values(data.counts || {}).reduce(function(a,b){return a+b;},0);
+  for (var i = 0; i < n; i++) {
+    var btn = document.getElementById(id + '_opt' + i);
+    var bar = document.getElementById(id + '_bar' + i);
+    var pct = document.getElementById(id + '_pct' + i);
+    var count = (data.counts || {})[i] || 0;
+    var p = total > 0 ? Math.round(count / total * 100) : 0;
+    if (btn) btn.disabled = true;
+    if (bar) setTimeout(function(){bar.style.width = p + '%';}, 50);
+    if (pct) pct.textContent = p + '%';
+  }
+  var note = document.querySelector('#' + id + ' .poll-note');
+  if (note) note.textContent = total + ' vote' + (total !== 1 ? 's' : '');
+};
+window.evpulseTab = function(id, idx) {
+  var btns = document.querySelectorAll('#' + id + ' .tab-btn');
+  var panels = document.querySelectorAll('#' + id + ' .tab-panel');
+  btns.forEach(function(b,i){b.classList.toggle('active', i===idx);});
+  panels.forEach(function(p,i){p.classList.toggle('active', i===idx);});
+};
+        ` }} />
       </body>
     </html>
   );

@@ -3230,6 +3230,430 @@ a {
   border: 1px solid var(--red);
 }
 
+/* ===== NEW CALLOUTS ===== */
+.callout-tip {
+  background: color-mix(in srgb, #534ab7 8%, var(--surface2));
+  border-color: #534ab7;
+}
+
+.callout-danger {
+  background: color-mix(in srgb, var(--red) 8%, var(--surface2));
+  border-color: var(--red);
+}
+
+/* ===== STAT ROW ===== */
+.stat-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 20px 0;
+}
+
+.stat-row .stat-card {
+  flex: 1;
+  min-width: 120px;
+}
+
+/* ===== COMPARE TABLE ===== */
+.compare-block {
+  margin: 20px 0;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 0.5px solid var(--border2);
+}
+
+.compare-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.compare-table th {
+  background: var(--surface2);
+  padding: 10px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  text-align: left;
+  border-bottom: 0.5px solid var(--border2);
+}
+
+.compare-table td {
+  padding: 9px 14px;
+  font-size: 13px;
+  border-bottom: 0.5px solid var(--border2);
+  vertical-align: top;
+  line-height: 1.6;
+}
+
+.compare-table tr:last-child td {
+  border-bottom: none;
+}
+
+/* ===== EXPANDABLE (fixed class names) ===== */
+.expandable-section {
+  border: 0.5px solid var(--border2);
+  border-radius: 10px;
+  margin: 16px 0;
+  overflow: hidden;
+}
+
+.expandable-summary {
+  padding: 12px 16px;
+  font-weight: 500;
+  cursor: pointer;
+  list-style: none;
+  background: var(--surface2);
+  font-size: 14px;
+}
+
+.expandable-summary::-webkit-details-marker {
+  display: none;
+}
+
+.expandable-summary::before {
+  content: "▶ ";
+  font-size: 11px;
+  color: var(--text2);
+}
+
+details[open] .expandable-summary::before {
+  content: "▼ ";
+}
+
+.expandable-body {
+  padding: 14px 16px;
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+/* ===== POLL BLOCK ===== */
+.poll-block {
+  background: var(--surface2);
+  border-radius: 10px;
+  padding: 16px;
+  margin: 20px 0;
+  border: 0.5px solid var(--border2);
+}
+
+.poll-question {
+  font-weight: 500;
+  margin-bottom: 12px;
+  font-size: 15px;
+}
+
+.poll-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.poll-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 0.5px solid var(--border);
+  background: var(--surface);
+  cursor: pointer;
+  text-align: left;
+  font-size: 14px;
+  transition: background 0.15s;
+}
+
+.poll-option:hover:not(:disabled) {
+  background: var(--surface3);
+}
+
+.poll-option:disabled {
+  cursor: default;
+  opacity: 0.85;
+}
+
+.poll-label {
+  flex: 1;
+  min-width: 0;
+}
+
+.poll-bar-wrap {
+  width: 80px;
+  height: 6px;
+  background: var(--surface3);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.poll-bar {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+  border-radius: 3px;
+  width: 0;
+  transition: width 0.4s ease;
+}
+
+.poll-pct {
+  font-size: 12px;
+  color: var(--text2);
+  min-width: 32px;
+  text-align: right;
+}
+
+.poll-note {
+  font-size: 11px;
+  color: var(--text2);
+  margin-top: 8px;
+}
+
+/* ===== TABS BLOCK ===== */
+.tabs-block {
+  margin: 20px 0;
+  border: 0.5px solid var(--border2);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.tab-buttons {
+  display: flex;
+  border-bottom: 0.5px solid var(--border2);
+  background: var(--surface2);
+  overflow-x: auto;
+}
+
+.tab-btn {
+  padding: 10px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: var(--text2);
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  white-space: nowrap;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.tab-btn:hover {
+  color: var(--text);
+}
+
+.tab-btn.active {
+  color: var(--text);
+  border-bottom-color: var(--accent);
+}
+
+.tab-panels {
+  padding: 16px;
+}
+
+.tab-panel {
+  display: none;
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.tab-panel.active {
+  display: block;
+}
+
+.tab-panel p:last-child {
+  margin-bottom: 0;
+}
+
+/* ===== EQUATION BLOCK ===== */
+.equation-block {
+  margin: 20px 0;
+}
+
+.equation-label {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 500;
+  background: var(--accent-dim);
+  color: var(--accent);
+  padding: 2px 10px;
+  border-radius: 6px;
+  margin-bottom: 6px;
+}
+
+/* ===== TIMELINE BLOCK ===== */
+.timeline-block {
+  position: relative;
+  margin: 28px 0;
+  padding-left: 28px;
+}
+
+.timeline-line {
+  position: absolute;
+  left: 8px;
+  top: 0;
+  bottom: 0;
+  width: 1.5px;
+  background: var(--border2);
+}
+
+.timeline-item {
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.timeline-item:last-child {
+  margin-bottom: 0;
+}
+
+.timeline-dot {
+  position: absolute;
+  left: -24px;
+  top: 4px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 2px solid var(--surface);
+}
+
+.timeline-content {
+  flex: 1;
+}
+
+.timeline-year {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--accent);
+  display: block;
+  margin-bottom: 2px;
+}
+
+.timeline-event {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* ===== STEPS BLOCK ===== */
+.steps-block {
+  margin: 20px 0;
+}
+
+.step-item {
+  display: flex;
+  gap: 14px;
+  padding: 14px 0;
+  border-bottom: 0.5px solid var(--border2);
+}
+
+.step-item:last-child {
+  border-bottom: none;
+}
+
+.step-number {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 500;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.step-content {
+  flex: 1;
+}
+
+.step-title {
+  display: block;
+  font-weight: 500;
+  margin-bottom: 4px;
+  font-size: 15px;
+}
+
+.step-body {
+  margin: 0;
+  font-size: 14px;
+  color: var(--text2);
+  line-height: 1.6;
+}
+
+/* ===== PROS & CONS ===== */
+.proscons-block {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--border2);
+  border-radius: 10px;
+  overflow: hidden;
+  margin: 20px 0;
+}
+
+.pros-col,
+.cons-col {
+  background: var(--surface);
+  padding: 14px;
+}
+
+.proscons-header {
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 10px;
+}
+
+.proscons-pros {
+  color: var(--green);
+}
+
+.proscons-cons {
+  color: var(--red);
+}
+
+.proscons-list {
+  margin: 0;
+  padding-left: 16px;
+}
+
+.proscons-list li {
+  font-size: 13px;
+  line-height: 1.6;
+  margin-bottom: 4px;
+}
+
+@media (max-width: 600px) {
+  .proscons-block {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ===== ARTICLE FIGURE ===== */
+.article-figure {
+  margin: 20px 0;
+}
+
+.article-figure img {
+  width: 100%;
+  border-radius: 8px;
+  display: block;
+}
+
+.article-figure figcaption {
+  font-size: 12px;
+  color: var(--text2);
+  margin-top: 6px;
+  line-height: 1.5;
+}
+
+.img-credit {
+  opacity: 0.8;
+}
+
+.img-credit a {
+  color: var(--text2);
+  text-decoration: underline;
+}
+
 /* ===== REACTION BAR ===== */
 .reaction-bar {
   display: flex;
