@@ -110,6 +110,7 @@ export async function POST(request: Request) {
       published: isPublished,
       reading_time: readingTime,
       tier: body.tier ?? 'intermediate',
+      faqs: body.faqs ?? [],
       updated_at: new Date().toISOString(),
     }).eq("id", body.id).select().single();
 
@@ -132,6 +133,7 @@ export async function POST(request: Request) {
     published: isPublished,
     reading_time: readingTime,
     tier: body.tier ?? 'intermediate',
+    faqs: body.faqs ?? [],
   }).select().single();
 
   if (error) {

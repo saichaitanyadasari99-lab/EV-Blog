@@ -449,6 +449,18 @@ function preprocessCustomBlocks(markdown: string): {
     }
   );
 
+  // [!FAQ]question::answer[/!FAQ]
+  text = text.replace(
+    /\[!FAQ\]([\s\S]*?)\[\/!FAQ\]/g,
+    (_, content) => {
+      const [question, ...rest] = content.split("::");
+      const answer = rest.join("::").trim();
+      return register(
+        `<details class="faq-item"><summary class="faq-question">${escapeHtml(question.trim())}</summary><div class="faq-answer">${formatInline(answer)}</div></details>`
+      );
+    }
+  );
+
   return { text, map };
 }
 

@@ -10,7 +10,7 @@ import type { PostRecord } from "@/types/post";
 import { NewsletterForm } from "@/components/NewsletterForm";
 import { ReadingProgress } from "@/components/ReadingProgress";
 import { TableOfContents } from "@/components/TableOfContents";
-import { getArticleSchema } from "@/lib/schema";
+import { getArticleSchema, getFAQSchema } from "@/lib/schema";
 import { ArticleContent } from "@/components/ArticleContent";
 import { ReactionBar } from "@/components/ReactionBar";
 
@@ -58,6 +58,14 @@ function extractQuizzes(html: string): QuizData[] {
     }
   }
   return quizzes;
+}
+
+function extractInlineFaqs(markdown: string): Array<{ question: string; answer: string }> {
+  const matches = [...markdown.matchAll(/\[!FAQ\]\s*([^\n]+?)\s*::([^\n]*?)\[\/!FAQ\]/gi)];
+  return matches.map((m) => ({
+    question: m[1].trim(),
+    answer: m[2].trim(),
+  }));
 }
 
 function stripQuizBlocks(html: string): string {
@@ -160,6 +168,11 @@ export default async function BlogPostPage({ params }: Params) {
     .slice(0, 4);
 
   const coverUrl = post?.cover_url;
+  const faqs = postRecord.faqs ?? [];
+  const inlineFaqs = postRecord.markdown_content
+    ? extractInlineFaqs(postRecord.markdown_content)
+    : [];
+  const allFaqs = faqs.length > 0 ? faqs : inlineFaqs;
   const articleSchema = getArticleSchema({
     title: post.title,
     description: post.excerpt ?? "",
@@ -181,6 +194,12 @@ export default async function BlogPostPage({ params }: Params) {
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
         />
+        {allFaqs.length > 0 && (
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(getFAQSchema(allFaqs)) }}
+          />
+        )}
         {coverUrl && (
           <div className="post-cover-image">
             <img 
@@ -225,7 +244,17 @@ export default async function BlogPostPage({ params }: Params) {
             </section>
 
             {/* FAQ Section - AI Discoverable */}
-            {/* FAQ support requires adding a 'faqs' JSONB column to the posts table in Supabase */}
+            {allFaqs.length > 0 && (
+              <section className="faq-list-card" aria-labelledby="faq-heading">
+                <h2 id="faq-heading">Frequently Asked Questions</h2>
+                {allFaqs.map((faq, idx) => (
+                  <details key={idx} className="faq-item">
+                    <summary className="faq-question">{faq.question}</summary>
+                    <div className="faq-answer">{faq.answer}</div>
+                  </details>
+                ))}
+              </section>
+            )}
 
             {references.length ? (
               <section className="references-card" aria-labelledby="references-heading">

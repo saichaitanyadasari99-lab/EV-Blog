@@ -2156,6 +2156,26 @@ a {
   padding: 0 18px 18px;
 }
 
+.faq-list-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  margin-top: 24px;
+  padding: 28px;
+}
+
+.faq-list-card h2 {
+  font-family: var(--font-syne), sans-serif;
+  font-size: 22px;
+  font-weight: 800;
+  margin-top: 0;
+  margin-bottom: 20px;
+}
+
+.faq-list-card .faq-item + .faq-item {
+  margin-top: 10px;
+}
+
 .post-layout {
   align-items: start;
   display: grid;
@@ -2165,7 +2185,7 @@ a {
 
 .post-main {
   min-width: 0;
-  max-width: 860px;
+  max-width: min(1040px, 100%);
 }
 
 .post-sidebar {

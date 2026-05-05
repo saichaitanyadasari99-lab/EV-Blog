@@ -27,6 +27,12 @@ function parseMarkdownMetadata(markdown: string) {
   const tagsMatch = normalized.match(/\*\*Tags:\*\*\s*(.+)$/m);
   const slugMatch = normalized.match(/\*\*Slug:\*\*\s*`?([^`\n]+)`?/m);
 
+  const faqMatches = [...normalized.matchAll(/\[!FAQ\]([^\n]+?)::([^\n]*?)\[\/!FAQ\]/gi)];
+  const faqs: Array<{ question: string; answer: string }> = faqMatches.map((m) => ({
+    question: m[1].trim(),
+    answer: m[2].trim(),
+  }));
+
   const body = normalized.trim();
   const firstParagraph = body
     .split("\n\n")
@@ -43,6 +49,7 @@ function parseMarkdownMetadata(markdown: string) {
     excerpt: firstParagraph?.slice(0, 220) ?? "",
     body,
     coverUrl: coverMatch?.[1]?.trim() ?? "",
+    faqs,
   };
 }
 
@@ -73,7 +80,9 @@ export function Editor({ initialPost }: Props) {
   const [importTab, setImportTab] = useState<"json" | "markdown">("json");
   const [showPreview, setShowPreview] = useState(false);
   const [previewHtml, setPreviewHtml] = useState("");
-  const [faqs, setFaqs] = useState<FaqItem[]>([]);
+  const [faqs, setFaqs] = useState<FaqItem[]>(
+    initialPost?.faqs ? [...initialPost.faqs] : []
+  );
   const [categories, setCategories] = useState<Array<{ slug: string; name: string }>>([]);
   const coverFileRef = useRef<HTMLInputElement | null>(null);
   const importFileRef = useRef<HTMLInputElement | null>(null);
@@ -158,6 +167,7 @@ export function Editor({ initialPost }: Props) {
       published,
       content: editor.getJSON(),
       markdown_content: rawMarkdown || undefined,
+      faqs: faqs.filter((f) => f.question.trim() || f.answer.trim()),
     };
 
     setSaving(true);
@@ -212,6 +222,7 @@ export function Editor({ initialPost }: Props) {
     if (meta.tags) setTags(meta.tags);
     if (meta.excerpt) setExcerpt(meta.excerpt);
     if (meta.coverUrl) setCoverUrl(meta.coverUrl);
+    if (meta.faqs && meta.faqs.length > 0) setFaqs(meta.faqs);
 
     setCategory(mapCategory(meta.category));
 
@@ -256,6 +267,9 @@ export function Editor({ initialPost }: Props) {
         editor.commands.setContent(markdownToHtml(meta.body));
         setPreviewHtml(markdownToHtml(data.markdown));
         setRawMarkdown(data.markdown);
+        if (!data.faqs && meta.faqs && meta.faqs.length > 0) {
+          setFaqs(meta.faqs);
+        }
         setStatus("JSON imported successfully. Review content, then click Save Post.");
       } else {
         setStatus("JSON imported. No markdown content found.");
@@ -575,6 +589,7 @@ export function Editor({ initialPost }: Props) {
             <button type="button" className="rounded-md border border-[var(--border)] px-2.5 py-1.5 text-xs hover:bg-[var(--surface)]" onClick={() => editor.commands.insertContent('[!STEPS]\nStep 1 Title::Step 1 description\nStep 2 Title::Step 2 description\n[/!STEPS]\n\n')} title="Numbered steps (title::body per line)">🔢 Steps</button>
             <button type="button" className="rounded-md border border-[var(--border)] px-2.5 py-1.5 text-xs hover:bg-[var(--surface)]" onClick={() => editor.commands.insertContent('[!PROSCONS]\n+ Pro item 1\n+ Pro item 2\n- Con item 1\n- Con item 2\n[/!PROSCONS]\n\n')} title="Pros and cons grid (+ for pros, - for cons)">✅ Pros/Cons</button>
             <button type="button" className="rounded-md border border-[var(--border)] px-2.5 py-1.5 text-xs hover:bg-[var(--surface)]" onClick={() => editor.commands.insertContent('[!FIGURE src="https://example.com/image.jpg" caption="Image caption" credit="Source Name" creditUrl="https://example.com"][/!FIGURE]\n\n')} title="Image with caption and credit">🖼️ Figure</button>
+            <button type="button" className="rounded-md border border-[var(--border)] px-2.5 py-1.5 text-xs hover:bg-[var(--surface)]" onClick={() => editor.commands.insertContent('[!FAQ]\nWhat is this question?\nThis is the answer.\n[/!FAQ]\n\n')} title="FAQ accordion item">❓ FAQ</button>
             <button type="button" className="rounded-md border border-[var(--border)] px-2.5 py-1.5 text-xs hover:bg-[var(--surface)]" onClick={() => editor.commands.insertContent("==highlighted text==")} title="Inline highlight">🖍️ Highlight</button>
           </div>
         </div>

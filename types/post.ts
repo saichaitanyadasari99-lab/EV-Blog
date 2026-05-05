@@ -16,6 +16,7 @@ export type PostRecord = {
   pullquote: string | null;
   stats: Array<{ value: string; label: string }> | null;
   references?: Array<{ title: string; url: string }> | null;
+  faqs?: Array<{ question: string; answer: string }> | null;
 };
 
 export type SavePostInput = {
@@ -32,4 +33,5 @@ export type SavePostInput = {
   tier?: 'basic' | 'intermediate' | 'advanced' | 'expert';
   pullquote?: string;
   stats?: Array<{ value: string; label: string }>;
+  faqs?: Array<{ question: string; answer: string }>;
 };
