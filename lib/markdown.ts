@@ -255,6 +255,7 @@ function preprocessCustomBlocks(markdown: string): {
       const correctIdx = parseInt(correct, 10) - 1;
       const id = `quiz_${counter}`;
       const escapedId = id.replace(/'/g, "\\'");
+      const answersJson = JSON.stringify(answers).replace(/"/g, "&quot;");
       const optionsHtml = answers
         .map((ans, idx) => {
           const isCorrect = idx === correctIdx;
@@ -264,7 +265,7 @@ function preprocessCustomBlocks(markdown: string): {
         })
         .join("");
       return register(
-        `<div class="quiz-block"><p class="quiz-question"><strong>Q:</strong> ${escapeHtml(
+        `<div class="quiz-block" data-question="${escapeHtml(q)}" data-answers="${answersJson}" data-correct="${correct}" data-explanation="${escapeHtml(explanation.trim())}"><p class="quiz-question"><strong>Q:</strong> ${escapeHtml(
           q
         )}</p><div class="quiz-options">${optionsHtml}</div><div class="quiz-explanation" id="${id}_exp" style="display:none"><p>${formatInline(
           explanation.trim()

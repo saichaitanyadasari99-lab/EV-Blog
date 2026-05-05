@@ -61,7 +61,32 @@ function extractQuizzes(html: string): QuizData[] {
 }
 
 function stripQuizBlocks(html: string): string {
-  return html.replace(/<div class="quiz-block"[^>]*>[\s\S]*?<\/div>/gi, "");
+  const result: string[] = [];
+  let i = 0;
+  while (i < html.length) {
+    const idx = html.indexOf('<div class="quiz-block"', i);
+    if (idx === -1) {
+      result.push(html.slice(i));
+      break;
+    }
+    result.push(html.slice(i, idx));
+    let depth = 0;
+    let j = idx;
+    while (j < html.length) {
+      if (html.startsWith("<div", j)) depth++;
+      else if (html.startsWith("</div", j)) {
+        depth--;
+        if (depth === 0) {
+          const endClose = html.indexOf(">", j);
+          j = endClose + 1;
+          break;
+        }
+      }
+      j++;
+    }
+    i = j;
+  }
+  return result.join("");
 }
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
@@ -219,10 +244,12 @@ export default async function BlogPostPage({ params }: Params) {
           </div>
 
           <aside className="post-sidebar">
-            <section className="sidebar-card" aria-labelledby="toc-heading">
-              <h3 className="sidebar-title" id="toc-heading">In This Article</h3>
+            <details className="sidebar-card toc-details" open>
+              <summary className="toc-details-summary">
+                <h3 className="sidebar-title" id="toc-heading">In This Article</h3>
+              </summary>
               <TableOfContents headings={headings} />
-            </section>
+            </details>
 
             <section className="sidebar-card" aria-labelledby="related-category-heading">
               <h3 className="sidebar-title" id="related-category-heading">Related In {post.category ?? "this category"}</h3>
