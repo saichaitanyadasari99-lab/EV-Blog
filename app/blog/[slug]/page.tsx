@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { getCategoryTone } from "@/lib/category-theme";
 import { getPublishedPostBySlug, getPublishedPosts } from "@/lib/posts";
 import { renderTiptapHtml } from "@/lib/tiptap";
+import { markdownToHtml } from "@/lib/markdown";
 import type { PostRecord } from "@/types/post";
 import { NewsletterForm } from "@/components/NewsletterForm";
 import { ReadingProgress } from "@/components/ReadingProgress";
@@ -111,11 +112,14 @@ export default async function BlogPostPage({ params }: Params) {
 
   if (!post) notFound();
 
-  const html = renderTiptapHtml(post?.content ?? null);
+  const postRecord = post as PostRecord;
+  const html = postRecord.markdown_content
+    ? markdownToHtml(postRecord.markdown_content)
+    : renderTiptapHtml(post?.content ?? null);
   const quizzes = extractQuizzes(html);
   const cleanHtml = quizzes.length > 0 ? stripQuizBlocks(html) : html;
   const toneStyle = { ["--tone" as string]: getCategoryTone(post?.category ?? "cell-chemistry") } as CSSProperties;
-  const references = (post as PostRecord)?.references ?? [];
+  const references = postRecord.references ?? [];
   const headings = extractHeadings(cleanHtml);
 
   const relatedByCategory = allPosts

@@ -5,6 +5,7 @@ export type PostRecord = {
   title: string;
   slug: string;
   content: string | null;
+  markdown_content?: string | null;
   excerpt: string | null;
   cover_url: string | null;
   category: string | null;
@@ -15,7 +16,6 @@ export type PostRecord = {
   pullquote: string | null;
   stats: Array<{ value: string; label: string }> | null;
   references?: Array<{ title: string; url: string }> | null;
-  faqs?: Array<{ question: string; answer: string }> | null;
 };
 
 export type SavePostInput = {
@@ -23,6 +23,7 @@ export type SavePostInput = {
   title: string;
   slug?: string;
   content: Record<string, unknown> | null;
+  markdown_content?: string;
   excerpt?: string;
   cover_url?: string;
   category?: string;
@@ -31,5 +32,4 @@ export type SavePostInput = {
   tier?: 'basic' | 'intermediate' | 'advanced' | 'expert';
   pullquote?: string;
   stats?: Array<{ value: string; label: string }>;
-  faqs?: Array<{ question: string; answer: string }>;
 };
