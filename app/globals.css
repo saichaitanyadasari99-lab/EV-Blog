@@ -3770,24 +3770,29 @@ details[open] .expandable-summary::before {
 
 .share-heading {
   position: absolute;
-  right: -32px;
+  right: 8px;
   top: 50%;
   transform: translateY(-50%);
-  opacity: 0;
-  transition: opacity 0.15s;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  transition: opacity 0.15s, visibility 0.15s;
   background: transparent;
   border: none;
   cursor: pointer;
   color: var(--text3);
   font-size: 16px;
-  padding: 4px;
+  padding: 4px 8px;
   display: flex;
   align-items: center;
+  pointer-events: none;
+  z-index: 1;
 }
 
 .prose h2:hover .share-heading,
 .prose h3:hover .share-heading {
-  opacity: 1;
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto;
 }
 
 .share-heading:hover {

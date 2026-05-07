@@ -1,6 +1,16 @@
 import katex from "katex";
 import "katex/dist/katex.min.css";
 
+function simpleHash(str: string): string {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash;
+  }
+  return Math.abs(hash).toString(36).slice(0, 8);
+}
+
 function escapeHtml(input: string) {
   return input
     .replaceAll("&", "&amp;")
@@ -282,16 +292,17 @@ function preprocessCustomBlocks(markdown: string): {
         .split("|")
         .map((o: string) => o.trim())
         .filter(Boolean);
-      const pollId = `poll_${counter}`;
+      const hash = simpleHash(question);
+      const pollId = `poll_${hash}`;
       const optionsHtml = options
         .map((opt: string, idx: number) =>
-          `<button class="poll-option" onclick="evpulsePollVote('${pollId}',${idx})" id="${pollId}_opt${idx}"><span class="poll-label">${escapeHtml(
+          `<button class="poll-option" data-poll="${pollId}" data-option="${idx}" id="${pollId}_opt${idx}"><span class="poll-label">${escapeHtml(
             opt
           )}</span><span class="poll-bar-wrap"><span class="poll-bar" id="${pollId}_bar${idx}"></span></span><span class="poll-pct" id="${pollId}_pct${idx}">—</span></button>`
         )
         .join("");
       return register(
-        `<div class="poll-block" id="${pollId}"><p class="poll-question"><strong>Poll:</strong> ${escapeHtml(
+        `<div class="poll-block" data-poll-id="${pollId}" id="${pollId}"><p class="poll-question"><strong>Poll:</strong> ${escapeHtml(
           question
         )}</p><div class="poll-options">${optionsHtml}</div><p class="poll-note">Tap to vote</p></div>`
       );
