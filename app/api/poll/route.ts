@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
 async function getVoterHash(request: Request): Promise<string> {
   const forwarded = request.headers.get("x-forwarded-for");
@@ -18,7 +18,7 @@ async function getVoterHash(request: Request): Promise<string> {
 }
 
 export async function POST(request: Request) {
-  const supabase = createClient(supabaseUrl, supabaseServiceKey);
+  const supabase = createClient(supabaseUrl, supabaseAnonKey);
   const { pollId, optionIndex } = await request.json();
 
   if (!pollId || optionIndex === undefined || optionIndex < 0) {
@@ -53,7 +53,7 @@ export async function POST(request: Request) {
 }
 
 export async function GET(request: Request) {
-  const supabase = createClient(supabaseUrl, supabaseServiceKey);
+  const supabase = createClient(supabaseUrl, supabaseAnonKey);
   const { searchParams } = new URL(request.url);
   const pollId = searchParams.get("pollId");
 
