@@ -298,7 +298,7 @@ function getEmailHtml(posts: Post[], unsubUrl: string) {
       .split-img { width: 100% !important; height: 180px !important; margin-bottom: 20px !important; }
       .split-text { padding: 0 !important; }
       .btn { display: block !important; text-align: center !important; width: auto !important; }
-      h1.hero-title { font-size: 26px !important; }
+      h1.hero-title { font-size: 17px !important; }
       .footer-socials td { padding: 0 8px !important; }
     }
   </style>
@@ -360,7 +360,7 @@ function getEmailHtml(posts: Post[], unsubUrl: string) {
                   ${card1.cover ? `<img src="${card1.cover}" alt="Article thumbnail" width="160" style="width:160px; height:120px; object-fit:cover; border-radius:10px; display:block;" />` : `<div style="width:160px; height:120px; background:linear-gradient(135deg,#E8F5E9,#DCFCE7); border-radius:10px;"></div>`}
                 </td>
                 <td class="split-right split-text" valign="top">
-                  <p style="margin:0 0 8px 0; font-size:10px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:#0e7490; font-family:${fp};">${card1.category}</p>
+                  <p style="margin:0 0 8px 0; font-size:16px; font-weight:700; color:#0e7490; font-family:${fp};">${card1.category}</p>
                   <h2 style="margin:0 0 8px 0; font-size:18px; font-weight:700; line-height:1.3; color:#0a0a0a; font-family:${fp};">${card1.title}</h2>
                   <p style="margin:0 0 14px 0; font-size:13px; line-height:1.6; color:#6b7280; font-family:${fp};">${card1.excerpt}</p>
                   <a href="${BASE_URL}/blog/${card1.slug}" target="_blank" style="display:inline-block; background-color:#ffffff; color:#0a0a0a; font-size:13px; font-weight:600; padding:9px 18px; border-radius:7px; border:1.5px solid #e5e7eb; font-family:${fp};">Read more →</a>
@@ -375,7 +375,7 @@ function getEmailHtml(posts: Post[], unsubUrl: string) {
             <table width="100%" cellpadding="0" cellspacing="0" border="0">
               <tr>
                 <td class="split-left split-text" valign="top" style="padding-right:20px;">
-                  <p style="margin:0 0 8px 0; font-size:10px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:#0e7490; font-family:${fp};">${card2.category}</p>
+                  <p style="margin:0 0 8px 0; font-size:16px; font-weight:700; color:#0e7490; font-family:${fp};">${card2.category}</p>
                   <h2 style="margin:0 0 8px 0; font-size:18px; font-weight:700; line-height:1.3; color:#0a0a0a; font-family:${fp};">${card2.title}</h2>
                   <p style="margin:0 0 14px 0; font-size:13px; line-height:1.6; color:#6b7280; font-family:${fp};">${card2.excerpt}</p>
                   <a href="${BASE_URL}/blog/${card2.slug}" target="_blank" style="display:inline-block; background-color:#ffffff; color:#0a0a0a; font-size:13px; font-weight:600; padding:9px 18px; border-radius:7px; border:1.5px solid #e5e7eb; font-family:${fp};">Read now →</a>
@@ -396,7 +396,7 @@ function getEmailHtml(posts: Post[], unsubUrl: string) {
                   ${card3.cover ? `<img src="${card3.cover}" alt="Article thumbnail" width="160" style="width:160px; height:120px; object-fit:cover; border-radius:10px; display:block;" />` : `<div style="width:160px; height:120px; background:linear-gradient(135deg,#E8F5E9,#DCFCE7); border-radius:10px;"></div>`}
                 </td>
                 <td class="split-right split-text" valign="top">
-                  <p style="margin:0 0 8px 0; font-size:10px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:#0e7490; font-family:${fp};">${card3.category}</p>
+                  <p style="margin:0 0 8px 0; font-size:16px; font-weight:700; color:#0e7490; font-family:${fp};">${card3.category}</p>
                   <h2 style="margin:0 0 8px 0; font-size:18px; font-weight:700; line-height:1.3; color:#0a0a0a; font-family:${fp};">${card3.title}</h2>
                   <p style="margin:0 0 14px 0; font-size:13px; line-height:1.6; color:#6b7280; font-family:${fp};">${card3.excerpt}</p>
                   <a href="${BASE_URL}/blog/${card3.slug}" target="_blank" style="display:inline-block; background-color:#ffffff; color:#0a0a0a; font-size:13px; font-weight:600; padding:9px 18px; border-radius:7px; border:1.5px solid #e5e7eb; font-family:${fp};">Read more →</a>
@@ -408,7 +408,7 @@ function getEmailHtml(posts: Post[], unsubUrl: string) {
         <tr><td style="height:12px;"></td></tr>
         <tr>
           <td class="card" style="background-color:#0a0a0a; border-radius:16px; padding:32px; text-align:center;">
-            <p style="margin:0 0 6px 0; font-size:12px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:#0e7490; font-family:${fp};">FREE TOOLS</p>
+            <p style="margin:0 0 6px 0; font-size:16px; font-weight:700; color:#0e7490; font-family:${fp};">FREE TOOLS</p>
             <h2 style="margin:0 0 12px 0; font-size:24px; font-weight:700; line-height:1.25; color:#ffffff; font-family:${fp};">6 free EV engineering calculators</h2>
             <p style="margin:0 0 24px 0; font-size:14px; line-height:1.65; color:#9ca3af; max-width:400px; margin-left:auto; margin-right:auto; font-family:${fp};">Battery pack designer, thermal load analyzer, SOC estimator, cooling system sizing, bus bar &amp; fusing, charging time — all free, all in your browser.</p>
             <a href="${BASE_URL}/calculators" target="_blank" style="display:inline-block; background-color:#ffffff; color:#0a0a0a; font-size:14px; font-weight:700; padding:13px 28px; border-radius:8px; font-family:${fp};">Try the calculators →</a>
@@ -426,7 +426,7 @@ function getEmailHtml(posts: Post[], unsubUrl: string) {
                   <a href="https://www.linkedin.com/company/evpulse" target="_blank" style="display:inline-block; width:36px; height:36px; background-color:#e5e7eb; border-radius:50%; text-align:center; line-height:36px; font-size:13px; font-weight:700; color:#374151; font-family:${fp};">in</a>
                 </td>
                 <td style="padding:0 10px;">
-                  <a href="https://x.com/evpulse" target="_blank" style="display:inline-block; width:36px; height:36px; background-color:#e5e7eb; border-radius:50%; text-align:center; line-height:36px; font-size:13px; font-weight:700; color:#374151; font-family:${fp};">X</a>
+                  <a href="${BASE_URL}" target="_blank" style="display:inline-block; width:36px; height:36px; background-color:#e5e7eb; border-radius:50%; text-align:center; line-height:36px; font-size:13px; font-weight:700; color:#374151; font-family:${fp};">X</a>
                 </td>
               </tr>
             </table>
