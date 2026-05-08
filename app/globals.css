@@ -1028,105 +1028,14 @@ a {
 
 .hero-visual-wrap {
   width: 100%;
-  max-width: 700px;
+  max-width: 420px;
 }
 
 .hero-visual-svg {
   width: 100%;
   height: auto;
   display: block;
-}
-
-.vis-led {
-  animation: vis-led-blink 1s ease-in-out infinite;
-}
-
-@keyframes vis-led-blink {
-  0%, 100% { opacity: 0.3; }
-  50% { opacity: 1; }
-}
-
-.vis-cable,
-.vis-cable-2,
-.vis-cable-3 {
-  animation: vis-cable-flow 0.6s linear infinite;
-}
-
-@keyframes vis-cable-flow {
-  from { stroke-dashoffset: 0; }
-  to { stroke-dashoffset: -14; }
-}
-
-.vis-station {
-  animation: vis-station-float 4s ease-in-out infinite;
-}
-
-@keyframes vis-station-float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-2px); }
-}
-
-.vis-car {
-  animation: vis-car-bounce 2.5s ease-in-out infinite;
-}
-
-@keyframes vis-car-bounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-1.5px); }
-}
-
-.vis-suv {
-  animation: vis-suv-bounce 2.8s ease-in-out infinite;
-  animation-delay: 0.5s;
-}
-
-@keyframes vis-suv-bounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-1.5px); }
-}
-
-.vis-scooter {
-  animation: vis-scooter-roll 0.4s linear infinite;
-}
-
-@keyframes vis-scooter-roll {
-  0%, 100% { transform: translateX(0); }
-  50% { transform: translateX(3px); }
-}
-
-.vis-turbine {
-  animation: vis-turbine-sway 5s ease-in-out infinite;
-  transform-origin: 0 110px;
-}
-
-@keyframes vis-turbine-sway {
-  0%, 100% { transform: rotate(0deg); }
-  25% { transform: rotate(1deg); }
-  75% { transform: rotate(-1deg); }
-}
-
-.vis-battery-icon,
-.vis-battery-icon-sm {
-  animation: vis-float 6s ease-in-out infinite;
-}
-
-@keyframes vis-float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-4px); }
-}
-
-.vis-nodes {
-  animation: vis-pulse 3s ease-in-out infinite;
-}
-
-@keyframes vis-pulse {
-  0%, 100% { opacity: 0.6; }
-  50% { opacity: 1; }
-}
-
-@keyframes vis-turbine-spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  border-radius: 16px;
 }
 
 .home-hero-label {
