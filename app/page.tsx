@@ -238,7 +238,7 @@ export default async function HomePage() {
 
       {/* Category Tabs */}
       <section className="cat-tabs">
-        {["All", "Cell Chemistry", "BMS Design", "Thermal", "Charging", "Market"].map((item, idx) => (
+        {["All", "Cell Chemistry", "BMS Design", "EV Benchmarks", "News", "Standards"].map((item, idx) => (
           <Link 
             key={item} 
             href={item === "All" ? "/blogs" : `/category/${item.toLowerCase().replace(/\s+/g, "-")}`} 

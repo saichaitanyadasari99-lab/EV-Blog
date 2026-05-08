@@ -76,7 +76,7 @@ async function generateNewsletter() {
   const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
   const monthYear = `${months[now.getMonth()]} ${now.getFullYear()}`;
 
-  const articleUrl = `https://evpulse.co.in/articles/${post.slug}`;
+  const articleUrl = `https://evpulse.co.in/blog/${post.slug}`;
   const author = post.author || 'EVPulse Team';
   const readTime = post.reading_time || 5;
   const tag = post.category || 'Deepdive';
@@ -428,10 +428,10 @@ async function generateNewsletter() {
       <a href="https://evpulse.co.in" class="header-logo">EV<span>Pulse</span></a>
       <p class="header-tagline">Engineering Clarity for the EV Era</p>
       <div class="header-meta">
-        <a href="https://evpulse.co.in/battery">Battery Status</a>
-        <a href="https://evpulse.co.in/charging">Charging</a>
-        <a href="https://evpulse.co.in/policy">Policy</a>
-        <a href="https://evpulse.co.in/tools">Tools</a>
+        <a href="https://evpulse.co.in/category/cell-chemistry">Battery Status</a>
+        <a href="https://evpulse.co.in/category/news">Charging</a>
+        <a href="https://evpulse.co.in/category/standards">Policy</a>
+        <a href="https://evpulse.co.in/calculators">Tools</a>
       </div>
     </div>
   </div>
@@ -486,7 +486,7 @@ async function generateNewsletter() {
         Read Full Article →
       </a>
       <br>
-      <a href="https://evpulse.co.in/articles" class="cta-secondary">Browse all articles</a>
+      <a href="https://evpulse.co.in/blogs" class="cta-secondary">Browse all articles</a>
     </div>
 
   </div>
@@ -496,9 +496,9 @@ async function generateNewsletter() {
     <p class="footer-tagline">Engineering clarity for the EV era · evpulse.co.in</p>
     <div class="footer-links">
       <a href="https://evpulse.co.in">Website</a>
-      <a href="https://evpulse.co.in/articles">Articles</a>
-      <a href="https://evpulse.co.in/tools">Tools</a>
-      <a href="https://evpulse.co.in/policy">Policy</a>
+      <a href="https://evpulse.co.in/blogs">Articles</a>
+      <a href="https://evpulse.co.in/calculators">Tools</a>
+      <a href="https://evpulse.co.in/category/standards">Policy</a>
       <a href="mailto:hello@evpulse.co.in">Contact</a>
     </div>
     <p class="footer-legal">

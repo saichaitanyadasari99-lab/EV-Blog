@@ -14,7 +14,7 @@ const categoryAliases: Record<string, string> = {
   news: "news",
 };
 
-function canonicalCategory(category?: string | null) {
+export function canonicalCategory(category?: string | null) {
   const key = (category ?? "post").trim().toLowerCase();
   return categoryAliases[key] ?? key;
 }

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { searchPublishedPosts, getPublishedPosts } from "@/lib/posts";
+import { searchPublishedPosts, getPublishedPosts, canonicalCategory } from "@/lib/posts";
 import { PostCard } from "@/components/PostCard";
 import { getCategoryTone } from "@/lib/category-theme";
 
@@ -43,7 +43,7 @@ export default async function SearchPage({ searchParams }: Props) {
   let allPosts = query ? await searchPublishedPosts(query) : await getPublishedPosts();
   
   if (catFilter) {
-    allPosts = allPosts.filter((post) => post.category === catFilter);
+    allPosts = allPosts.filter((post) => canonicalCategory(post.category) === canonicalCategory(catFilter));
   }
   
   allPosts = filterByDate(allPosts, dateFilter);

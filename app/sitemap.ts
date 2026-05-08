@@ -41,7 +41,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.7,
     },
     {
-      url: `${baseUrl}/calculators/busbar`,
+      url: `${baseUrl}/calculators/bus-bar`,
       lastModified: new Date(),
       changeFrequency: "monthly",
       priority: 0.7,
