@@ -3076,18 +3076,22 @@ a {
   background: linear-gradient(135deg, var(--surface2), var(--surface3));
   border: 1px solid var(--border2);
   border-radius: 14px;
-  padding: 20px 32px;
+  padding: 18px 24px;
   margin: 16px 8px;
   min-width: 140px;
+  max-width: 100%;
   text-align: center;
+  overflow-wrap: break-word;
 }
 
 .stat-value {
   font-family: var(--font-syne), sans-serif;
-  font-size: 32px;
+  font-size: 24px;
   font-weight: 800;
   color: var(--accent);
-  line-height: 1.1;
+  line-height: 1.2;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .stat-label {
