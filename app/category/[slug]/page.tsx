@@ -1,6 +1,5 @@
 ﻿import Link from "next/link";
 import type { CSSProperties } from "react";
-import { notFound } from "next/navigation";
 import { getCategoryTone } from "@/lib/category-theme";
 import { getPublishedPostsByCategory } from "@/lib/posts";
 import { PostCard } from "@/components/PostCard";
@@ -15,11 +14,8 @@ export default async function CategoryPage({ params }: Params) {
   const { slug } = await params;
   const posts = await getPublishedPostsByCategory(slug);
 
-  if (!posts.length) {
-    notFound();
-  }
-
   const toneStyle = { ["--tone" as string]: getCategoryTone(slug) } as CSSProperties;
+  const displayName = slug.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 
   return (
     <main className="page-main wrapper">
@@ -28,11 +24,11 @@ export default async function CategoryPage({ params }: Params) {
           CATEGORY
         </div>
         <h1 className="page-title" style={{ textTransform: "capitalize" }}>
-          {slug}
+          {displayName}
         </h1>
-        <p className="page-subtitle">Technical posts under the {slug} category.</p>
+        <p className="page-subtitle">Technical posts under the {displayName} category.</p>
         <Link href="/blogs" className="sec-link" style={{ marginTop: 8, display: "inline-flex" }}>
-          Back to all blogs {"->"}
+          Browse all blogs {"->"}
         </Link>
       </section>
 
@@ -40,9 +36,18 @@ export default async function CategoryPage({ params }: Params) {
         <h2 className="sec-title">Articles</h2>
       </section>
       <section className="articles-grid">
-        {posts.map((post) => (
-          <PostCard key={post.id} post={post} />
-        ))}
+        {posts.length > 0 ? (
+          posts.map((post) => (
+            <PostCard key={post.id} post={post} />
+          ))
+        ) : (
+          <article className="a-card">
+            <div className="a-card-body">
+              <h3 className="a-title">No articles yet</h3>
+              <p className="a-excerpt">There are no published articles in this category yet. Check back soon or browse all blogs.</p>
+            </div>
+          </article>
+        )}
       </section>
     </main>
   );
