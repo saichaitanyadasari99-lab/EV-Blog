@@ -3086,7 +3086,7 @@ a {
 
 .stat-value {
   font-family: var(--font-syne), sans-serif;
-  font-size: 24px;
+  font-size: 20px;
   font-weight: 800;
   color: var(--accent);
   line-height: 1.2;
@@ -3271,14 +3271,13 @@ a {
 /* ===== STAT ROW ===== */
 .stat-row {
   display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 10px;
   margin: 20px 0;
 }
 
 .stat-row .stat-card {
-  flex: 1;
-  min-width: 120px;
+  width: 100%;
 }
 
 /* ===== COMPARE TABLE ===== */
