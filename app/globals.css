@@ -1023,144 +1023,110 @@ a {
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 100%;
 }
 
-.ev-ecosystem {
+.hero-visual-wrap {
   width: 100%;
   max-width: 700px;
 }
 
-.ev-svg {
+.hero-visual-svg {
   width: 100%;
   height: auto;
+  display: block;
 }
 
-/* Drone Animations */
-.drone-1 {
-  animation: drone-fly-1 8s ease-in-out infinite;
+.vis-led {
+  animation: vis-led-blink 1s ease-in-out infinite;
 }
 
-@keyframes drone-fly-1 {
-  0%, 100% { transform: translate(0, 0); }
-  25% { transform: translate(15px, -10px); }
-  50% { transform: translate(30px, 5px); }
-  75% { transform: translate(15px, 10px); }
-}
-
-.drone-2 {
-  animation: drone-fly-2 6s ease-in-out infinite;
-  animation-delay: 1s;
-}
-
-@keyframes drone-fly-2 {
-  0%, 100% { transform: translate(0, 0); }
-  33% { transform: translate(10px, -8px); }
-  66% { transform: translate(-5px, 5px); }
-}
-
-.drone-3 {
-  animation: drone-fly-3 7s ease-in-out infinite;
-  animation-delay: 2s;
-}
-
-@keyframes drone-fly-3 {
-  0%, 100% { transform: translate(0, 0); }
-  50% { transform: translate(-15px, 12px); }
-}
-
-/* Tower Light Blink */
-.tower-light {
-  animation: blink 1s ease-in-out infinite;
-}
-
-@keyframes blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.3; }
-}
-
-/* Charging Indicators */
-.charge-indicator {
-  animation: charge-blink 0.8s ease-in-out infinite;
-}
-
-.charge-indicator:nth-child(1) { animation-delay: 0s; }
-.charge-indicator:nth-child(2) { animation-delay: 0.2s; }
-.charge-indicator:nth-child(3) { animation-delay: 0.4s; }
-.charge-indicator:nth-child(4) { animation-delay: 0.6s; }
-
-@keyframes charge-blink {
+@keyframes vis-led-blink {
   0%, 100% { opacity: 0.3; }
   50% { opacity: 1; }
 }
 
-/* Charging Cable Flow */
-.charging-cable {
-  stroke-dasharray: 3 2;
-  animation: cable-flow 0.5s linear infinite;
+.vis-cable,
+.vis-cable-2,
+.vis-cable-3 {
+  animation: vis-cable-flow 0.6s linear infinite;
 }
 
-@keyframes cable-flow {
+@keyframes vis-cable-flow {
   from { stroke-dashoffset: 0; }
-  to { stroke-dashoffset: -5; }
+  to { stroke-dashoffset: -14; }
 }
 
-/* Charger Glow */
-.charger-1, .charger-2, .charger-3, .charger-4 {
-  animation: charger-pulse 1.5s ease-in-out infinite;
+.vis-station {
+  animation: vis-station-float 4s ease-in-out infinite;
 }
 
-.charger-1 { animation-delay: 0s; }
-.charger-2 { animation-delay: 0.3s; }
-.charger-3 { animation-delay: 0.6s; }
-.charger-4 { animation-delay: 0.9s; }
+@keyframes vis-station-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-2px); }
+}
 
-@keyframes charger-pulse {
-  0%, 100% { opacity: 0.5; }
+.vis-car {
+  animation: vis-car-bounce 2.5s ease-in-out infinite;
+}
+
+@keyframes vis-car-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-1.5px); }
+}
+
+.vis-suv {
+  animation: vis-suv-bounce 2.8s ease-in-out infinite;
+  animation-delay: 0.5s;
+}
+
+@keyframes vis-suv-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-1.5px); }
+}
+
+.vis-scooter {
+  animation: vis-scooter-roll 0.4s linear infinite;
+}
+
+@keyframes vis-scooter-roll {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(3px); }
+}
+
+.vis-turbine {
+  animation: vis-turbine-sway 5s ease-in-out infinite;
+  transform-origin: 0 110px;
+}
+
+@keyframes vis-turbine-sway {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(1deg); }
+  75% { transform: rotate(-1deg); }
+}
+
+.vis-battery-icon,
+.vis-battery-icon-sm {
+  animation: vis-float 6s ease-in-out infinite;
+}
+
+@keyframes vis-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+.vis-nodes {
+  animation: vis-pulse 3s ease-in-out infinite;
+}
+
+@keyframes vis-pulse {
+  0%, 100% { opacity: 0.6; }
   50% { opacity: 1; }
 }
 
-/* Power Line */
-.power-line {
-  stroke-dasharray: 5 3;
-  animation: power-flow 2s linear infinite;
-}
-
-@keyframes power-flow {
-  from { stroke-dashoffset: 0; }
-  to { stroke-dashoffset: -16; }
-}
-
-/* Tree Sway */
-.tree-left, .tree-right {
-  animation: tree-sway 4s ease-in-out infinite;
-  transform-origin: bottom center;
-}
-
-.tree-right {
-  animation-delay: 2s;
-}
-
-@keyframes tree-sway {
-  0%, 100% { transform: rotate(0deg); }
-  50% { transform: rotate(2deg); }
-}
-
-/* Car body bounce */
-.car-charging {
-  animation: car-bounce 2s ease-in-out infinite;
-}
-
-@keyframes car-bounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-1px); }
-}
-
-.semi-truck {
-  animation: car-bounce 2.5s ease-in-out infinite;
-}
-
-.volvo-truck {
-  animation: car-bounce 2.2s ease-in-out infinite;
+@keyframes vis-turbine-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 .home-hero-label {
@@ -1276,8 +1242,8 @@ a {
   align-items: center;
   display: flex;
   justify-content: center;
-  position: relative;
-  width: 240px;
+  width: 100%;
+  max-width: 700px;
 }
 
 .hero-illustration {
@@ -6446,7 +6412,8 @@ tr.winner-row {
   }
   
   .home-hero-visual {
-    display: none;
+    max-width: 100%;
+    margin-top: 24px;
   }
   
   .featured-card {
@@ -6517,7 +6484,8 @@ tr.winner-row {
   }
   
   .home-hero-visual {
-    display: none;
+    max-width: 100%;
+    margin-top: 20px;
   }
   
   .home-hero-title {
