@@ -18,8 +18,8 @@ export function SiteFooter() {
             <h4>Categories</h4>
             <Link href="/category/cell-chemistry">Cell Chemistry</Link>
             <Link href="/category/bms-design">BMS Design</Link>
-            <Link href="/category/ev-benchmarks">Thermal</Link>
-            <Link href="/category/news">Charging</Link>
+            <Link href="/category/thermal">Thermal</Link>
+            <Link href="/category/charging">Charging</Link>
           </section>
 
           <section className="footer-col">
