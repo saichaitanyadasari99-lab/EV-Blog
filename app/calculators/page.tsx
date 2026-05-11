@@ -1,4 +1,14 @@
-﻿import Link from "next/link";
+﻿import type { Metadata } from "next";
+import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: "EV Battery Engineering Calculators",
+  description: "Free engineering-grade calculators for EV battery pack design, thermal load analysis, cooling system sizing, SOC estimation, charging time, range prediction, bus bar sizing, cell comparison, and BMS voltage window checking.",
+  openGraph: {
+    title: "EV Battery Engineering Calculators — EVPulse",
+    description: "Free engineering-grade calculators for battery pack design, thermal analysis, SOC estimation, charging, range prediction, and BMS calibration.",
+  },
+};
 
 const calculators = [
   {

@@ -1,7 +1,17 @@
+import type { Metadata } from "next";
 import { PostCard } from "@/components/PostCard";
 import { getPublishedPosts } from "@/lib/posts";
 import Link from "next/link";
 import type { PostRecord } from "@/types/post";
+
+export const metadata: Metadata = {
+  title: "All EV Battery Articles & Technical Analysis",
+  description: "Browse the complete archive of EV battery research notes, benchmarks, and explainers — covering cell chemistry, BMS design, thermal management, charging infrastructure, and vehicle reviews.",
+  openGraph: {
+    title: "All EV Battery Articles & Technical Analysis — EVPulse",
+    description: "Browse the complete archive of EV battery research notes, benchmarks, and explainers covering cell chemistry, BMS design, thermal management, and charging.",
+  },
+};
 
 type SectionSpec = {
   title: string;

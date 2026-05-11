@@ -5,7 +5,7 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SkipLink } from "@/components/SkipLink";
 import "katex/dist/katex.min.css";
 import "./globals.css";
-import { ORGANIZATION_SCHEMA } from "@/lib/schema";
+import { ORGANIZATION_SCHEMA, WEBSITE_SCHEMA } from "@/lib/schema";
 
 const syne = Syne({
   variable: "--font-syne",
@@ -35,12 +35,12 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),
   title: {
-    default: "EVPulse - Battery and EV Technology Newsroom",
+    default: "EVPulse — EV Battery Technology Newsroom & Engineering Calculators",
     template: "%s | EVPulse",
   },
-  description: "Deep-dive technical analysis, battery engineering insights, and EV benchmarks for engineers and enthusiasts.",
-  keywords: ["EV batteries", "battery technology", "electric vehicles", "BMS", "BMS design", "battery thermal management", "charging technology", "EV benchmarks"],
-  authors: [{ name: "EVPulse Team" }],
+  description: "Deep-dive technical analysis on EV batteries, BMS design, cell chemistry (LFP, NMC, Na-ion), thermal management, charging infrastructure, and EV benchmarks. Free engineering calculators for pack design, SOC estimation, and thermal analysis.",
+  keywords: ["EV battery", "electric vehicle", "BMS design", "battery management system", "LFP battery", "NMC battery", "sodium ion battery", "thermal management", "EV charging", "battery pack design", "SOC estimation", "EV benchmarks", "battery engineering", "cell chemistry", "immersion cooling", "CCS charging", "ISO 15118", "UN ECE R100"],
+  authors: [{ name: "Sai Chaitanya Dasari", url: "https://www.linkedin.com/in/dasarisaisrinivasachaitanya" }],
   creator: "EVPulse",
   publisher: "EVPulse",
   formatDetection: {
@@ -53,21 +53,21 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: baseUrl,
     siteName: "EVPulse",
-    title: "EVPulse - Battery and EV Technology Newsroom",
-    description: "Deep-dive technical analysis, battery engineering insights, and EV benchmarks for engineers and enthusiasts.",
+    title: "EVPulse — EV Battery Technology Newsroom & Engineering Calculators",
+    description: "Deep-dive technical analysis on EV batteries, BMS design, cell chemistry, thermal management, and charging infrastructure. Free engineering calculators for pack design, SOC estimation, and thermal analysis.",
     images: [
       {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "EVPulse",
+        alt: "EVPulse — EV Battery Technology Newsroom",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "EVPulse - Battery and EV Technology Newsroom",
-    description: "Deep-dive technical analysis, battery engineering insights, and EV benchmarks.",
+    title: "EVPulse — EV Battery Technology Newsroom & Engineering Calculators",
+    description: "Deep-dive EV battery technical analysis, BMS design, cell chemistry, and free engineering calculators.",
     images: ["/og-image.png"],
   },
   robots: {
@@ -107,6 +107,10 @@ export default function RootLayout({
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(ORGANIZATION_SCHEMA) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(WEBSITE_SCHEMA) }}
         />
       </head>
       <body className="min-h-full flex flex-col">

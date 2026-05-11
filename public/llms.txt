@@ -1,49 +1,53 @@
-# EVPulse - EV Battery Technology Resource
+# EVPulse — EV Battery Technology Resource
 
-EVPulse (www.evpulse.co.in) is a technical resource for battery systems engineers, EV professionals, and enthusiasts.
+EVPulse (https://www.evpulse.co.in) is a technical resource for battery systems engineers, EV professionals, and enthusiasts. Publishes deep-dive technical analysis on EV battery technology, BMS design, cell chemistry, thermal management, charging infrastructure, and vehicle benchmarks. Also hosts free engineering-grade interactive calculators for battery pack design, thermal analysis, SOC estimation, and more.
 
-## About
-
-Deep-dive technical analysis on EV battery technology, BMS design, cell chemistry, thermal management, and charging infrastructure.
-
-Author: Sai Chaitanya Dasari - Battery Systems Engineer with 3+ years at Volvo Eicher Commercial Vehicles
+Author: Sai Chaitanya Dasari — Battery Systems Engineer at Volvo Eicher Commercial Vehicles
 
 ## Core Content
 
-### Articles & Blog Posts
-- /blogs - All technical articles
-- /category/cell-chemistry - LFP, NMC, NMC 811, Na-ion cell analysis
-- /category/bms-design - Battery management systems, SOC/SOH algorithms
-- /category/thermal - Thermal management, immersion cooling
-- /category/charging - Charging infrastructure, CCS, CHAdeMO, ISO 15118
+### Blog Posts by Category
+- /category/cell-chemistry — LFP, NMC, NMC 811, Na-ion cell analysis, DCIR, OCV-SOC hysteresis, silicon anode, calendar aging, electrolyte additives
+- /category/bms-design — Battery management systems, SOC/SOH estimation algorithms, EKF vs UKF, active balancing topologies, CAN FD vs Ethernet, ISO 26262 safety goals, thermal runaway detection
+- /category/ev-benchmarks — DC fast charge taper curves, winter range loss heat pump vs PTC, regenerative braking efficiency, HVAC load sensitivity
+- /category/vehicle-reviews — Real-world EV range consistency, thermal behavior, long-term efficiency (BMW i4, Ioniq 5, etc.)
+- /category/standards — UN ECE R100, UL 2580, AIS-156, ISO 15118 plug and charge, IEC 61851, GB/T
+- /category/news — Latest EV battery industry news and updates
 
-### Interactive Tools
-- /calculators - EV battery design calculators
-- /calculators/pack-size - Battery pack designer
-- /calculators/heat-generation - Thermal load analyzer
-- /calculators/cooling-plate - Cooling system sizing
-- /calculators/bus-bar - Bus bar & fusing calculator
-- /calculators/soc-estimator - SOC estimator tool
-- /calculators/charging-time - Charging time calculator
+### All Blog Posts
+- /blogs — Complete archive of all published articles
 
-### About & Contact
-- /about - About the author and EVPulse mission
-- /contact - Contact form
+### Interactive Engineering Calculators
+- /calculators — Directory of all 9 free EV battery engineering calculators
+- /calculators/pack-size — Battery pack SxP architecture designer (voltage, energy, density, mass)
+- /calculators/heat-generation — Thermal load analyzer for continuous, pulse, and WLTC duty cycles
+- /calculators/cooling-plate — Cooling plate sizing with Reynolds, Nusselt, and pressure-drop outputs
+- /calculators/bus-bar — HV bus bar cross-section, power loss, thermal rise, and fuse sizing
+- /calculators/soc-estimator — SOC estimator from OCV and temperature with chemistry-specific curves (LFP, NMC, NCA)
+- /calculators/charging-time — CC-CV charging profile with phase split and total duration
+- /calculators/range-estimator — EV range vs speed from aero drag, rolling resistance, mass, and drivetrain efficiency
+- /calculators/cell-comparison — Compare up to 3 cells across energy, power, life, cost, and temperature
+- /calculators/bms-window-checker — Validate pack voltage window and balancing thresholds
+
+### Other Pages
+- /about — About the author, EVPulse mission, and expertise areas
+- /contact — Contact form for consulting, reviews, and collaboration
+- /search — Search all articles by keyword, category, or date
 
 ## Expertise Areas
+- BMS Algorithm Design (SOC estimation, SOH estimation, Kalman filtering)
+- Cell Chemistry Analysis (LFP, NMC, NCA, Na-ion, solid-state)
+- Thermal Management Systems (immersion cooling, cold plates, heat pumps)
+- EV Charging Infrastructure (CCS, CHAdeMO, GB/T, V2G, ISO 15118)
+- Battery Pack Design (SxP architecture, bus bars, fusing, HV safety)
+- Compliance (UN ECE R100, UL 2580, AIS-156, ISO 26262)
 
-- BMS Algorithm Design (SOC, SOH estimation)
-- Cell Chemistry Analysis (LFP, NMC, Na-ion)
-- Thermal Management Systems
-- EV Charging Infrastructure
-- Battery Pack Design
-- UN ECE R100, UL 2580, AIS-156 Compliance
+## Technical Keywords
+EV battery, electric vehicle, BMS, battery management system, LFP battery, NMC battery, sodium ion battery, lithium ion, DCIR, OCV-SOC, SOC estimation, SOH estimation, Kalman filter, EKF, UKF, thermal runaway, immersion cooling, cold plate, bus bar, DC fast charging, CCS, CHAdeMO, ISO 15118, V2G, regenerative braking, winter range, HVAC, WLTC, cell chemistry, pack design, CAN FD, J1939, Simulink, ISO 26262, UN ECE R100, UL 2580, AIS-156
 
 ## Update Frequency
-
-New articles published 2+ times weekly covering latest in EV battery technology.
+New articles published 2+ times weekly covering the latest in EV battery technology, benchmarks, and engineering analysis.
 
 ## Contact
-
 Email: chaitanya_dasari@evpulse.co.in
 LinkedIn: https://www.linkedin.com/in/dasarisaisrinivasachaitanya

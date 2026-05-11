@@ -1,5 +1,15 @@
-﻿import Link from "next/link";
+﻿import type { Metadata } from "next";
+import Link from "next/link";
 import { ContactForm } from "@/components/ContactForm";
+
+export const metadata: Metadata = {
+  title: "Contact — EVPulse Battery Engineering Team",
+  description: "Reach out for EV battery consulting, technical reviews, guest articles, or data collaboration on pack performance and charging benchmarks.",
+  openGraph: {
+    title: "Contact EVPulse — EV Battery Engineering Team",
+    description: "Reach out for EV battery consulting, technical reviews, guest articles, or data collaboration.",
+  },
+};
 
 type Props = {
   searchParams: Promise<{ intent?: string }>;

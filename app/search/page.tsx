@@ -1,7 +1,17 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { searchPublishedPosts, getPublishedPosts, canonicalCategory } from "@/lib/posts";
 import { PostCard } from "@/components/PostCard";
 import { getCategoryTone } from "@/lib/category-theme";
+
+export const metadata: Metadata = {
+  title: "Search EV Battery Articles",
+  description: "Search EVPulse's complete library of EV battery technical articles, benchmarks, and engineering guides by keyword, category, or date.",
+  openGraph: {
+    title: "Search EV Battery Articles — EVPulse",
+    description: "Search the complete library of EV battery technical articles, benchmarks, and engineering guides.",
+  },
+};
 
 type Props = {
   searchParams: Promise<{ q?: string; category?: string; date?: string }>;

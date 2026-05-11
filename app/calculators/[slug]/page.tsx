@@ -1,4 +1,5 @@
-﻿import Link from "next/link";
+﻿import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { ComponentType } from "react";
 import { CoolingPlateCalculator } from "@/components/calculators/CoolingPlateCalculator";
@@ -10,6 +11,7 @@ import { ChargingTimeCalculator } from "@/components/calculators/ChargingTimeCal
 import { RangeEstimatorCalculator } from "@/components/calculators/RangeEstimatorCalculator";
 import { CellComparisonCalculator } from "@/components/calculators/CellComparisonCalculator";
 import { BmsVoltageWindowCalculator } from "@/components/calculators/BmsVoltageWindowCalculator";
+import { getWebApplicationSchema } from "@/lib/schema";
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -116,6 +118,61 @@ const calculators: Record<string, CalculatorSpec> = {
   },
 };
 
+const CALC_META: Record<string, { description: string; keywords: string }> = {
+  "cooling-plate": {
+    description: "Size EV battery cooling plate channels with Reynolds number, Nusselt number, pressure drop, and flow velocity calculations for liquid-cooled thermal management systems.",
+    keywords: "battery cooling plate, cold plate design, liquid cooling EV, thermal management, cold plate sizing, immersion cooling, battery thermal",
+  },
+  "heat-generation": {
+    description: "Estimate per-cell and pack heat load under continuous, pulse, and WLTC duty cycles for EV battery thermal analysis.",
+    keywords: "battery heat generation, thermal load, WLTC cycle, EV battery temperature, cell heating, battery thermal analysis",
+  },
+  "bus-bar": {
+    description: "Compute HV bus bar cross-section, resistance, power loss, thermal rise, and fuse sizing with copper vs aluminum comparison.",
+    keywords: "bus bar calculator, HV bus bar, fuse sizing, copper bus bar, aluminum bus bar, power loss, thermal rise EV",
+  },
+  "pack-size": {
+    description: "Design battery pack SxP architecture — estimate voltage, energy capacity, energy density, mass, and packaging dimensions.",
+    keywords: "battery pack design, SxP configuration, EV battery architecture, pack voltage, energy density calculator, battery mass estimation",
+  },
+  "soc-estimator": {
+    description: "Estimate battery state-of-charge from open-circuit voltage and temperature with chemistry-aware OCV-SOC curve fitting (LFP, NMC, NCA).",
+    keywords: "SOC estimation, state of charge, OCV SOC curve, battery SOC calculator, LFP SOC, NMC SOC, BMS algorithm",
+  },
+  "charging-time": {
+    description: "Estimate EV charging time over CC-CV phases using charger power limits and battery C-rate constraints.",
+    keywords: "EV charging time, CC CV charging, fast charging calculator, DC fast charge, charging curve, battery C-rate, charging time estimator",
+  },
+  "range-estimator": {
+    description: "Predict EV range across speeds from aerodynamic drag, rolling resistance, vehicle mass, and drivetrain efficiency.",
+    keywords: "EV range calculator, electric vehicle range, range estimator, aero drag, rolling resistance, EV efficiency, range prediction",
+  },
+  "cell-comparison": {
+    description: "Compare up to three battery cell candidates across energy density, power capability, cycle life, cost, and temperature range.",
+    keywords: "battery cell comparison, cell selection, LFP vs NMC, energy density comparison, cycle life, battery cell datasheet",
+  },
+  "bms-window-checker": {
+    description: "Validate cell voltage limits, pack series voltage window, and balancing start thresholds for BMS calibration.",
+    keywords: "BMS voltage window, cell voltage limits, battery balancing, BMS calibration, pack voltage range, overvoltage undervoltage protection",
+  },
+};
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params;
+  const calc = calculators[slug];
+  if (!calc) return {};
+  const meta = CALC_META[slug];
+  return {
+    title: calc.title,
+    description: meta?.description || calc.description,
+    keywords: meta?.keywords || "EV battery calculator, engineering tool",
+    openGraph: {
+      title: `${calc.title} — EVPulse Calculator`,
+      description: meta?.description || calc.description,
+    },
+  };
+}
+
 export default async function CalculatorPage({ params }: Props) {
   const { slug } = await params;
   const calc = calculators[slug];
@@ -126,8 +183,14 @@ export default async function CalculatorPage({ params }: Props) {
 
   const Component = calc.component;
 
+  const webAppSchema = getWebApplicationSchema(slug, calc.title);
+
   return (
     <main className="page-main wrapper">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(webAppSchema) }}
+      />
       <section className="page-hero page-hero-center calc-page-hero">
         <p className="calc-breadcrumb">
           <Link href="/calculators">Calculators</Link> <span>&gt;</span> {calc.title}

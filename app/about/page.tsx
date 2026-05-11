@@ -1,5 +1,15 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
+
+export const metadata: Metadata = {
+  title: "About — EVPulse Battery Engineering Team",
+  description: "EVPulse is run by Sai Chaitanya Dasari, a Battery Systems Engineer at Volvo Eicher Commercial Vehicles. Deep-dive EV battery technical analysis, BMS design, cell chemistry, thermal management, and charging infrastructure insights.",
+  openGraph: {
+    title: "About EVPulse — EV Battery Engineering Team",
+    description: "EVPulse is run by Sai Chaitanya Dasari, a Battery Systems Engineer at Volvo Eicher Commercial Vehicles. Deep-dive EV battery technical content and engineering tools.",
+  },
+};
 
 const marqueeTags = [
   "BMS DESIGN", "LFP / NA-ION", "IMMERSION COOLING", "SWAPPABLE BATTERY",
