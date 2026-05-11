@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import type { CSSProperties } from "react";
 import { notFound } from "next/navigation";
 import { getCategoryTone } from "@/lib/category-theme";
@@ -238,9 +239,13 @@ export default async function BlogPostPage({ params }: Params) {
         )}
         {coverUrl && (
           <div className="post-cover-image">
-            <img 
-              src={coverUrl} 
+            <Image
+              src={coverUrl}
               alt={post?.title ?? ""}
+              fill
+              sizes="(max-width: 768px) 100vw, 800px"
+              className="post-cover-img"
+              priority
             />
           </div>
         )}

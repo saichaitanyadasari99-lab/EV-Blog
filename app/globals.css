@@ -1029,6 +1029,7 @@ a {
 .hero-visual-wrap {
   width: 100%;
   max-width: 420px;
+  aspect-ratio: 400 / 340;
 }
 
 .hero-visual-svg {
@@ -1634,11 +1635,15 @@ a {
 
 .post-cover-image {
   width: 100%;
-  max-height: 520px;
+  aspect-ratio: 16 / 9;
   margin-bottom: 28px;
   border-radius: 14px;
   overflow: hidden;
   position: relative;
+}
+
+.post-cover-img {
+  object-fit: cover;
 }
 
 .post-cover-image img {
@@ -2452,6 +2457,15 @@ a {
 
 .a-card-link {
   display: block;
+}
+
+.a-card-link-image {
+  display: block;
+  position: relative;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  border-radius: 8px 8px 0 0;
+  background: var(--surface2);
 }
 
 .a-card-img {

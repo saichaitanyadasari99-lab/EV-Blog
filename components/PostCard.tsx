@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import type { PostRecord } from "@/types/post";
 import { getCategoryTone } from "@/lib/category-theme";
 
@@ -26,18 +27,17 @@ export function PostCard({ post, featured = false }: Props) {
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
     const img = e.currentTarget;
     img.style.display = 'none';
-    if (img.parentElement) {
-      img.parentElement.setAttribute('style', 'background: linear-gradient(135deg,#091830 0%,#0F2A4A 40%,#072038 100%)');
-    }
   };
   
   return (
     <article className={`a-card ${featured ? 'featured-card-item' : ''}`}>
       {showImage ? (
-        <Link href={`/blog/${post.slug}`} className="a-card-link">
-          <img 
-            src={coverUrl} 
+        <Link href={`/blog/${post.slug}`} className="a-card-link-image">
+          <Image
+            src={coverUrl}
             alt={post.title}
+            fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             className="a-card-img"
             style={{ objectFit: 'contain', padding: '8px' }}
             onError={handleImageError}
