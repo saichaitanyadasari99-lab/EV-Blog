@@ -9,7 +9,20 @@ type Params = {
   params: Promise<{ slug: string }>;
 };
 
-export const revalidate = 60;
+export const revalidate = 300;
+
+export async function generateStaticParams() {
+  return [
+    { slug: "cell-chemistry" },
+    { slug: "bms-design" },
+    { slug: "ev-benchmarks" },
+    { slug: "vehicle-reviews" },
+    { slug: "standards" },
+    { slug: "news" },
+    { slug: "thermal" },
+    { slug: "charging" },
+  ];
+}
 
 const CATEGORY_META: Record<string, { title: string; description: string }> = {
   "cell-chemistry": {

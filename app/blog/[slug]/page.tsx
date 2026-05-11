@@ -5,6 +5,7 @@ import type { CSSProperties } from "react";
 import { notFound } from "next/navigation";
 import { getCategoryTone } from "@/lib/category-theme";
 import { getPublishedPostBySlug, getPublishedPosts } from "@/lib/posts";
+import "katex/dist/katex.min.css";
 import { renderTiptapHtml } from "@/lib/tiptap";
 import { markdownToHtml } from "@/lib/markdown";
 import type { PostRecord } from "@/types/post";
@@ -21,7 +22,12 @@ type Params = {
   params: Promise<{ slug: string }>;
 };
 
-export const revalidate = 60;
+export const revalidate = 300;
+
+export async function generateStaticParams() {
+  const posts = await getPublishedPosts();
+  return posts.map((post) => ({ slug: post.slug }));
+}
 
 function stripTags(value: string) {
   return value.replace(/<[^>]*>/g, "").trim();

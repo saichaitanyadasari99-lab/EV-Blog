@@ -1,5 +1,5 @@
 import { MetadataRoute } from "next";
-import { getServerSupabaseClient } from "@/lib/supabase/server";
+import { getPublicSupabaseClient } from "@/lib/supabase/public";
 
 const CALCULATOR_SLUGS = [
   "pack-size", "heat-generation", "cooling-plate", "bus-bar",
@@ -16,11 +16,11 @@ const CATEGORY_SLUGS = [
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://www.evpulse.co.in";
 
-  const supabase = await getServerSupabaseClient();
+  const supabase = getPublicSupabaseClient();
   const { data: posts } = await supabase
     .from("posts")
     .select("slug, updated_at, created_at")
-    .eq("published", true);
+    .eq("published", true) as unknown as { data: { slug: string; updated_at: string | null; created_at: string }[] | null };
 
   const staticPages: MetadataRoute.Sitemap = [
     { url: baseUrl, lastModified: new Date(), changeFrequency: "daily", priority: 1 },

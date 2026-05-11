@@ -1,4 +1,4 @@
-import { getServerSupabaseClient } from "@/lib/supabase/server";
+import { getPublicSupabaseClient } from "@/lib/supabase/public";
 import type { PostRecord } from "@/types/post";
 
 const categoryAliases: Record<string, string> = {
@@ -20,7 +20,7 @@ export function canonicalCategory(category?: string | null) {
 }
 
 export async function getPublishedPosts() {
-  const supabase = await getServerSupabaseClient();
+  const supabase = getPublicSupabaseClient();
   const { data, error } = await supabase
     .from("posts")
     .select("*")
@@ -36,7 +36,7 @@ export async function getPublishedPosts() {
 }
 
 export async function getPublishedPostBySlug(slug: string) {
-  const supabase = await getServerSupabaseClient();
+  const supabase = getPublicSupabaseClient();
   const { data, error } = await supabase
     .from("posts")
     .select("*")

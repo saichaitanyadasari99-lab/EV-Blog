@@ -3,7 +3,6 @@ import { DM_Sans, IBM_Plex_Mono, Syne } from "next/font/google";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SkipLink } from "@/components/SkipLink";
-import "katex/dist/katex.min.css";
 import "./globals.css";
 import { ORGANIZATION_SCHEMA, WEBSITE_SCHEMA } from "@/lib/schema";
 

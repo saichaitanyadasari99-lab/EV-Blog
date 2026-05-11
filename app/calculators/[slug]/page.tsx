@@ -175,6 +175,22 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
+export const revalidate = 300;
+
+export function generateStaticParams() {
+  return [
+    { slug: "cooling-plate" },
+    { slug: "heat-generation" },
+    { slug: "bus-bar" },
+    { slug: "pack-size" },
+    { slug: "soc-estimator" },
+    { slug: "charging-time" },
+    { slug: "range-estimator" },
+    { slug: "cell-comparison" },
+    { slug: "bms-window-checker" },
+  ];
+}
+
 export default async function CalculatorPage({ params }: Props) {
   const { slug } = await params;
   const calc = calculators[slug];
