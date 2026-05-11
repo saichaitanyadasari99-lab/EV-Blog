@@ -259,7 +259,7 @@ export default async function BlogPostPage({ params }: Params) {
             {new Date(post.created_at).toLocaleDateString()} | {post.reading_time ?? 1} min read
           </p>
           <Link href="/blogs" className="sec-link" style={{ marginTop: 8, display: "inline-flex" }}>
-            Back to all blogs {"->"}
+            Back to all blogs <span aria-hidden="true">{"->"}</span>
           </Link>
         </header>
 
@@ -309,7 +309,7 @@ export default async function BlogPostPage({ params }: Params) {
                   )}
                   {nextInSeries && (
                     <Link href={`/blog/${nextInSeries.slug}`} className="series-nav-next">
-                      <span className="series-nav-direction">Next →</span>
+                      <span className="series-nav-direction">Next <span aria-hidden="true">→</span></span>
                       <span className="series-nav-title">{nextInSeries.title}</span>
                     </Link>
                   )}

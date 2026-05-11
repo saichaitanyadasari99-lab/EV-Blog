@@ -26,6 +26,8 @@ export function SiteFooter() {
             <h4>Resources</h4>
             <Link href="/search">Search</Link>
             <Link href="/blogs">All Blogs</Link>
+            <Link href="/glossary">Glossary</Link>
+            <Link href="/calculators">Calculators</Link>
             <Link href="/about">About</Link>
             <Link href="/contact">Contact</Link>
           </section>

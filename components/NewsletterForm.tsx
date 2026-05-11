@@ -140,7 +140,7 @@ export function NewsletterForm({ compact = false }: { compact?: boolean }) {
         type="submit" 
         disabled={status === "loading" || status === "success"}
       >
-        {status === "loading" ? "..." : status === "success" ? "Done" : "Subscribe ->"}
+        {status === "loading" ? "..." : status === "success" ? "Done" : "Subscribe"}
       </button>
       {message && (
         <span style={{ color: status === "error" ? "var(--red)" : "var(--green)", fontSize: "12px", gridColumn: "1 / -1" }}>

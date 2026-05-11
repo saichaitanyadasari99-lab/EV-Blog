@@ -2,11 +2,14 @@
 import Link from "next/link";
 import { ContactForm } from "@/components/ContactForm";
 
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://www.evpulse.co.in";
+
 export const metadata: Metadata = {
-  title: "Contact — EVPulse Battery Engineering Team",
+  title: "Contact",
   description: "Reach out for EV battery consulting, technical reviews, guest articles, or data collaboration on pack performance and charging benchmarks.",
+  alternates: { canonical: `${baseUrl}/contact` },
   openGraph: {
-    title: "Contact EVPulse — EV Battery Engineering Team",
+    title: "Contact | EVPulse",
     description: "Reach out for EV battery consulting, technical reviews, guest articles, or data collaboration.",
   },
 };

@@ -2,12 +2,15 @@ import type { Metadata } from "next";
 import { glossaryTerms } from "@/lib/glossary";
 import { getDefinedTermSetSchema } from "@/lib/schema";
 
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://www.evpulse.co.in";
+
 export const metadata: Metadata = {
-  title: "EV Battery Engineering Glossary — 50+ Technical Terms Defined",
+  title: `EV Battery Engineering Glossary — ${glossaryTerms.length}+ Technical Terms Defined`,
   description: "Comprehensive glossary of EV battery, BMS, cell chemistry, thermal management, and charging infrastructure terms with engineering-grade definitions. SOC, SOH, LFP, NMC, EKF, DCIR, and more.",
+  alternates: { canonical: `${baseUrl}/glossary` },
   openGraph: {
-    title: "EV Battery Engineering Glossary — EVPulse",
-    description: "50+ battery systems, BMS, cell chemistry, and EV charging terms with engineering-grade definitions.",
+    title: `EV Battery Engineering Glossary | EVPulse`,
+    description: `${glossaryTerms.length}+ battery systems, BMS, cell chemistry, and EV charging terms with engineering-grade definitions.`,
   },
 };
 

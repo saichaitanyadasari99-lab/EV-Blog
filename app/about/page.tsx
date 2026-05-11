@@ -2,11 +2,14 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://www.evpulse.co.in";
+
 export const metadata: Metadata = {
-  title: "About — EVPulse Battery Engineering Team",
+  title: "About",
   description: "EVPulse is run by Sai Chaitanya Dasari, a Battery Systems Engineer at Volvo Eicher Commercial Vehicles. Deep-dive EV battery technical analysis, BMS design, cell chemistry, thermal management, and charging infrastructure insights.",
+  alternates: { canonical: `${baseUrl}/about` },
   openGraph: {
-    title: "About EVPulse — EV Battery Engineering Team",
+    title: "About — Battery Engineering Team | EVPulse",
     description: "EVPulse is run by Sai Chaitanya Dasari, a Battery Systems Engineer at Volvo Eicher Commercial Vehicles. Deep-dive EV battery technical content and engineering tools.",
   },
 };
@@ -102,8 +105,8 @@ export default function AboutPage() {
           </div>
           <div className="about-hero-buttons">
             <Link href="/contact" className="about-btn-black">Let&apos;s Talk</Link>
-            <a href="https://www.linkedin.com/in/dasarisaisrinivasachaitanya" target="_blank" rel="noreferrer" className="about-btn-outline">LinkedIn →</a>
-            <a href="https://github.com/saichaitanyadasari99-lab" target="_blank" rel="noreferrer" className="about-btn-outline">GitHub →</a>
+            <a href="https://www.linkedin.com/in/dasarisaisrinivasachaitanya" target="_blank" rel="noreferrer" className="about-btn-outline">LinkedIn <span aria-hidden="true">→</span></a>
+            <a href="https://github.com/saichaitanyadasari99-lab" target="_blank" rel="noreferrer" className="about-btn-outline">GitHub <span aria-hidden="true">→</span></a>
           </div>
         </div>
         <div className="about-hero-right">
@@ -154,7 +157,7 @@ export default function AboutPage() {
               <div className="about-card-icon-box">{topic.icon}</div>
               <h3 className="about-card-title">{topic.title}</h3>
               <p className="about-card-desc">{topic.description}</p>
-              <Link href="/blogs" className="about-card-link">Read more →</Link>
+              <Link href="/blogs" className="about-card-link">Read more <span aria-hidden="true">→</span></Link>
             </article>
           ))}
         </div>

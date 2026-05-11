@@ -162,10 +162,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const calc = calculators[slug];
   if (!calc) return {};
   const meta = CALC_META[slug];
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://www.evpulse.co.in";
   return {
     title: calc.title,
     description: meta?.description || calc.description,
     keywords: meta?.keywords || "EV battery calculator, engineering tool",
+    alternates: { canonical: `${baseUrl}/calculators/${slug}` },
     openGraph: {
       title: `${calc.title} — EVPulse Calculator`,
       description: meta?.description || calc.description,
@@ -236,7 +238,8 @@ export default async function CalculatorPage({ params }: Props) {
         </details>
       </section>
 
-      <section className="calc-container calc-container-wide">
+      <section className="calc-container calc-container-wide" aria-labelledby="calc-inputs-heading">
+        <h2 id="calc-inputs-heading" className="sr-only">Calculator Inputs</h2>
         <Component />
       </section>
 

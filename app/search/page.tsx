@@ -4,9 +4,12 @@ import { searchPublishedPosts, getPublishedPosts, canonicalCategory } from "@/li
 import { PostCard } from "@/components/PostCard";
 import { getCategoryTone } from "@/lib/category-theme";
 
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://www.evpulse.co.in";
+
 export const metadata: Metadata = {
   title: "Search EV Battery Articles",
   description: "Search EVPulse's complete library of EV battery technical articles, benchmarks, and engineering guides by keyword, category, or date.",
+  alternates: { canonical: `${baseUrl}/search` },
   openGraph: {
     title: "Search EV Battery Articles — EVPulse",
     description: "Search the complete library of EV battery technical articles, benchmarks, and engineering guides.",
@@ -98,7 +101,7 @@ export default async function SearchPage({ searchParams }: Props) {
             : "Start with a keyword like LFP, BMS, or thermal."}
         </p>
         <Link href="/blogs" className="sec-link" style={{ marginTop: 8, display: "inline-flex" }}>
-          Browse all blogs {"->"}
+          Browse all blogs <span aria-hidden="true">{"->"}</span>
         </Link>
       </section>
 

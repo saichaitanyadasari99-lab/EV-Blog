@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { getPublishedPosts } from "@/lib/posts";
 import { PostCard } from "@/components/PostCard";
@@ -5,6 +6,12 @@ import { getCategoryTone } from "@/lib/category-theme";
 import { NewsletterForm } from "@/components/NewsletterForm";
 import { HeroAnimation } from "@/components/HeroAnimation";
 import type { PostRecord } from "@/types/post";
+
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://www.evpulse.co.in";
+
+export const metadata: Metadata = {
+  alternates: { canonical: baseUrl },
+};
 
 export default async function HomePage() {
   let posts: PostRecord[] = [];
@@ -128,7 +135,7 @@ export default async function HomePage() {
       <section className="sec-head">
         <h2 className="sec-title">Latest Articles</h2>
         <Link href="/blogs" className="sec-link">
-          View all {"->"}
+          View all <span aria-hidden="true">{"->"}</span>
         </Link>
       </section>
       <section className="articles-grid home-grid">
@@ -141,7 +148,7 @@ export default async function HomePage() {
       <section className="sec-head">
         <h2 className="sec-title">Battery Design Tools</h2>
         <Link href="/calculators" className="sec-link">
-          View all {"->"}
+          View all <span aria-hidden="true">{"->"}</span>
         </Link>
       </section>
       <section className="calc-grid-home">
@@ -223,7 +230,7 @@ export default async function HomePage() {
           <section className="sec-head">
             <h2 className="sec-title">More Articles</h2>
             <Link href="/blogs" className="sec-link">
-              View all {"->"}
+              View all <span aria-hidden="true">{"->"}</span>
             </Link>
           </section>
           <section className="grid-4">

@@ -40,14 +40,16 @@ const CATEGORY_META: Record<string, { title: string; description: string }> = {
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { slug } = await params;
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://www.evpulse.co.in";
   const meta = CATEGORY_META[slug];
   if (!meta) {
     const displayName = slug.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
-    return { title: `${displayName} — EV Battery Articles`, description: `Technical articles under the ${displayName} category.` };
+    return { title: `${displayName} — EV Battery Articles`, description: `Technical articles under the ${displayName} category.`, alternates: { canonical: `${baseUrl}/category/${slug}` } };
   }
   return {
     title: meta.title,
     description: meta.description,
+    alternates: { canonical: `${baseUrl}/category/${slug}` },
     openGraph: {
       title: meta.title,
       description: meta.description,
@@ -73,7 +75,7 @@ export default async function CategoryPage({ params }: Params) {
         </h1>
         <p className="page-subtitle">Technical posts under the {displayName} category.</p>
         <Link href="/blogs" className="sec-link" style={{ marginTop: 8, display: "inline-flex" }}>
-          Browse all blogs {"->"}
+          Browse all blogs <span aria-hidden="true">{"->"}</span>
         </Link>
       </section>
 

@@ -10,6 +10,7 @@ const CALCULATOR_SLUGS = [
 const CATEGORY_SLUGS = [
   "cell-chemistry", "bms-design", "ev-benchmarks",
   "vehicle-reviews", "standards", "news",
+  "thermal", "charging",
 ];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
