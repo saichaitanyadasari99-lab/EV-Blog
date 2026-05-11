@@ -11,7 +11,7 @@ import { ChargingTimeCalculator } from "@/components/calculators/ChargingTimeCal
 import { RangeEstimatorCalculator } from "@/components/calculators/RangeEstimatorCalculator";
 import { CellComparisonCalculator } from "@/components/calculators/CellComparisonCalculator";
 import { BmsVoltageWindowCalculator } from "@/components/calculators/BmsVoltageWindowCalculator";
-import { getWebApplicationSchema } from "@/lib/schema";
+import { getWebApplicationSchema, getHowToSchema, getBreadcrumbSchema } from "@/lib/schema";
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -184,6 +184,24 @@ export default async function CalculatorPage({ params }: Props) {
   const Component = calc.component;
 
   const webAppSchema = getWebApplicationSchema(slug, calc.title);
+  const howToSchema = getHowToSchema(slug, calc.title);
+  const breadcrumbSchema = getBreadcrumbSchema([
+    { name: "Home", url: `${process.env.NEXT_PUBLIC_BASE_URL || "https://www.evpulse.co.in"}` },
+    { name: "Calculators", url: `${process.env.NEXT_PUBLIC_BASE_URL || "https://www.evpulse.co.in"}/calculators` },
+    { name: calc.title, url: `${process.env.NEXT_PUBLIC_BASE_URL || "https://www.evpulse.co.in"}/calculators/${slug}` },
+  ]);
+
+  const methodologyNotes: Record<string, string> = {
+    "pack-size": "Uses basic electrical relationships: V_pack = S × V_cell, E_kWh = V_pack × P × Ah_cell / 1000. Mass is estimated from cell-level gravimetric density with a 25% overhead for module housing, bus bars, and cooling components.",
+    "heat-generation": "Based on Joule heating: P_heat = I² × R. Temperature rise uses lumped thermal capacity: ΔT = Q / (m × c_p). Duty cycles model continuous (1C), pulse (3C 10s), and WLTC-derived current profiles.",
+    "cooling-plate": "Uses internal flow correlations: Re = ρ × v × D_h / μ, Nu from Gnielinski correlation for turbulent flow. Heat transfer: Q = h × A × ΔT_lm. Pressure drop from Darcy-Weisbach with Moody friction factor.",
+    "bus-bar": "DC resistance: R = ρ × L / A. Self-heating: ΔT = P_loss × R_th. Fuse sizing follows IEC 60269 derating curves for continuous and pulsed DC loads.",
+    "soc-estimator": "SOC is determined from OCV using chemistry-specific polynomial curve fits for LFP, NMC, and NCA. Temperature compensation applies Nernst-derived correction factors from -20°C to 60°C.",
+    "charging-time": "CC phase: t_CC = (SOC_target - SOC_start) × E_pack / P_charger. CV taper uses exponential decay model fitted to typical Li-ion charge acceptance above 80% SOC.",
+    "range-estimator": "Road load: P = ½ρC_dAv³ + mgC_rrv + ma. Drivetrain efficiency modeled as 0.85-0.92 depending on speed. MIDC and WLTC cycle energy computed by numerical integration.",
+    "cell-comparison": "All metrics normalized to a 0-100 scale using min-max normalization per parameter. Weighted scoring allows user-defined importance for energy, power, life, cost, and temperature.",
+    "bms-window-checker": "Pack voltage limits: V_pack,min = S × V_cell,min, V_pack,max = S × V_cell,max. Balancing thresholds set at configurable ΔV above min-cell voltage per industry best practices.",
+  };
 
   return (
     <main className="page-main wrapper">
@@ -191,6 +209,16 @@ export default async function CalculatorPage({ params }: Props) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(webAppSchema) }}
       />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
+      {howToSchema && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(howToSchema) }}
+        />
+      )}
       <section className="page-hero page-hero-center calc-page-hero">
         <p className="calc-breadcrumb">
           <Link href="/calculators">Calculators</Link> <span>&gt;</span> {calc.title}
@@ -201,6 +229,10 @@ export default async function CalculatorPage({ params }: Props) {
         <details className="calc-equation">
           <summary>How this works</summary>
           <pre>{calc.equation}</pre>
+        </details>
+        <details className="calc-methodology">
+          <summary>Methodology</summary>
+          <p>{methodologyNotes[slug] || "This calculator uses physics-based models derived from EV battery engineering first principles."}</p>
         </details>
       </section>
 

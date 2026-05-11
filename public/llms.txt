@@ -33,6 +33,7 @@ Author: Sai Chaitanya Dasari — Battery Systems Engineer at Volvo Eicher Commer
 - /about — About the author, EVPulse mission, and expertise areas
 - /contact — Contact form for consulting, reviews, and collaboration
 - /search — Search all articles by keyword, category, or date
+- /glossary — Comprehensive glossary of 50+ EV battery, BMS, and charging terms with engineering-grade definitions
 
 ## Expertise Areas
 - BMS Algorithm Design (SOC estimation, SOH estimation, Kalman filtering)

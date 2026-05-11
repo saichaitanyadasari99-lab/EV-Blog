@@ -10,7 +10,7 @@ import type { PostRecord } from "@/types/post";
 import { NewsletterForm } from "@/components/NewsletterForm";
 import { ReadingProgress } from "@/components/ReadingProgress";
 import { TableOfContents } from "@/components/TableOfContents";
-import { getArticleSchema, getFAQSchema } from "@/lib/schema";
+import { getArticleSchema, getFAQSchema, getBreadcrumbSchema } from "@/lib/schema";
 import { ArticleContent } from "@/components/ArticleContent";
 import { ReactionBar } from "@/components/ReactionBar";
 
@@ -173,6 +173,9 @@ export default async function BlogPostPage({ params }: Params) {
     ? extractInlineFaqs(postRecord.markdown_content)
     : [];
   const allFaqs = faqs.length > 0 ? faqs : inlineFaqs;
+  const categorySlug = post?.category
+    ? post.category.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "")
+    : "";
   const articleSchema = getArticleSchema({
     title: post.title,
     description: post.excerpt ?? "",
@@ -184,7 +187,36 @@ export default async function BlogPostPage({ params }: Params) {
     category: post.category ?? undefined,
     tags: post.tags ?? undefined,
     reading_time: post.reading_time ?? undefined,
+    tier: post.tier ?? undefined,
+    categorySlug: categorySlug || undefined,
   });
+
+  const breadcrumbSchema = getBreadcrumbSchema([
+    { name: "Home", url: baseUrl },
+    { name: post.category || "Articles", url: `${baseUrl}/blogs` },
+    { name: post.title, url: `${baseUrl}/blog/${post.slug}` },
+  ]);
+
+  const seriesPosts = post.tier ? allPosts
+    .filter((item) => item.slug !== post.slug && item.category === post.category && item.tier)
+    .sort((a, b) => {
+      const order = ["basic", "intermediate", "advanced", "expert"];
+      return order.indexOf(a.tier || "basic") - order.indexOf(b.tier || "basic");
+    }) : [];
+
+  const prevInSeries = seriesPosts.length > 0
+    ? seriesPosts.filter((p) => {
+        const order = ["basic", "intermediate", "advanced", "expert"];
+        return order.indexOf(p.tier || "basic") < order.indexOf(post.tier || "basic");
+      }).pop()
+    : null;
+
+  const nextInSeries = seriesPosts.length > 0
+    ? seriesPosts.find((p) => {
+        const order = ["basic", "intermediate", "advanced", "expert"];
+        return order.indexOf(p.tier || "basic") > order.indexOf(post.tier || "basic");
+      })
+    : null;
 
   return (
     <>
@@ -193,6 +225,10 @@ export default async function BlogPostPage({ params }: Params) {
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
         />
         {allFaqs.length > 0 && (
           <script
@@ -253,6 +289,26 @@ export default async function BlogPostPage({ params }: Params) {
                     <div className="faq-answer">{faq.answer}</div>
                   </details>
                 ))}
+              </section>
+            )}
+
+            {(prevInSeries || nextInSeries) && (
+              <section className="series-nav" aria-labelledby="series-heading">
+                <h2 id="series-heading">Part of the {post.category} Series</h2>
+                <div className="series-nav-links">
+                  {prevInSeries && (
+                    <Link href={`/blog/${prevInSeries.slug}`} className="series-nav-prev">
+                      <span className="series-nav-direction">← Previous</span>
+                      <span className="series-nav-title">{prevInSeries.title}</span>
+                    </Link>
+                  )}
+                  {nextInSeries && (
+                    <Link href={`/blog/${nextInSeries.slug}`} className="series-nav-next">
+                      <span className="series-nav-direction">Next →</span>
+                      <span className="series-nav-title">{nextInSeries.title}</span>
+                    </Link>
+                  )}
+                </div>
               </section>
             )}
 
