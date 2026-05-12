@@ -246,13 +246,37 @@ function extractSectionsFromPost(post: Post | null): { heading: string; body: st
   return sections.slice(0, 3);
 }
 
+function getPreheader(post: Post | null): string {
+  const excerpt = post?.excerpt || "";
+  return excerpt.slice(0, 140).replace(/<[^>]+>/g, "").trim();
+}
+
+function getSeriesBadge(post: Post | null): string {
+  if (!post?.tags?.length) return "";
+  const tags = post.tags.map(t => t.toLowerCase());
+  const seriesKeywords = ["basic", "intermediate", "advanced", "expert", "master"];
+  const tierMap: Record<string, string> = {
+    basic: "Beginner",
+    intermediate: "Intermediate",
+    advanced: "Advanced",
+    expert: "Expert",
+    master: "Master Class",
+  };
+  for (const kw of seriesKeywords) {
+    if (tags.includes(kw)) return `<span style="background-color:#ecfdf5; color:#065f46; font-size:10px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; padding:3px 10px; border-radius:20px; font-family:${fp};">${tierMap[kw] || kw.toUpperCase()}</span>`;
+  }
+  if (tags.some(t => t.includes("series"))) {
+    return `<span style="background-color:#ecfdf5; color:#065f46; font-size:10px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; padding:3px 10px; border-radius:20px; font-family:${fp};">SERIES</span>`;
+  }
+  return "";
+}
+
 function getEmailHtml(posts: Post[], unsubUrl: string) {
   const issueNum = getIssueNumber();
   
   const post0 = posts[0] || null;
   const post1 = posts[1] || null;
   const post2 = posts[2] || null;
-  const post3 = posts[3] || null;
   
   const heroCategory = post0?.category?.toUpperCase() || "DEEP DIVE";
   const heroTitle = post0?.title || "Your EV Battery Guide";
@@ -261,23 +285,24 @@ function getEmailHtml(posts: Post[], unsubUrl: string) {
   const heroDate = post0?.created_at ? new Date(post0.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : "April 2026";
   const heroReadTime = post0?.reading_time || 5;
   const heroUrl = post0 ? `${BASE_URL}/blog/${post0.slug}` : "#";
+  const heroSeriesBadge = getSeriesBadge(post0);
   
-  const getCardData = (post: Post | null, idx: number) => {
-    if (!post) return { category: "ARTICLE", title: "Article Title", excerpt: "Article description", cover: "", slug: "blogs" };
+  const getCardData = (post: Post | null) => {
+    if (!post) return null;
     return {
       category: post.category?.toUpperCase() || "ARTICLE",
       title: post.title || "Article",
       excerpt: post.excerpt?.slice(0, 120) || "Article description",
       cover: post.cover_url || "",
       slug: post.slug,
+      badge: getSeriesBadge(post),
     };
   };
   
-  const card1 = getCardData(post1, 1);
-  const card2 = getCardData(post2, 2);
-  const card3 = getCardData(post3, 3);
+  const card1 = getCardData(post1);
+  const card2 = getCardData(post2);
 
-  const fp = "-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif";
+  const preheaderText = getPreheader(post0);
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -285,65 +310,72 @@ function getEmailHtml(posts: Post[], unsubUrl: string) {
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>EVPulse Weekly — Issue #${issueNum}</title>
+  <title>EVPulse — Issue #${issueNum}</title>
   <style>
-    body { margin: 0; padding: 0; background-color: #f0efea; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; }
+    body { margin: 0; padding: 0; background-color: #f0efea; font-family: ${fp}; }
     a { text-decoration: none; }
     img { border: 0; display: block; }
     @media only screen and (max-width: 600px) {
       .wrapper { padding: 16px 12px !important; }
       .card { padding: 24px 20px !important; }
-      .hero-visual { display: none !important; }
       .split-left, .split-right { display: block !important; width: 100% !important; }
-      .split-img { width: 100% !important; height: 180px !important; margin-bottom: 20px !important; }
-      .split-text { padding: 0 !important; }
-      .btn { display: block !important; text-align: center !important; width: auto !important; }
-      h1.hero-title { font-size: 17px !important; }
-      .footer-socials td { padding: 0 8px !important; }
+      .split-img-mobile { width: 100% !important; height: 180px !important; margin-bottom: 16px !important; }
+      .btn { display: block !important; text-align: center !important; }
     }
   </style>
 </head>
 <body>
+  <!--[if !mso]><!-- -->
+  <div style="display:none;font-size:1px;color:#f0efea;line-height:1px;max-height:0;max-width:0;opacity:0;overflow:hidden;">
+    ${preheaderText}
+  </div>
+  <!--<![endif]-->
 <div style="background-color:#f0efea; padding:0; margin:0;">
-  <table class="wrapper" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f0efea; padding:32px 16px;">
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f0efea; padding:32px 16px;">
     <tr>
       <td align="center">
       <table width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;">
+        <!-- BRANDED HEADER -->
         <tr>
-          <td style="padding: 0 0 20px 0;">
-            <a href="${BASE_URL}" target="_blank" style="font-size:17px; font-weight:700; color:#0a0a0a; letter-spacing:-0.02em; font-family:${fp}; text-decoration:none;">
-              ⚡ EVPulse
-            </a>
+          <td style="background-color:#0099b8; border-radius:16px 16px 0 0; padding:28px 32px 22px; text-align:center;">
+            <a href="${BASE_URL}" target="_blank" style="font-size:22px; font-weight:800; color:#ffffff; letter-spacing:-0.03em; font-family:${fp}; text-decoration:none;">⚡ EVPulse</a>
+            <p style="margin:6px 0 0 0; font-size:12px; color:rgba(255,255,255,0.8); font-family:${fp};">Battery Engineering Dispatch · Issue #${issueNum}</p>
           </td>
         </tr>
+        <!-- AUTHOR INTRO -->
         <tr>
-          <td class="card" style="background-color:#ffffff; border-radius:16px; padding:32px; margin-bottom:16px; display:block;">
-            <div style="margin-bottom:16px;">
-              <span style="background-color:#ecfdf5; color:#065f46; font-size:11px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; padding:4px 12px; border-radius:20px; font-family:${fp};">
-                ${heroCategory}
-              </span>
+          <td class="card" style="background-color:#ffffff; padding:28px 32px 12px; border-bottom:1px solid #e5e7eb;">
+            <p style="margin:0 0 8px 0; font-size:14px; line-height:1.7; color:#4b5563; font-family:${fp};">Hey — Chaitanya here. This week I'm sharing the latest battery engineering analysis, benchmarks, and tools from EVPulse. Thanks for reading.</p>
+          </td>
+        </tr>
+        <!-- LEAD STORY -->
+        <tr>
+          <td class="card" style="background-color:#ffffff; padding:24px 32px 32px;">
+            <div style="margin-bottom:14px;">
+              <span style="background-color:#0099b8; color:#ffffff; font-size:10px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; padding:3px 10px; border-radius:4px; font-family:${fp};">LEAD STORY</span>
+              ${heroSeriesBadge ? `&nbsp;${heroSeriesBadge}` : ''}
             </div>
-            <h1 class="hero-title" style="margin:0 0 16px 0; font-size:30px; font-weight:700; line-height:1.2; letter-spacing:-0.025em; color:#0a0a0a; font-family:${fp};">
+            <h1 style="margin:0 0 14px 0; font-size:22px; font-weight:700; line-height:1.25; letter-spacing:-0.02em; color:#0a0a0a; font-family:${fp};">
               ${heroTitle}
             </h1>
-            <div class="hero-visual" style="border-radius:12px; overflow:hidden; margin-bottom:20px; background-color:#f0fafb; height:220px; text-align:center; line-height:220px;">
-              ${heroCover ? `<img src="${heroCover}" alt="Article cover" width="100%" style="width:100%; height:220px; object-fit:cover; border-radius:12px; display:block;" />` : ''}
+            <div style="border-radius:12px; overflow:hidden; margin-bottom:18px; background-color:#f0fafb;">
+              ${heroCover ? `<img src="${heroCover}" alt="" width="100%" style="width:100%; height:auto; max-height:300px; object-fit:cover; display:block;" />` : ''}
             </div>
-            <p style="margin:0 0 24px 0; font-size:15px; line-height:1.65; color:#4b5563; font-family:${fp};">
+            <p style="margin:0 0 16px 0; font-size:14px; line-height:1.65; color:#4b5563; font-family:${fp};">
               ${heroExcerpt}
             </p>
-            <p style="margin:0 0 24px 0; font-size:12px; color:#9ca3af; font-family:${fp};">
-              ${heroDate} &nbsp;·&nbsp; ${heroReadTime} min read
+            <p style="margin:0 0 20px 0; font-size:11px; color:#9ca3af; font-family:${fp};">
+              ${heroDate} · ${heroReadTime} min read
             </p>
             <table cellpadding="0" cellspacing="0" border="0">
               <tr>
-                <td style="padding-right:10px;">
-                  <a class="btn" href="${heroUrl}" target="_blank" style="display:inline-block; background-color:#0a0a0a; color:#ffffff; font-size:14px; font-weight:600; padding:12px 22px; border-radius:8px; font-family:${fp};">
+                <td>
+                  <a class="btn" href="${heroUrl}" target="_blank" style="display:inline-block; background-color:#0099b8; color:#ffffff; font-size:13px; font-weight:700; padding:11px 20px; border-radius:8px; font-family:${fp};">
                     Read article →
                   </a>
                 </td>
-                <td>
-                  <a class="btn" href="${BASE_URL}/blogs" target="_blank" style="display:inline-block; background-color:#ffffff; color:#0a0a0a; font-size:14px; font-weight:600; padding:12px 22px; border-radius:8px; border:1.5px solid #e5e7eb; font-family:${fp};">
+                <td style="padding-left:10px;">
+                  <a class="btn" href="${BASE_URL}/blogs" target="_blank" style="display:inline-block; background-color:#ffffff; color:#0a0a0a; font-size:13px; font-weight:600; padding:11px 20px; border-radius:8px; border:1.5px solid #d1d5db; font-family:${fp};">
                     All articles
                   </a>
                 </td>
@@ -351,92 +383,73 @@ function getEmailHtml(posts: Post[], unsubUrl: string) {
             </table>
           </td>
         </tr>
+        <!-- CALCULATOR CTA (mid-email) -->
         <tr><td style="height:12px;"></td></tr>
         <tr>
-          <td class="card" style="background-color:#ffffff; border-radius:16px; padding:24px;">
+          <td style="background-color:#0a0a0a; border-radius:16px; padding:28px 32px; text-align:center;">
+            <p style="margin:0 0 4px 0; font-size:11px; font-weight:700; color:#0099b8; letter-spacing:0.1em; text-transform:uppercase; font-family:${fp};">FREE ENGINEERING TOOLS</p>
+            <h2 style="margin:0 0 10px 0; font-size:20px; font-weight:700; line-height:1.25; color:#ffffff; font-family:${fp};">6 free EV battery calculators</h2>
+            <p style="margin:0 0 20px 0; font-size:13px; line-height:1.6; color:#9ca3af; font-family:${fp};">Battery pack designer, thermal load analyzer, SOC estimator, cooling system sizing, bus bar &amp; fusing, charging time — all free, no sign-up.</p>
+            <a href="${BASE_URL}/calculators" target="_blank" style="display:inline-block; background-color:#0099b8; color:#ffffff; font-size:13px; font-weight:700; padding:11px 24px; border-radius:8px; font-family:${fp};">Try the calculators →</a>
+          </td>
+        </tr>
+        <!-- SECONDARY ARTICLES -->
+        ${[card1, card2].filter(Boolean).map((card, i) => {
+          const c = card!;
+          const isLeftImg = i === 0;
+          return `
+        <tr><td style="height:12px;"></td></tr>
+        <tr>
+          <td style="background-color:#ffffff; border-radius:16px; padding:20px;">
             <table width="100%" cellpadding="0" cellspacing="0" border="0">
               <tr>
-                <td class="split-left split-img" valign="top" style="width:160px; padding-right:20px;">
-                  ${card1.cover ? `<img src="${card1.cover}" alt="Article thumbnail" width="160" style="width:160px; height:120px; object-fit:cover; border-radius:10px; display:block;" />` : `<div style="width:160px; height:120px; background:linear-gradient(135deg,#E8F5E9,#DCFCE7); border-radius:10px;"></div>`}
+                ${isLeftImg ? `
+                <td class="split-left split-img-mobile" valign="top" style="width:140px; padding-right:18px;">
+                  ${c.cover ? `<img src="${c.cover}" alt="" width="140" style="width:140px; height:100px; object-fit:cover; border-radius:8px; display:block;" />` : `<div style="width:140px; height:100px; background:linear-gradient(135deg,#e0f2fe,#bae6fd); border-radius:8px;"></div>`}
                 </td>
-                <td class="split-right split-text" valign="top">
-                  <p style="margin:0 0 8px 0; font-size:16px; font-weight:700; color:#0e7490; font-family:${fp};">${card1.category}</p>
-                  <h2 style="margin:0 0 8px 0; font-size:18px; font-weight:700; line-height:1.3; color:#0a0a0a; font-family:${fp};">${card1.title}</h2>
-                  <p style="margin:0 0 14px 0; font-size:13px; line-height:1.6; color:#6b7280; font-family:${fp};">${card1.excerpt}</p>
-                  <a href="${BASE_URL}/blog/${card1.slug}" target="_blank" style="display:inline-block; background-color:#ffffff; color:#0a0a0a; font-size:13px; font-weight:600; padding:9px 18px; border-radius:7px; border:1.5px solid #e5e7eb; font-family:${fp};">Read more →</a>
+                <td class="split-right" valign="top">
+                  ${c.badge ? `<p style="margin:0 0 6px 0;">${c.badge}</p>` : ''}
+                  <h2 style="margin:0 0 6px 0; font-size:16px; font-weight:700; line-height:1.3; color:#0a0a0a; font-family:${fp};">${c.title}</h2>
+                  <p style="margin:0 0 10px 0; font-size:12px; line-height:1.55; color:#6b7280; font-family:${fp};">${c.excerpt}</p>
+                  <a href="${BASE_URL}/blog/${c.slug}" target="_blank" style="font-size:12px; font-weight:700; color:#0099b8; font-family:${fp};">Read article →</a>
+                </td>` : `
+                <td class="split-left" valign="top" style="padding-right:18px;">
+                  ${c.badge ? `<p style="margin:0 0 6px 0;">${c.badge}</p>` : ''}
+                  <h2 style="margin:0 0 6px 0; font-size:16px; font-weight:700; line-height:1.3; color:#0a0a0a; font-family:${fp};">${c.title}</h2>
+                  <p style="margin:0 0 10px 0; font-size:12px; line-height:1.55; color:#6b7280; font-family:${fp};">${c.excerpt}</p>
+                  <a href="${BASE_URL}/blog/${c.slug}" target="_blank" style="font-size:12px; font-weight:700; color:#0099b8; font-family:${fp};">Read article →</a>
                 </td>
+                <td class="split-right split-img-mobile" valign="top" style="width:140px;">
+                  ${c.cover ? `<img src="${c.cover}" alt="" width="140" style="width:140px; height:100px; object-fit:cover; border-radius:8px; display:block;" />` : `<div style="width:140px; height:100px; background:linear-gradient(135deg,#e0f2fe,#bae6fd); border-radius:8px;"></div>`}
+                </td>`}
               </tr>
             </table>
           </td>
-        </tr>
-        <tr><td style="height:12px;"></td></tr>
-        <tr>
-          <td class="card" style="background-color:#ffffff; border-radius:16px; padding:24px;">
-            <table width="100%" cellpadding="0" cellspacing="0" border="0">
-              <tr>
-                <td class="split-left split-text" valign="top" style="padding-right:20px;">
-                  <p style="margin:0 0 8px 0; font-size:16px; font-weight:700; color:#0e7490; font-family:${fp};">${card2.category}</p>
-                  <h2 style="margin:0 0 8px 0; font-size:18px; font-weight:700; line-height:1.3; color:#0a0a0a; font-family:${fp};">${card2.title}</h2>
-                  <p style="margin:0 0 14px 0; font-size:13px; line-height:1.6; color:#6b7280; font-family:${fp};">${card2.excerpt}</p>
-                  <a href="${BASE_URL}/blog/${card2.slug}" target="_blank" style="display:inline-block; background-color:#ffffff; color:#0a0a0a; font-size:13px; font-weight:600; padding:9px 18px; border-radius:7px; border:1.5px solid #e5e7eb; font-family:${fp};">Read now →</a>
-                </td>
-                <td class="split-right split-img" valign="top" style="width:160px;">
-                  ${card2.cover ? `<img src="${card2.cover}" alt="Article thumbnail" width="160" style="width:160px; height:120px; object-fit:cover; border-radius:10px; display:block;" />` : `<div style="width:160px; height:120px; background:linear-gradient(135deg,#E8F5E9,#DCFCE7); border-radius:10px;"></div>`}
-                </td>
-              </tr>
-            </table>
-          </td>
-        </tr>
-        <tr><td style="height:12px;"></td></tr>
-        <tr>
-          <td class="card" style="background-color:#ffffff; border-radius:16px; padding:24px;">
-            <table width="100%" cellpadding="0" cellspacing="0" border="0">
-              <tr>
-                <td class="split-left split-img" valign="top" style="width:160px; padding-right:20px;">
-                  ${card3.cover ? `<img src="${card3.cover}" alt="Article thumbnail" width="160" style="width:160px; height:120px; object-fit:cover; border-radius:10px; display:block;" />` : `<div style="width:160px; height:120px; background:linear-gradient(135deg,#E8F5E9,#DCFCE7); border-radius:10px;"></div>`}
-                </td>
-                <td class="split-right split-text" valign="top">
-                  <p style="margin:0 0 8px 0; font-size:16px; font-weight:700; color:#0e7490; font-family:${fp};">${card3.category}</p>
-                  <h2 style="margin:0 0 8px 0; font-size:18px; font-weight:700; line-height:1.3; color:#0a0a0a; font-family:${fp};">${card3.title}</h2>
-                  <p style="margin:0 0 14px 0; font-size:13px; line-height:1.6; color:#6b7280; font-family:${fp};">${card3.excerpt}</p>
-                  <a href="${BASE_URL}/blog/${card3.slug}" target="_blank" style="display:inline-block; background-color:#ffffff; color:#0a0a0a; font-size:13px; font-weight:600; padding:9px 18px; border-radius:7px; border:1.5px solid #e5e7eb; font-family:${fp};">Read more →</a>
-                </td>
-              </tr>
-            </table>
-          </td>
-        </tr>
-        <tr><td style="height:12px;"></td></tr>
-        <tr>
-          <td class="card" style="background-color:#0a0a0a; border-radius:16px; padding:32px; text-align:center;">
-            <p style="margin:0 0 6px 0; font-size:16px; font-weight:700; color:#0e7490; font-family:${fp};">FREE TOOLS</p>
-            <h2 style="margin:0 0 12px 0; font-size:24px; font-weight:700; line-height:1.25; color:#ffffff; font-family:${fp};">6 free EV engineering calculators</h2>
-            <p style="margin:0 0 24px 0; font-size:14px; line-height:1.65; color:#9ca3af; max-width:400px; margin-left:auto; margin-right:auto; font-family:${fp};">Battery pack designer, thermal load analyzer, SOC estimator, cooling system sizing, bus bar &amp; fusing, charging time — all free, all in your browser.</p>
-            <a href="${BASE_URL}/calculators" target="_blank" style="display:inline-block; background-color:#ffffff; color:#0a0a0a; font-size:14px; font-weight:700; padding:13px 28px; border-radius:8px; font-family:${fp};">Try the calculators →</a>
-          </td>
-        </tr>
-        <tr><td style="height:24px;"></td></tr>
+        </tr>`}).join('')}
+        <!-- FOOTER -->
+        <tr><td style="height:20px;"></td></tr>
         <tr>
           <td style="text-align:center; padding-bottom:16px;">
-            <table class="footer-socials" cellpadding="0" cellspacing="0" border="0" align="center" style="margin-bottom:20px;">
+            <table cellpadding="0" cellspacing="0" border="0" align="center" style="margin-bottom:18px;">
               <tr>
-                <td style="padding:0 10px;">
-                  <a href="${BASE_URL}" target="_blank" style="display:inline-block; width:36px; height:36px; background-color:#e5e7eb; border-radius:50%; text-align:center; line-height:36px; font-size:13px; font-weight:700; color:#374151; font-family:${fp};">W</a>
+                <td style="padding:0 8px;">
+                  <a href="${BASE_URL}" target="_blank" style="display:inline-block; width:34px; height:34px; background-color:#e5e7eb; border-radius:50%; text-align:center; line-height:34px; font-size:12px; font-weight:700; color:#374151; font-family:${fp};">W</a>
                 </td>
-                <td style="padding:0 10px;">
-                  <a href="https://www.linkedin.com/company/evpulse" target="_blank" style="display:inline-block; width:36px; height:36px; background-color:#e5e7eb; border-radius:50%; text-align:center; line-height:36px; font-size:13px; font-weight:700; color:#374151; font-family:${fp};">in</a>
+                <td style="padding:0 8px;">
+                  <a href="https://www.linkedin.com/company/evpulse" target="_blank" style="display:inline-block; width:34px; height:34px; background-color:#e5e7eb; border-radius:50%; text-align:center; line-height:34px; font-size:12px; font-weight:700; color:#374151; font-family:${fp};">in</a>
                 </td>
-                <td style="padding:0 10px;">
-                  <a href="${BASE_URL}" target="_blank" style="display:inline-block; width:36px; height:36px; background-color:#e5e7eb; border-radius:50%; text-align:center; line-height:36px; font-size:13px; font-weight:700; color:#374151; font-family:${fp};">X</a>
+                <td style="padding:0 8px;">
+                  <a href="${BASE_URL}" target="_blank" style="display:inline-block; width:34px; height:34px; background-color:#e5e7eb; border-radius:50%; text-align:center; line-height:34px; font-size:12px; font-weight:700; color:#374151; font-family:${fp};">X</a>
                 </td>
               </tr>
             </table>
-            <p style="margin:0 0 6px 0; font-size:12px; color:#9ca3af; font-family:${fp};">
-              <a href="${unsubUrl}" style="color:#9ca3af; text-decoration:underline;">Manage preferences</a>
-              &nbsp;&nbsp;
+            <p style="margin:0 0 4px 0; font-size:11px; color:#9ca3af; font-family:${fp};">
               <a href="${unsubUrl}" style="color:#9ca3af; text-decoration:underline;">Unsubscribe</a>
+              &nbsp;&nbsp;·&nbsp;&nbsp;
+              <a href="${unsubUrl}" style="color:#9ca3af; text-decoration:underline;">Manage preferences</a>
             </p>
-            <p style="margin:0 0 20px 0; font-size:11px; color:#d1d5db; font-family:${fp};">© 2026 EVPulse. All rights reserved.<br/>evpulse.co.in</p>
-            <a href="${BASE_URL}" target="_blank" style="font-size:14px; font-weight:700; color:#374151; letter-spacing:-0.02em; font-family:${fp}; text-decoration:none;">⚡ EVPulse</a>
+            <p style="margin:0 0 18px 0; font-size:10px; color:#d1d5db; font-family:${fp};">© 2026 EVPulse. All rights reserved.</p>
+            <a href="${BASE_URL}" target="_blank" style="font-size:15px; font-weight:800; color:#374151; letter-spacing:-0.02em; font-family:${fp}; text-decoration:none;">⚡ EVPulse</a>
           </td>
         </tr>
       </table>
@@ -446,7 +459,7 @@ function getEmailHtml(posts: Post[], unsubUrl: string) {
 </div>
 </body>
 </html>`;
-}
+  }
 
 async function sendEmailBrevo(toEmail: string, subject: string, html: string) {
   const apiKey = process.env.BREVO_API_KEY;
