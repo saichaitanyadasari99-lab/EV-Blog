@@ -134,15 +134,16 @@ return (
       </section>
 
       {sortedCategories.map((category) => {
-        const categoryPosts = (grouped.get(category) ?? []).slice(0, 3);
+        const categoryPosts = grouped.get(category) ?? [];
+        const totalPosts = categoryPosts.length;
 
-        if (categoryPosts.length === 0) return null;
+        if (totalPosts === 0) return null;
 
         return (
           <section key={category} className="section-block">
             <div className="sec-head">
               <h2 className="sec-title">
-                {getSectionTitle(category)} ({categoryPosts.length})
+                {getSectionTitle(category)} ({totalPosts})
               </h2>
             </div>
             <p className="section-keywords">{getSectionKeywords(category)}</p>
@@ -151,6 +152,13 @@ return (
                 <PostCard key={post.id} post={post} />
               ))}
             </div>
+            {totalPosts > 6 && (
+              <div className="sec-foot">
+                <Link href={`/category/${category}`} className="sec-link">
+                  View all {totalPosts} articles →
+                </Link>
+              </div>
+            )}
           </section>
         );
       })}

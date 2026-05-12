@@ -230,7 +230,7 @@ export function getArticleSchema(article: {
       "@id": `${baseUrl}/blog/${article.slug}`,
     },
     articleSection: article.category,
-    keywords: article.tags?.join(", "),
+    keywords: Array.isArray(article.tags) ? article.tags.join(", ") : typeof article.tags === "string" ? article.tags : "",
     timeRequired: article.reading_time ? `PT${article.reading_time}M` : undefined,
     inLanguage: "en-IN",
   };

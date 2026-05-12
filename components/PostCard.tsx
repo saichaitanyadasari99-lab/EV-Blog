@@ -10,6 +10,32 @@ type Props = {
   featured?: boolean;
 };
 
+function parseTags(tags: unknown): string[] {
+  if (!tags) return [];
+  if (Array.isArray(tags)) {
+    return tags.flatMap((t) => {
+      if (typeof t === "string" && t.startsWith("[") && t.endsWith("]")) {
+        try {
+          const parsed = JSON.parse(t);
+          return Array.isArray(parsed) ? parsed : [t];
+        } catch {
+          return [t];
+        }
+      }
+      return [t];
+    }).filter(Boolean);
+  }
+  if (typeof tags === "string") {
+    try {
+      const parsed = JSON.parse(tags);
+      return Array.isArray(parsed) ? parsed : [tags];
+    } catch {
+      return [tags];
+    }
+  }
+  return [];
+}
+
 export function PostCard({ post, featured = false }: Props) {
   const tone = getCategoryTone(post.category);
   const coverUrl = post.cover_url;
@@ -74,12 +100,15 @@ export function PostCard({ post, featured = false }: Props) {
           <span className="a-date">{new Date(post.created_at).toLocaleDateString()}</span>
           <span className="a-dot">·</span>
           <span className="a-readtime">{post.reading_time ?? 1} min read</span>
-          {post.tags?.length ? (
-            <>
-              <span className="a-dot">·</span>
-              <span className="a-tags">{post.tags.slice(0, 2).join(', ')}</span>
-            </>
-          ) : null}
+          {(() => {
+            const tags = parseTags(post.tags).slice(0, 2);
+            return tags.length ? (
+              <>
+                <span className="a-dot">·</span>
+                <span className="a-tags">{tags.join(', ')}</span>
+              </>
+            ) : null;
+          })()}
         </div>
       </div>
     </article>

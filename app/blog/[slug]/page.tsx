@@ -36,8 +36,17 @@ function stripTags(value: string) {
 function extractHeadings(html: string) {
   const matches = [...html.matchAll(/<h2[^>]*>(.*?)<\/h2>/gi)];
   return matches
-    .map((match) => ({ text: stripTags(match[1] ?? ""), id: stripTags(match[1] ?? "").toLowerCase().replace(/\s+/g, "-") }))
-    .filter(Boolean)
+    .map((match) => {
+      const raw = match[0];
+      const inner = match[1] ?? "";
+      const text = stripTags(inner);
+      const idAttr = raw.match(/id="([^"]+)"/);
+      const id = idAttr
+        ? idAttr[1]
+        : text.toLowerCase().replace(/[^\w\s-]/g, "").replace(/\s+/g, "-").replace(/-+/g, "-").trim();
+      return { text, id };
+    })
+    .filter((h) => h.text && h.id)
     .slice(0, 8);
 }
 
@@ -166,11 +175,14 @@ export default async function BlogPostPage({ params }: Params) {
     .filter((item) => item.slug !== post?.slug && item.category === post?.category)
     .slice(0, 4);
 
-  const tagSet = new Set((post?.tags ?? []).map((tag) => tag.toLowerCase()));
+  const postTags = Array.isArray(post?.tags) ? post.tags : typeof post?.tags === "string" ? [post.tags] : [];
+  const tagSet = new Set(postTags.map((tag) => tag.toLowerCase()));
   const relatedByTags = allPosts
     .filter(
-      (item) =>
-        item.slug !== post?.slug && item.tags?.some((tag) => tagSet.has(tag.toLowerCase())),
+      (item) => {
+        const itemTags = Array.isArray(item.tags) ? item.tags : typeof item.tags === "string" ? [item.tags] : [];
+        return item.slug !== post?.slug && itemTags.some((tag) => tagSet.has(tag.toLowerCase()));
+      },
     )
     .slice(0, 4);
 

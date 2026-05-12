@@ -238,7 +238,9 @@ export function Editor({ initialPost }: Props) {
       setTitle(data.title || "");
       setSlug(data.slug || "");
       setExcerpt(data.excerpt || "");
-      setTags((data.tags || []).join(", "));
+      const rawTags = data.tags ?? [];
+      const tagsArray = Array.isArray(rawTags) ? rawTags : typeof rawTags === "string" ? [rawTags] : [];
+      setTags(tagsArray.join(", "));
       setTier(data.tier || "intermediate");
       setPublished(data.published || false);
       setCategory(mapCategory(data.category || "cell-chemistry"));

@@ -69,7 +69,7 @@ export async function searchPublishedPosts(query: string) {
       post.excerpt ?? "",
       post.content ?? "",
       post.category ?? "",
-      (post.tags ?? []).join(" "),
+      Array.isArray(post.tags) ? post.tags.join(" ") : typeof post.tags === "string" ? post.tags : "",
     ]
       .join(" ")
       .toLowerCase();

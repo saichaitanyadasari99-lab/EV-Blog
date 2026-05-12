@@ -1636,6 +1636,11 @@ a {
   font-size: 11px;
 }
 
+.sec-foot {
+  text-align: right;
+  margin-top: 12px;
+}
+
 .page-hero {
   background: var(--surface);
   border: 1px solid var(--border);

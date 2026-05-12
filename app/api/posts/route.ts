@@ -6,7 +6,8 @@ import { isAdminEmail } from "@/lib/auth";
 import type { SavePostInput } from "@/types/post";
 
 function htmlToExcerpt(html: string) {
-  return html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim().slice(0, 220);
+  const withoutHeadings = html.replace(/<h[1-6][^>]*>.*?<\/h[1-6]>/gi, " ");
+  return withoutHeadings.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim().slice(0, 220);
 }
 
 async function normalizeCategory(supabase: Awaited<ReturnType<typeof getServerSupabaseClient>>, input?: string) {
