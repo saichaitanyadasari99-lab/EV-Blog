@@ -145,8 +145,6 @@ export function Editor({ initialPost }: Props) {
     }
 
     const postId = initialPost?.id;
-    console.log({ category, postId });
-
     const payload = {
       id: postId,
       title,
