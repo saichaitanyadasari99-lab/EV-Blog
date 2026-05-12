@@ -49,6 +49,14 @@ const CATEGORY_META: Record<string, { title: string; description: string }> = {
     title: "EV Battery Industry News & Updates",
     description: "Latest news and updates in the EV battery industry — new cell technologies, regulatory changes, charging infrastructure developments, and production announcements.",
   },
+  "thermal": {
+    title: "Thermal Management — EV Battery Cooling & Heating Analysis",
+    description: "Technical articles on EV battery thermal management including immersion cooling, heat pump vs PTC, cold-plate design, and thermal runaway detection and prevention.",
+  },
+  "charging": {
+    title: "Charging Infrastructure — DC Fast Charging & Standards",
+    description: "In-depth analysis of EV charging infrastructure including CCS, CHAdeMO, ISO 15118 plug and charge, battery preconditioning, and charging curve optimization.",
+  },
 };
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {

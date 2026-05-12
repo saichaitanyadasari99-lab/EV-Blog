@@ -40,7 +40,7 @@ export const metadata: Metadata = {
     default: "EVPulse — EV Battery Technology Newsroom & Engineering Calculators",
     template: "%s | EVPulse",
   },
-  description: "Deep-dive technical analysis on EV batteries, BMS design, cell chemistry (LFP, NMC, Na-ion), thermal management, charging infrastructure, and EV benchmarks. Free engineering calculators for pack design, SOC estimation, and thermal analysis.",
+  description: "Deep-dive analysis on EV batteries, BMS design, cell chemistry, and thermal management. Free calculators for pack design and SOC estimation.",
   keywords: ["EV battery", "electric vehicle", "BMS design", "battery management system", "LFP battery", "NMC battery", "sodium ion battery", "thermal management", "EV charging", "battery pack design", "SOC estimation", "EV benchmarks", "battery engineering", "cell chemistry", "immersion cooling", "CCS charging", "ISO 15118", "UN ECE R100"],
   authors: [{ name: "Sai Chaitanya Dasari", url: "https://www.linkedin.com/in/dasarisaisrinivasachaitanya" }],
   creator: "EVPulse",
@@ -56,10 +56,10 @@ export const metadata: Metadata = {
     url: baseUrl,
     siteName: "EVPulse",
     title: "EVPulse — EV Battery Technology Newsroom & Engineering Calculators",
-    description: "Deep-dive technical analysis on EV batteries, BMS design, cell chemistry, thermal management, and charging infrastructure. Free engineering calculators for pack design, SOC estimation, and thermal analysis.",
+    description: "Deep-dive analysis on EV batteries, BMS design, cell chemistry, thermal management, and charging. Free calculators for pack design and SOC estimation.",
     images: [
       {
-        url: "/og-image.png",
+        url: "/og-image.svg",
         width: 1200,
         height: 630,
         alt: "EVPulse — EV Battery Technology Newsroom",
@@ -69,8 +69,8 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "EVPulse — EV Battery Technology Newsroom & Engineering Calculators",
-    description: "Deep-dive EV battery technical analysis, BMS design, cell chemistry, and free engineering calculators.",
-    images: ["/og-image.png"],
+    description: "Deep-dive EV battery technical analysis, BMS design, and cell chemistry. Free engineering calculators.",
+    images: ["/og-image.svg"],
   },
   robots: {
     index: true,

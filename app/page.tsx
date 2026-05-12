@@ -24,8 +24,8 @@ export default async function HomePage() {
   
   const hero = posts[0];
   const side = posts.slice(1, 4);
-  const topStories = posts.slice(0, 5);
-  const moreStories = posts.slice(5, 11);
+  const topStories = posts.slice(0, 3);
+  const moreStories = posts.slice(3, 6);
   const trending = posts.slice(0, 5);
   const hot = posts.find(p => p.category?.toLowerCase().includes("hot") || p.title.toLowerCase().includes("analysis")) ?? posts[0];
 
@@ -120,7 +120,7 @@ export default async function HomePage() {
 
       {/* Category Tabs */}
       <section className="cat-tabs">
-        {["All", "Cell Chemistry", "BMS Design", "Thermal", "Charging", "Market"].map((item, idx) => (
+        {["All", "Cell Chemistry", "BMS Design", "Thermal", "Charging"].map((item, idx) => (
           <Link 
             key={item} 
             href={item === "All" ? "/blogs" : `/category/${item.toLowerCase().replace(/\s+/g, "-")}`} 
@@ -240,6 +240,16 @@ export default async function HomePage() {
           </section>
         </>
       )}
+
+      {/* External Sources — Authority Signals */}
+      <section className="external-sources">
+        <span className="section-label">Cited Sources</span>
+        <div className="external-sources-links">
+          <a href="https://www.iea.org/reports/global-ev-outlook-2025" target="_blank" rel="noreferrer">IEA Global EV Outlook 2025</a>
+          <a href="https://www.energy.gov/eere/vehicles/batteries" target="_blank" rel="noreferrer">DOE Vehicle Batteries</a>
+          <a href="https://unece.org/transport/vehicle-regulations-wp29" target="_blank" rel="noreferrer">UN ECE WP.29</a>
+        </div>
+      </section>
     </main>
   );
 }

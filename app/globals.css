@@ -6724,3 +6724,28 @@ tr.winner-row {
     font-size: max(12px, 0.8rem);
   }
 }
+
+.external-sources {
+  margin: 32px 0;
+  padding: 16px 0;
+  border-top: 1px solid var(--border);
+}
+
+.external-sources-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 12px;
+}
+
+.external-sources-links a {
+  color: var(--accent);
+  font-size: 13px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: opacity 0.15s;
+}
+
+.external-sources-links a:hover {
+  opacity: 0.8;
+}

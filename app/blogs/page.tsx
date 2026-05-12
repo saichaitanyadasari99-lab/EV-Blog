@@ -134,7 +134,7 @@ return (
       </section>
 
       {sortedCategories.map((category) => {
-        const categoryPosts = (grouped.get(category) ?? []).slice(0, 5);
+        const categoryPosts = (grouped.get(category) ?? []).slice(0, 3);
 
         if (categoryPosts.length === 0) return null;
 
