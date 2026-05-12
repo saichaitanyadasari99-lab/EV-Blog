@@ -11,23 +11,10 @@ function htmlToExcerpt(html: string) {
 
 async function normalizeCategory(supabase: Awaited<ReturnType<typeof getServerSupabaseClient>>, input?: string) {
   const value = (input ?? "cell-chemistry").toLowerCase().trim();
+  const slug = value.replace(/\s+/g, "-");
   
-  const categoryMap: Record<string, string> = {
-    "benchmark": "ev-benchmarks",
-    "benchmarks": "ev-benchmarks",
-    "benchmarking": "ev-benchmarks",
-    "review": "vehicle-reviews",
-    "reviews": "vehicle-reviews",
-    "deep-dive": "bms-design",
-    "deep dives": "bms-design",
-    "post": "cell-chemistry",
-    "posts": "cell-chemistry",
-    "standards": "standards",
-    "news": "news",
-  };
-  
-  const slug = categoryMap[value] || value.replace(/\s+/g, "-");
-  
+  if (!slug) return "cell-chemistry";
+
   const { data: existing } = await supabase.from("categories").select("slug").eq("slug", slug).single();
   if (!existing) {
     const name = input?.trim() || slug;

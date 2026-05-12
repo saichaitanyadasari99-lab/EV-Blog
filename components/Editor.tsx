@@ -1,12 +1,14 @@
 "use client";
 
 import { useMemo, useRef, useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { EditorContent, useEditor } from "@tiptap/react";
 import slugify from "slugify";
 import { tiptapExtensions } from "@/lib/tiptap";
 import { parseTiptapJson } from "@/lib/tiptap";
 import { markdownToHtml } from "@/lib/markdown";
 import { MediaUpload } from "@/components/MediaUpload";
+import { CategorySelect } from "@/components/CategorySelect";
 import { getBrowserSupabaseClient } from "@/lib/supabase/client";
 import { useUploadThing } from "@/lib/uploadthing";
 import type { PostRecord } from "@/types/post";
@@ -83,7 +85,7 @@ export function Editor({ initialPost }: Props) {
   const [faqs, setFaqs] = useState<FaqItem[]>(
     initialPost?.faqs ? [...initialPost.faqs] : []
   );
-  const [categories, setCategories] = useState<Array<{ slug: string; name: string }>>([]);
+  const router = useRouter();
   const coverFileRef = useRef<HTMLInputElement | null>(null);
   const importFileRef = useRef<HTMLInputElement | null>(null);
 
@@ -116,13 +118,6 @@ export function Editor({ initialPost }: Props) {
     setStatus("Uploading image...");
     await uploadToEditor([file]);
   };
-
-  useEffect(() => {
-    fetch("/api/categories")
-      .then((res) => res.json())
-      .then((data) => setCategories(data.categories || []))
-      .catch(console.error);
-  }, []);
 
   const editor = useEditor({
     extensions: tiptapExtensions(),
@@ -191,6 +186,7 @@ export function Editor({ initialPost }: Props) {
         : `Saved draft with slug ${payload.slug}`,
     );
     setSaving(false);
+    router.push("/admin/posts");
   };
 
   const uploadCover = async (file: File) => {
@@ -335,20 +331,7 @@ export function Editor({ initialPost }: Props) {
               }}
             />
           </div>
-          <div className="flex gap-2">
-            <input
-              className="flex-1 rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 py-2"
-              placeholder="Category (type to search or enter new)"
-              value={category}
-              onChange={(event) => setCategory(event.target.value)}
-              list="categories"
-            />
-            <datalist id="categories">
-              {categories.map((cat) => (
-                <option key={cat.slug} value={cat.slug} />
-              ))}
-            </datalist>
-          </div>
+          <CategorySelect value={category} onChange={setCategory} />
           <select
             className="rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 py-2"
             value={tier}
