@@ -246,6 +246,8 @@ function extractSectionsFromPost(post: Post | null): { heading: string; body: st
   return sections.slice(0, 3);
 }
 
+const fp = "-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif";
+
 function getPreheader(post: Post | null): string {
   const excerpt = post?.excerpt || "";
   return excerpt.slice(0, 140).replace(/<[^>]+>/g, "").trim();
