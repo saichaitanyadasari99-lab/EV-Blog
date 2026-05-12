@@ -15,10 +15,13 @@ async function normalizeCategory(supabase: Awaited<ReturnType<typeof getServerSu
   
   if (!slug) return "cell-chemistry";
 
-  const { data: existing } = await supabase.from("categories").select("slug").eq("slug", slug).single();
+  const { data: existing } = await supabase.from("categories").select("slug").eq("slug", slug).maybeSingle();
   if (!existing) {
     const name = input?.trim() || slug;
-    await supabase.from("categories").upsert({ slug, name }, { onConflict: "slug" });
+    const { error: upsertError } = await supabase.from("categories").upsert({ slug, name }, { onConflict: "slug" });
+    if (upsertError) {
+      console.error("normalizeCategory upsert error:", upsertError);
+    }
   }
   
   return slug;

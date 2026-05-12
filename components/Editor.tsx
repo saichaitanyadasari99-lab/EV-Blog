@@ -186,7 +186,7 @@ export function Editor({ initialPost }: Props) {
         : `Saved draft with slug ${payload.slug}`,
     );
     setSaving(false);
-    router.push("/admin/posts");
+    window.location.href = "/admin/posts";
   };
 
   const uploadCover = async (file: File) => {
