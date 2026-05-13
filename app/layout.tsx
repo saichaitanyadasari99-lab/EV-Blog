@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { DM_Sans, IBM_Plex_Mono, Syne } from "next/font/google";
+import { DM_Sans, IBM_Plex_Mono, Plus_Jakarta_Sans, JetBrains_Mono, Syne } from "next/font/google";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SkipLink } from "@/components/SkipLink";
@@ -20,6 +20,19 @@ const dmSans = DM_Sans({
 
 const ibmMono = IBM_Plex_Mono({
   variable: "--font-ibm-mono",
+  weight: ["400", "500"],
+  subsets: ["latin"],
+  display: "swap",
+});
+
+const plusJakarta = Plus_Jakarta_Sans({
+  variable: "--font-plus-jakarta",
+  subsets: ["latin"],
+  display: "swap",
+});
+
+const jetBrainsMono = JetBrains_Mono({
+  variable: "--font-jetbrains-mono",
   weight: ["400", "500"],
   subsets: ["latin"],
   display: "swap",
@@ -95,7 +108,7 @@ export default function RootLayout({
       lang="en"
       data-theme="light"
       suppressHydrationWarning
-      className={`${syne.variable} ${dmSans.variable} ${ibmMono.variable} h-full antialiased`}
+      className={`${syne.variable} ${dmSans.variable} ${ibmMono.variable} ${plusJakarta.variable} ${jetBrainsMono.variable} h-full antialiased`}
     >
       <head>
         <meta name="theme-color" content="#0099b8" />

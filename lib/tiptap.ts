@@ -92,25 +92,38 @@ export function renderTiptapHtml(content: string | null): string {
   html = html.replaceAll(/\[\[VIDEO:(.*?)\]\]/g, '<video controls src="$1" style="max-height:520px;"></video>');
   html = html.replaceAll(/\[\[DOC:(.*?)\]\]/g, '<div class="doc-embed"><a href="$1" target="_blank" rel="noreferrer" class="doc-link"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>View Document</a></div>');
 
-  // Add copy buttons to code blocks
+  // Wrap code blocks with .code-block header
   html = html.replace(/<pre([^>]*)>([\s\S]*?)<\/pre>/g, (_, attrs, code) => {
-    return `<pre${attrs}><button type="button" class="copy-btn" onclick="navigator.clipboard.writeText(this.parentElement.textContent.replace('Copy','').trim()).then(()=>{this.textContent='Copied!';this.classList.add('copied');setTimeout(()=>{this.textContent='Copy';this.classList.remove('copied')},2000)})"><span>Copy</span></button>${code}</pre>`;
+    const langMatch = attrs.match(/class="[^"]*language-(\w+)[^"]*"/);
+    const lang = langMatch ? langMatch[1] : "code";
+    return `<div class="code-block"><div class="code-block-header"><span class="lang-tag">${lang}</span><button type="button" class="copy-btn" onclick="navigator.clipboard.writeText(this.parentElement.nextElementSibling.textContent.trim()).then(()=>{this.textContent='Copied!';this.classList.add('copied');setTimeout(()=>{this.textContent='Copy';this.classList.remove('copied')},2000)})">Copy</button></div><pre${attrs}>${code}</pre></div>`;
+  });
+
+  // Protect pre/code content from custom block regex
+  const protectedBlocks: string[] = [];
+  html = html.replace(/<pre[\s\S]*?<\/pre>|<code[\s\S]*?<\/code>/gi, (match) => {
+    const placeholder = `@@PROTECTED_${protectedBlocks.length}@@`;
+    protectedBlocks.push(match);
+    return placeholder;
   });
 
   // Process custom block syntax in TipTap-rendered content
   html = processCustomBlocks(html);
 
+  // Restore protected content
+  html = html.replace(/@@PROTECTED_(\d+)@@/g, (_, idx) => protectedBlocks[parseInt(idx)]);
+
   // Add share links to headings
   html = html.replace(/<h2([^>]*)>(.*?)<\/h2>/gi, (_, attrs, text) => {
     const idMatch = attrs.match(/id="([^"]+)"/);
     const id = idMatch ? idMatch[1] : text.toLowerCase().replace(/\s+/g, "-").replace(/[^\w-]/g, "");
-    return `<h2${attrs} id="${id}">${text}<button type="button" class="share-heading" onclick="navigator.clipboard.writeText(window.location.origin+window.location.pathname+'#${id}').then(()=>{this.classList.add('copied');setTimeout(()=>this.classList.remove('copied'),1500)})" title="Copy link to this section">🔗</button></h2>`;
+    return `<h2${attrs} id="${id}">${text}<button type="button" class="anchor-btn" onclick="navigator.clipboard.writeText(window.location.origin+window.location.pathname+'#${id}').then(()=>{this.classList.add('copied');setTimeout(()=>this.classList.remove('copied'),1500)})" title="Copy link to this section">🔗</button></h2>`;
   });
 
   html = html.replace(/<h3([^>]*)>(.*?)<\/h3>/gi, (_, attrs, text) => {
     const idMatch = attrs.match(/id="([^"]+)"/);
     const id = idMatch ? idMatch[1] : text.toLowerCase().replace(/\s+/g, "-").replace(/[^\w-]/g, "");
-    return `<h3${attrs} id="${id}">${text}<button type="button" class="share-heading" onclick="navigator.clipboard.writeText(window.location.origin+window.location.pathname+'#${id}').then(()=>{this.classList.add('copied');setTimeout(()=>this.classList.remove('copied'),1500)})" title="Copy link to this section">🔗</button></h3>`;
+    return `<h3${attrs} id="${id}">${text}<button type="button" class="anchor-btn" onclick="navigator.clipboard.writeText(window.location.origin+window.location.pathname+'#${id}').then(()=>{this.classList.add('copied');setTimeout(()=>this.classList.remove('copied'),1500)})" title="Copy link to this section">🔗</button></h3>`;
   });
 
   return html;

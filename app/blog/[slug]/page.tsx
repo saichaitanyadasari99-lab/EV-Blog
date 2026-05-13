@@ -15,6 +15,10 @@ import { TableOfContents } from "@/components/TableOfContents";
 import { getArticleSchema, getFAQSchema, getBreadcrumbSchema } from "@/lib/schema";
 import { ArticleContent } from "@/components/ArticleContent";
 import { ReactionBar } from "@/components/ReactionBar";
+import { Breadcrumb } from "@/components/Breadcrumb";
+import { MobileTOC } from "@/components/MobileTOC";
+import { BottomTabBar } from "@/components/BottomTabBar";
+import { SeriesWidget } from "@/components/SeriesWidget";
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://www.evpulse.co.in";
 
@@ -144,6 +148,20 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   };
 }
 
+const TIER_LABELS: Record<string, string> = {
+  basic: "Beginner",
+  intermediate: "Intermediate",
+  advanced: "Advanced",
+  expert: "Expert",
+};
+
+const TIER_CLASSES: Record<string, string> = {
+  basic: "level-beginner",
+  intermediate: "level-intermediate",
+  advanced: "level-advanced",
+  expert: "level-expert",
+};
+
 export default async function BlogPostPage({ params }: Params) {
   const { slug } = await params;
   
@@ -167,7 +185,6 @@ export default async function BlogPostPage({ params }: Params) {
     : renderTiptapHtml(post?.content ?? null);
   const quizzes = extractQuizzes(html);
   const cleanHtml = quizzes.length > 0 ? stripQuizBlocks(html) : html;
-  const toneStyle = { ["--tone" as string]: getCategoryTone(post?.category ?? "cell-chemistry") } as CSSProperties;
   const references = postRecord.references ?? [];
   const headings = extractHeadings(cleanHtml);
 
@@ -216,187 +233,228 @@ export default async function BlogPostPage({ params }: Params) {
     { name: post.title, url: `${baseUrl}/blog/${post.slug}` },
   ]);
 
+  const tierOrder = ["basic", "intermediate", "advanced", "expert"];
   const seriesPosts = post.tier ? allPosts
     .filter((item) => item.slug !== post.slug && item.category === post.category && item.tier)
     .sort((a, b) => {
-      const order = ["basic", "intermediate", "advanced", "expert"];
-      return order.indexOf(a.tier || "basic") - order.indexOf(b.tier || "basic");
+      return tierOrder.indexOf(a.tier || "basic") - tierOrder.indexOf(b.tier || "basic");
     }) : [];
 
   const prevInSeries = seriesPosts.length > 0
     ? seriesPosts.filter((p) => {
-        const order = ["basic", "intermediate", "advanced", "expert"];
-        return order.indexOf(p.tier || "basic") < order.indexOf(post.tier || "basic");
+        return tierOrder.indexOf(p.tier || "basic") < tierOrder.indexOf(post.tier || "basic");
       }).pop()
     : null;
 
   const nextInSeries = seriesPosts.length > 0
     ? seriesPosts.find((p) => {
-        const order = ["basic", "intermediate", "advanced", "expert"];
-        return order.indexOf(p.tier || "basic") > order.indexOf(post.tier || "basic");
+        return tierOrder.indexOf(p.tier || "basic") > tierOrder.indexOf(post.tier || "basic");
       })
     : null;
+
+  const allSeriesPosts = post.tier
+    ? [post, ...seriesPosts]
+        .sort((a, b) => tierOrder.indexOf(a.tier || "basic") - tierOrder.indexOf(b.tier || "basic"))
+    : [];
 
   return (
     <>
       <ReadingProgress />
-      <article className="page-main wrapper">
+
+      {/* JSON-LD Schema Scripts */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
+      {allFaqs.length > 0 && (
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(getFAQSchema(allFaqs)) }}
         />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
-        />
-        {allFaqs.length > 0 && (
-          <script
-            type="application/ld+json"
-            dangerouslySetInnerHTML={{ __html: JSON.stringify(getFAQSchema(allFaqs)) }}
+      )}
+
+      {/* HERO IMAGE (full width, above article) */}
+      {coverUrl && (
+        <div className="post-cover-image">
+          <Image
+            src={coverUrl}
+            alt={post?.title ?? ""}
+            fill
+            sizes="100vw"
+            className="post-cover-img"
+            priority
           />
-        )}
-        {coverUrl && (
-          <div className="post-cover-image">
-            <Image
-              src={coverUrl}
-              alt={post?.title ?? ""}
-              fill
-              sizes="(max-width: 768px) 100vw, 800px"
-              className="post-cover-img"
-              priority
-            />
+        </div>
+      )}
+
+      {/* META BAR: breadcrumb + tag pill */}
+      <div className="article-meta-bar">
+        <Breadcrumb
+          items={[
+            { label: "Home", href: "/" },
+            { label: "Articles", href: "/blogs" },
+            { label: post.title ?? "" },
+          ]}
+        />
+        {post.category && <span className="tag-pill">{post.category}</span>}
+      </div>
+
+      {/* LAYOUT GRID: article + sidebar */}
+      <div className="layout">
+
+        {/* ARTICLE COLUMN */}
+        <article className="article" id="article-body">
+
+          <h1>{post.title}</h1>
+
+          <div className="article-meta">
+            <span>{new Date(post.created_at).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}</span>
+            <span className="dot">·</span>
+            <span>{post.reading_time ?? 1} min read</span>
+            {post.tier && (
+              <>
+                <span className="dot">·</span>
+                <span className={`level-badge ${TIER_CLASSES[post.tier] || ""}`}>
+                  {TIER_LABELS[post.tier] || post.tier}
+                </span>
+              </>
+            )}
           </div>
-        )}
 
-        <header style={toneStyle} className="page-hero">
-          <p className="hero-badge" style={{ background: "var(--tone)", color: "#000" }}>
-            {post.category ?? "uncategorized"}
-          </p>
-          <h1 className="page-title post-page-title">{post.title}</h1>
-          <p className="page-subtitle">
-            {new Date(post.created_at).toLocaleDateString()} | {post.reading_time ?? 1} min read
-          </p>
-          <Link href="/blogs" className="sec-link" style={{ marginTop: 8, display: "inline-flex" }}>
-            Back to all blogs <span aria-hidden="true">{"->"}</span>
-          </Link>
-        </header>
+          {/* MOBILE TOC */}
+          <MobileTOC headings={headings} />
 
-        <div className="post-layout">
-          <div className="post-main">
-            <section className="article-content prose">
-              <ArticleContent html={cleanHtml} quizzes={quizzes} />
+          {/* ARTICLE BODY */}
+          <section className="article-content prose">
+            <ArticleContent html={cleanHtml} quizzes={quizzes} />
+          </section>
+
+          <ReactionBar />
+
+          {/* Author Bio - E-E-A-T Signal */}
+          <section className="author-bio">
+            <div className="author-avatar">
+              <span className="author-initials">SD</span>
+            </div>
+            <div className="author-info">
+              <p className="author-label">Written by</p>
+              <h4 className="author-name">Sai Chaitanya Dasari</h4>
+              <p className="author-title">Battery Systems Engineer | Volvo Eicher Commercial Vehicles</p>
+              <p className="author-desc">3+ years in commercial EV pack development. Writing about real battery engineering from the bench.</p>
+            </div>
+          </section>
+
+          {/* FAQ Section */}
+          {allFaqs.length > 0 && (
+            <section className="faq-list-card" aria-labelledby="faq-heading">
+              <h2 id="faq-heading">Frequently Asked Questions</h2>
+              {allFaqs.map((faq, idx) => (
+                <details key={idx} className="faq-item">
+                  <summary className="faq-question">{faq.question}</summary>
+                  <div className="faq-answer">{faq.answer}</div>
+                </details>
+              ))}
             </section>
+          )}
 
-            <ReactionBar />
-
-            {/* Author Bio - E-E-A-T Signal */}
-            <section className="author-bio">
-              <div className="author-avatar">
-                <span className="author-initials">SD</span>
-              </div>
-              <div className="author-info">
-                <p className="author-label">Written by</p>
-                <h4 className="author-name">Sai Chaitanya Dasari</h4>
-                <p className="author-title">Battery Systems Engineer | Volvo Eicher Commercial Vehicles</p>
-                <p className="author-desc">3+ years in commercial EV pack development. Writing about real battery engineering from the bench.</p>
+          {/* Series Navigation */}
+          {(prevInSeries || nextInSeries) && (
+            <section className="series-nav" aria-labelledby="series-heading">
+              <h2 id="series-heading">Part of the {post.category} Series</h2>
+              <div className="series-nav-links">
+                {prevInSeries && (
+                  <Link href={`/blog/${prevInSeries.slug}`} className="series-nav-prev">
+                    <span className="series-nav-direction">← Previous</span>
+                    <span className="series-nav-title">{prevInSeries.title}</span>
+                  </Link>
+                )}
+                {nextInSeries && (
+                  <Link href={`/blog/${nextInSeries.slug}`} className="series-nav-next">
+                    <span className="series-nav-direction">Next →</span>
+                    <span className="series-nav-title">{nextInSeries.title}</span>
+                  </Link>
+                )}
               </div>
             </section>
+          )}
 
-            {/* FAQ Section - AI Discoverable */}
-            {allFaqs.length > 0 && (
-              <section className="faq-list-card" aria-labelledby="faq-heading">
-                <h2 id="faq-heading">Frequently Asked Questions</h2>
-                {allFaqs.map((faq, idx) => (
-                  <details key={idx} className="faq-item">
-                    <summary className="faq-question">{faq.question}</summary>
-                    <div className="faq-answer">{faq.answer}</div>
-                  </details>
+          {/* References */}
+          {references.length ? (
+            <section className="references-card" aria-labelledby="references-heading">
+              <h2 id="references-heading">References</h2>
+              <ol>
+                {references.map((ref) => (
+                  <li key={ref.url}>
+                    <a href={ref.url} target="_blank" rel="noreferrer noopener">
+                      {ref.title}
+                    </a>
+                  </li>
                 ))}
-              </section>
-            )}
+              </ol>
+            </section>
+          ) : null}
+        </article>
 
-            {(prevInSeries || nextInSeries) && (
-              <section className="series-nav" aria-labelledby="series-heading">
-                <h2 id="series-heading">Part of the {post.category} Series</h2>
-                <div className="series-nav-links">
-                  {prevInSeries && (
-                    <Link href={`/blog/${prevInSeries.slug}`} className="series-nav-prev">
-                      <span className="series-nav-direction">← Previous</span>
-                      <span className="series-nav-title">{prevInSeries.title}</span>
-                    </Link>
-                  )}
-                  {nextInSeries && (
-                    <Link href={`/blog/${nextInSeries.slug}`} className="series-nav-next">
-                      <span className="series-nav-direction">Next <span aria-hidden="true">→</span></span>
-                      <span className="series-nav-title">{nextInSeries.title}</span>
-                    </Link>
-                  )}
-                </div>
-              </section>
-            )}
+        {/* SIDEBAR */}
+        <aside className="sidebar">
 
-            {references.length ? (
-              <section className="references-card" aria-labelledby="references-heading">
-                <h2 id="references-heading">References</h2>
-                <ol>
-                  {references.map((ref) => (
-                    <li key={ref.url}>
-                      <a href={ref.url} target="_blank" rel="noreferrer noopener">
-                        {ref.title}
-                      </a>
-                    </li>
-                  ))}
-                </ol>
-              </section>
-            ) : null}
+          {/* TOC Widget */}
+          <div className="toc-widget">
+            <div className="toc-title">In This Article</div>
+            <TableOfContents headings={headings} />
           </div>
 
-          <aside className="post-sidebar">
-            <details className="sidebar-card toc-details" open>
-              <summary className="toc-details-summary">
-                <h3 className="sidebar-title" id="toc-heading">In This Article</h3>
-              </summary>
-              <TableOfContents headings={headings} />
-            </details>
+          {/* Series Widget */}
+          {allSeriesPosts.length > 1 && (
+            <SeriesWidget
+              seriesPosts={allSeriesPosts}
+              currentSlug={post.slug}
+              category={post.category ?? ""}
+            />
+          )}
 
+          {/* Related In Category */}
+          {relatedByCategory.length > 0 && (
             <section className="sidebar-card" aria-labelledby="related-category-heading">
               <h3 className="sidebar-title" id="related-category-heading">Related In {post.category ?? "this category"}</h3>
-              {relatedByCategory.length ? (
-                <ul className="sidebar-links">
-                  {relatedByCategory.map((item) => (
-                    <li key={item.id}>
-                      <Link href={`/blog/${item.slug}`}>{item.title}</Link>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="sidebar-empty">No category matches yet.</p>
-              )}
+              <ul className="sidebar-links">
+                {relatedByCategory.map((item) => (
+                  <li key={item.id}>
+                    <Link href={`/blog/${item.slug}`}>{item.title}</Link>
+                  </li>
+                ))}
+              </ul>
             </section>
+          )}
 
+          {/* Newsletter Widget */}
+          <div className="newsletter-widget">
+            <h4>Weekly EV Insights</h4>
+            <p>Battery engineering delivered to your inbox every week.</p>
+            <NewsletterForm compact />
+          </div>
+
+          {/* Similar Topics */}
+          {relatedByTags.length > 0 && (
             <section className="sidebar-card" aria-labelledby="similar-topics-heading">
               <h3 className="sidebar-title" id="similar-topics-heading">Similar Topics</h3>
-              {relatedByTags.length ? (
-                <ul className="sidebar-links">
-                  {relatedByTags.map((item) => (
-                    <li key={item.id}>
-                      <Link href={`/blog/${item.slug}`}>{item.title}</Link>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="sidebar-empty">No tag-based matches yet.</p>
-              )}
+              <ul className="sidebar-links">
+                {relatedByTags.map((item) => (
+                  <li key={item.id}>
+                    <Link href={`/blog/${item.slug}`}>{item.title}</Link>
+                  </li>
+                ))}
+              </ul>
             </section>
+          )}
+        </aside>
+      </div>
 
-            <section className="sidebar-card" aria-labelledby="newsletter-heading">
-              <h3 className="sidebar-title" id="newsletter-heading">Newsletter</h3>
-              <p className="text-sm text-[var(--text2)] mb-3">Get weekly EV battery insights delivered to your inbox.</p>
-              <NewsletterForm compact />
-            </section>
-          </aside>
-        </div>
-      </article>
+      <BottomTabBar />
     </>
   );
 }
