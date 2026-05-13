@@ -97,6 +97,9 @@ export function renderTiptapHtml(content: string | null): string {
     return `<pre${attrs}><button type="button" class="copy-btn" onclick="navigator.clipboard.writeText(this.parentElement.textContent.replace('Copy','').trim()).then(()=>{this.textContent='Copied!';this.classList.add('copied');setTimeout(()=>{this.textContent='Copy';this.classList.remove('copied')},2000)})"><span>Copy</span></button>${code}</pre>`;
   });
 
+  // Process custom block syntax in TipTap-rendered content
+  html = processCustomBlocks(html);
+
   // Add share links to headings
   html = html.replace(/<h2([^>]*)>(.*?)<\/h2>/gi, (_, attrs, text) => {
     const idMatch = attrs.match(/id="([^"]+)"/);
@@ -109,6 +112,136 @@ export function renderTiptapHtml(content: string | null): string {
     const id = idMatch ? idMatch[1] : text.toLowerCase().replace(/\s+/g, "-").replace(/[^\w-]/g, "");
     return `<h3${attrs} id="${id}">${text}<button type="button" class="share-heading" onclick="navigator.clipboard.writeText(window.location.origin+window.location.pathname+'#${id}').then(()=>{this.classList.add('copied');setTimeout(()=>this.classList.remove('copied'),1500)})" title="Copy link to this section">🔗</button></h3>`;
   });
+
+  return html;
+}
+
+function processCustomBlocks(html: string): string {
+  // Inline highlight: ==text==
+  html = html.replace(/==([^=]+)==/g, '<mark class="inline-highlight">$1</mark>');
+
+  // Callouts
+  html = html.replace(
+    /(?:<p>)?\[!NOTE\]([\s\S]*?)\[\/!NOTE\](?:<\/p>)?/gi,
+    (_, c) => `<div class="callout callout-note"><span class="callout-icon">ℹ</span><div class="callout-body">${c.trim()}</div></div>`,
+  );
+  html = html.replace(
+    /(?:<p>)?\[!WARNING\]([\s\S]*?)\[\/!WARNING\](?:<\/p>)?/gi,
+    (_, c) => `<div class="callout callout-warning"><span class="callout-icon">⚠</span><div class="callout-body">${c.trim()}</div></div>`,
+  );
+  html = html.replace(
+    /(?:<p>)?\[!KEY\]([\s\S]*?)\[\/!KEY\](?:<\/p>)?/gi,
+    (_, c) => `<div class="callout callout-key"><span class="callout-icon">🔑</span><div class="callout-body">${c.trim()}</div></div>`,
+  );
+  html = html.replace(
+    /(?:<p>)?\[!TIP\]([\s\S]*?)\[\/!TIP\](?:<\/p>)?/gi,
+    (_, c) => `<div class="callout callout-tip"><span class="callout-icon">💡</span><div class="callout-body">${c.trim()}</div></div>`,
+  );
+  html = html.replace(
+    /(?:<p>)?\[!DANGER\]([\s\S]*?)\[\/!DANGER\](?:<\/p>)?/gi,
+    (_, c) => `<div class="callout callout-danger"><span class="callout-icon">🔴</span><div class="callout-body">${c.trim()}</div></div>`,
+  );
+
+  // Pull quote
+  html = html.replace(
+    /(?:<p>)?\[!QUOTE\]([\s\S]*?)\[\/!QUOTE\](?:<\/p>)?/gi,
+    (_, c) => `<div class="pull-quote"><blockquote><p>${c.trim()}</p></blockquote></div>`,
+  );
+
+  // Single stat card
+  html = html.replace(
+    /(?:<p>)?\[!STAT\s+label="([^"]+)"\]([\s\S]*?)\[\/!STAT\](?:<\/p>)?/gi,
+    (_, label, value) => `<div class="stat-card"><div class="stat-label">${label}</div><div class="stat-value">${value.trim()}</div></div>`,
+  );
+
+  // Multi stat row
+  html = html.replace(
+    /(?:<p>)?\[!STATS\]\s*([\s\S]*?)\s*\[\/!STATS\](?:<\/p>)?/gi,
+    (_, content) => {
+      const items = content.trim().split("\n").filter(Boolean).map((line: string) => {
+        const [label, ...rest] = line.split("::");
+        const value = rest.join("::").trim();
+        return `<div class="stat-card"><div class="stat-label">${label.trim()}</div><div class="stat-value">${value}</div></div>`;
+      }).join("");
+      return `<div class="stat-row">${items}</div>`;
+    },
+  );
+
+  // Expandable section
+  html = html.replace(
+    /(?:<p>)?\[!EXPAND\s+title="([^"]+)"\]([\s\S]*?)\[\/!EXPAND\](?:<\/p>)?/gi,
+    (_, title, content) => `<details class="expandable-section"><summary class="expandable-summary">${title}</summary><div class="expandable-body"><p>${content.trim()}</p></div></details>`,
+  );
+
+  // Steps
+  html = html.replace(
+    /(?:<p>)?\[!STEPS\]\s*([\s\S]*?)\s*\[\/!STEPS\](?:<\/p>)?/gi,
+    (_, content) => {
+      const items = content.trim().split("\n").filter(Boolean).map((line: string, idx: number) => {
+        const [title, ...rest] = line.split("::");
+        const body = rest.join("::").trim();
+        return `<div class="step-item"><div class="step-number">${idx + 1}</div><div class="step-content"><strong class="step-title">${title.trim()}</strong>${body ? `<p class="step-body">${body}</p>` : ""}</div></div>`;
+      }).join("");
+      return `<div class="steps-block">${items}</div>`;
+    },
+  );
+
+  // Timeline
+  html = html.replace(
+    /(?:<p>)?\[!TIMELINE\]\s*([\s\S]*?)\s*\[\/!TIMELINE\](?:<\/p>)?/gi,
+    (_, content) => {
+      const items = content.trim().split("\n").filter(Boolean).map((line: string) => {
+        const [year, ...rest] = line.split("::");
+        const event = rest.join("::").trim();
+        return `<div class="timeline-item"><div class="timeline-dot"></div><div class="timeline-content"><span class="timeline-year">${year.trim()}</span><p class="timeline-event">${event}</p></div></div>`;
+      }).join("");
+      return `<div class="timeline-block"><div class="timeline-line"></div>${items}</div>`;
+    },
+  );
+
+  // Pros & Cons
+  html = html.replace(
+    /(?:<p>)?\[!PROSCONS\]\s*([\s\S]*?)\s*\[\/!PROSCONS\](?:<\/p>)?/gi,
+    (_, content) => {
+      const lines = content.trim().split("\n").filter(Boolean);
+      const pros = lines.filter((l: string) => l.trim().startsWith("+")).map((l: string) => `<li>${l.trim().slice(1).trim()}</li>`).join("");
+      const cons = lines.filter((l: string) => l.trim().startsWith("-")).map((l: string) => `<li>${l.trim().slice(1).trim()}</li>`).join("");
+      return `<div class="proscons-block"><div class="pros-col"><div class="proscons-header proscons-pros">✅ Pros</div><ul class="proscons-list">${pros}</ul></div><div class="cons-col"><div class="proscons-header proscons-cons">❌ Cons</div><ul class="proscons-list">${cons}</ul></div></div>`;
+    },
+  );
+
+  // Compare table
+  html = html.replace(
+    /(?:<p>)?\[!COMPARE\s+a="([^"]+)"\s+b="([^"]+)"\]\s*([\s\S]*?)\s*\[\/!COMPARE\](?:<\/p>)?/gi,
+    (_, labelA, labelB, content) => {
+      const rows = content.trim().split("\n").filter(Boolean).map((line: string) => {
+        const parts = line.split("|").map((p: string) => p.trim());
+        return `<tr><td>${parts[0] ?? ""}</td><td>${parts[1] ?? ""}</td></tr>`;
+      }).join("");
+      return `<div class="compare-block"><table class="compare-table"><thead><tr><th>${labelA}</th><th>${labelB}</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+    },
+  );
+
+  // FAQ
+  html = html.replace(
+    /(?:<p>)?\[!FAQ\]\s*([\s\S]*?)\s*\[\/!FAQ\](?:<\/p>)?/gi,
+    (_, content) => {
+      const [question, ...rest] = content.split("::");
+      const answer = rest.join("::").trim();
+      return `<details class="faq-item"><summary class="faq-question">${question.trim()}</summary><div class="faq-answer">${answer}</div></details>`;
+    },
+  );
+
+  // Figure
+  html = html.replace(
+    /(?:<p>)?\[!FIGURE\s+src="([^"]+)"(?:\s+caption="([^"]*)")?(?:\s+credit="([^"]*)")?(?:\s+creditUrl="([^"]*)")?\]\[\/!FIGURE\](?:<\/p>)?/gi,
+    (_, src, caption, credit, creditUrl) => {
+      const creditHtml = credit
+        ? `<span class="img-credit">Source: ${creditUrl ? `<a href="${creditUrl}" target="_blank" rel="noopener noreferrer">${credit}</a>` : credit}</span>`
+        : "";
+      return `<figure class="article-figure"><img src="${src}" alt="${caption || ""}" loading="lazy" />${caption ? `<figcaption>${caption}${creditHtml ? " " + creditHtml : ""}</figcaption>` : creditHtml ? `<figcaption>${creditHtml}</figcaption>` : ""}</figure>`;
+    },
+  );
 
   return html;
 }

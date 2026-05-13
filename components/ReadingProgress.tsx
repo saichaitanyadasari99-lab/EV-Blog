@@ -26,6 +26,7 @@ export function ReadingProgress() {
       aria-valuemin={0}
       aria-valuemax={100}
       aria-label="Reading progress"
+      style={{ width: `${progress}%` }}
     />
   );
 }
