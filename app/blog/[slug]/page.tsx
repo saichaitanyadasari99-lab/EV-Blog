@@ -43,7 +43,7 @@ function extractHeadings(html: string) {
     .map((match) => {
       const raw = match[0];
       const inner = match[1] ?? "";
-      const text = stripTags(inner);
+      const text = stripTags(inner.replace(/<button[^>]*class="anchor-btn"[^>]*>.*?<\/button>/gi, ""));
       const idAttr = raw.match(/id="([^"]+)"/);
       const id = idAttr
         ? idAttr[1]

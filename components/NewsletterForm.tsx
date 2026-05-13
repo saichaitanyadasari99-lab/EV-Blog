@@ -65,10 +65,10 @@ export function NewsletterForm({ compact = false }: { compact?: boolean }) {
           onChange={(e) => setName(e.target.value)}
           disabled={status === "loading" || status === "success"}
           style={{
-            background: "var(--surface3)",
-            border: "1px solid var(--border2)",
+            background: "rgba(255,255,255,0.15)",
+            border: "1px solid rgba(255,255,255,0.25)",
             borderRadius: "8px",
-            color: "var(--text)",
+            color: "#fff",
             fontSize: "13px",
             height: "36px",
             padding: "0 12px",
@@ -82,10 +82,10 @@ export function NewsletterForm({ compact = false }: { compact?: boolean }) {
           onChange={(e) => setEmail(e.target.value)}
           disabled={status === "loading" || status === "success"}
           style={{
-            background: "var(--surface3)",
-            border: "1px solid var(--border2)",
+            background: "rgba(255,255,255,0.15)",
+            border: "1px solid rgba(255,255,255,0.25)",
             borderRadius: "8px",
-            color: "var(--text)",
+            color: "#fff",
             fontSize: "13px",
             height: "36px",
             padding: "0 12px",
@@ -96,12 +96,12 @@ export function NewsletterForm({ compact = false }: { compact?: boolean }) {
           type="submit" 
           disabled={status === "loading" || status === "success"}
           style={{
-            background: "var(--accent)",
+            background: "#fff",
             border: "none",
             borderRadius: "8px",
-            color: "#000",
+            color: "var(--brand-xdark)",
             cursor: "pointer",
-            fontFamily: "var(--font-ibm-mono)",
+            fontFamily: "var(--font-syne), sans-serif",
             fontSize: "12px",
             fontWeight: 700,
             height: "36px",

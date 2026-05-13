@@ -42,7 +42,7 @@ export function TableOfContents({ headings }: TableOfContentsProps) {
 
   return (
     <nav aria-label="Table of contents">
-      <ul className="sidebar-list">
+      <ul className="toc-list">
         {headings.map((heading) => (
           <li
             key={heading.id}
