@@ -37,6 +37,10 @@ function stripTags(value: string) {
   return value.replace(/<[^>]*>/g, "").trim();
 }
 
+function stripH1(value: string): string {
+  return value.replace(/<h1[^>]*>.*?<\/h1>/i, "");
+}
+
 function extractHeadings(html: string) {
   const matches = [...html.matchAll(/<h2[^>]*>(.*?)<\/h2>/gi)];
   return matches
@@ -184,7 +188,7 @@ export default async function BlogPostPage({ params }: Params) {
     ? markdownToHtml(postRecord.markdown_content)
     : renderTiptapHtml(post?.content ?? null);
   const quizzes = extractQuizzes(html);
-  const cleanHtml = quizzes.length > 0 ? stripQuizBlocks(html) : html;
+  const cleanHtml = stripH1(quizzes.length > 0 ? stripQuizBlocks(html) : html);
   const references = postRecord.references ?? [];
   const headings = extractHeadings(cleanHtml);
 
