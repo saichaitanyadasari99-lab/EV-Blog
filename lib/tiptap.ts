@@ -256,6 +256,74 @@ function processCustomBlocks(html: string): string {
     },
   );
 
+  // Equation block
+  html = html.replace(
+    /(?:<p>)?\[!EQ\s+label="([^"]+)"\]\s*([\s\S]*?)\s*\[\/!EQ\](?:<\/p>)?/gi,
+    (_, label, formula) => {
+      const f = formula.trim();
+      let rendered = escapeHtml(f);
+      try {
+        rendered = katex.renderToString(f, { displayMode: true, throwOnError: false });
+      } catch { /* fallback to escaped formula */ }
+      return `<div class="equation-block"><span class="equation-label">${label}</span><div class="katex-display">${rendered}</div></div>`;
+    },
+  );
+
+  // Tabs
+  let tabCounter = 0;
+  html = html.replace(
+    /(?:<p>)?\[!TABS((?:\s+t\d+="[^"]*")+)\]\s*([\s\S]*?)\s*\[\/!TABS\](?:<\/p>)?/gi,
+    (_, attribs, content) => {
+      const labels: string[] = [];
+      const labelRe = /t(\d+)="([^"]*)"/g;
+      let m: RegExpExecArray | null;
+      while ((m = labelRe.exec(attribs)) !== null) {
+        labels[parseInt(m[1]) - 1] = m[2];
+      }
+      const tabId = `tabs_${tabCounter++}`;
+      const panels = content.split("---TAB---");
+      const tabButtons = labels.map((label, idx) =>
+        `<button class="tab-btn${idx === 0 ? " active" : ""}" onclick="evpulseTab('${tabId}',${idx})" id="${tabId}_btn${idx}">${label}</button>`,
+      ).join("");
+      const tabPanels = panels.map((panel: string, idx: number) =>
+        `<div class="tab-panel${idx === 0 ? " active" : ""}" id="${tabId}_panel${idx}">${panel.trim()}</div>`,
+      ).join("");
+      return `<div class="tabs-block" id="${tabId}"><div class="tab-buttons">${tabButtons}</div><div class="tab-panels">${tabPanels}</div></div>`;
+    },
+  );
+
+  // Quiz
+  let quizCounter = 0;
+  html = html.replace(
+    /(?:<p>)?\[!QUIZ\s+q="([^"]+)"\s+a1="([^"]+)"\s+a2="([^"]+)"\s+a3="([^"]+)"\s+a4="([^"]+)"\s+correct=(\d+)\]([\s\S]*?)\[\/!QUIZ\](?:<\/p>)?/gi,
+    (_match, q, a1, a2, a3, a4, correct, explanation) => {
+      const answers = [a1, a2, a3, a4];
+      const correctIdx = parseInt(correct, 10) - 1;
+      const id = `quiz_${quizCounter++}`;
+      const escapedId = id.replace(/'/g, "\\'");
+      const answersJson = JSON.stringify(answers).replace(/"/g, "&quot;");
+      const optionsHtml = answers.map((ans: string, idx: number) => {
+        const isCorrect = idx === correctIdx;
+        return `<button class="quiz-option" data-correct="${isCorrect}" data-quiz="${id}" onclick="(function(btn){var all=document.querySelectorAll('[data-quiz=\\'${escapedId}\\']');all.forEach(function(b){b.disabled=true;b.classList.remove('correct','incorrect');b.classList.add(b.dataset.correct==='true'?'correct':'incorrect')});var exp=document.getElementById('${escapedId}_exp');if(exp)exp.style.display='block'})(this)">${ans}</button>`;
+      }).join("");
+      return `<div class="quiz-block" data-question="${q}" data-answers="${answersJson}" data-correct="${correct}" data-explanation="${explanation.trim()}"><p class="quiz-question"><strong>Q:</strong> ${q}</p><div class="quiz-options">${optionsHtml}</div><div class="quiz-explanation" id="${id}_exp" style="display:none"><p>${explanation.trim()}</p></div></div>`;
+    },
+  );
+
+  // Poll
+  let pollCounter = 0;
+  html = html.replace(
+    /(?:<p>)?\[!POLL\s+q="([^"]+)"\]\s*([\s\S]*?)\s*\[\/!POLL\](?:<\/p>)?/gi,
+    (_, question, content) => {
+      const options = content.trim().split("|").map((o: string) => o.trim()).filter(Boolean);
+      const pollId = `poll_${pollCounter++}`;
+      const optionsHtml = options.map((opt: string, idx: number) =>
+        `<button class="poll-option" data-poll="${pollId}" data-option="${idx}" id="${pollId}_opt${idx}"><span class="poll-label">${opt}</span><span class="poll-bar-wrap"><span class="poll-bar" id="${pollId}_bar${idx}"></span></span><span class="poll-pct" id="${pollId}_pct${idx}">—</span></button>`,
+      ).join("");
+      return `<div class="poll-block" data-poll-id="${pollId}" id="${pollId}"><p class="poll-question"><strong>Poll:</strong> ${question}</p><div class="poll-options">${optionsHtml}</div><p class="poll-note">Tap to vote</p></div>`;
+    },
+  );
+
   return html;
 }
 
