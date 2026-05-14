@@ -6,6 +6,8 @@ import type { PostRecord } from "@/types/post";
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://www.evpulse.co.in";
 
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: "All EV Battery Articles & Technical Analysis",
   description: "Browse the complete archive of EV battery research notes, benchmarks, and explainers — covering cell chemistry, BMS design, thermal management, charging infrastructure, and vehicle reviews.",

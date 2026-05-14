@@ -9,6 +9,8 @@ import type { PostRecord } from "@/types/post";
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://www.evpulse.co.in";
 
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   alternates: { canonical: baseUrl },
 };
