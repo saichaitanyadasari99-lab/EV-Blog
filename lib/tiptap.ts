@@ -225,13 +225,21 @@ function processCustomBlocks(html: string): string {
 
   // Compare table
   html = html.replace(
-    /(?:<p>)?\[!COMPARE\s+a="([^"]+)"\s+b="([^"]+)"\]\s*([\s\S]*?)\s*\[\/!COMPARE\](?:<\/p>)?/gi,
-    (_, labelA, labelB, content) => {
-      const rows = content.trim().split("\n").filter(Boolean).map((line: string) => {
+    /(?:<p>)?\[!COMPARE\s+a="([^"]+)"\s+b="([^"]+)"(?:\s+c="([^"]*)")?\](?:\s*([\s\S]*?)\s*\[\/!COMPARE\])?(?:<\/p>)?/gi,
+    (_, labelA, labelB, labelC, content) => {
+      const threeCol = !!labelC;
+      const parseRow = (line: string) => {
         const parts = line.split("|").map((p: string) => p.trim());
-        return `<tr><td>${parts[0] ?? ""}</td><td>${parts[1] ?? ""}</td></tr>`;
-      }).join("");
-      return `<div class="compare-block"><table class="compare-table"><thead><tr><th>${labelA}</th><th>${labelB}</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+        const cells = [parts[0] ?? "", parts[1] ?? ""];
+        if (threeCol) cells.push(parts[2] ?? "");
+        return `<tr>${cells.map((c) => `<td>${c}</td>`).join("")}</tr>`;
+      };
+      const rows = content?.trim()
+        ? content.trim().split("\n").filter(Boolean).map(parseRow).join("")
+        : `<tr><td colspan="${threeCol ? 3 : 2}" style="text-align:center;padding:14px;color:var(--text3)">—</td></tr>`;
+      const headers = [labelA, labelB];
+      if (threeCol) headers.push(labelC);
+      return `<div class="compare-block"><table class="compare-table"><thead><tr>${headers.map((h) => `<th>${h}</th>`).join("")}</tr></thead><tbody>${rows}</tbody></table></div>`;
     },
   );
 

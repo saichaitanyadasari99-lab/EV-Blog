@@ -214,25 +214,22 @@ function preprocessCustomBlocks(markdown: string): {
   );
 
   text = text.replace(
-    /\[!COMPARE\s+a="([^"]+)"\s+b="([^"]+)"\]([\s\S]*?)\[\/!COMPARE\]/g,
-    (_, labelA, labelB, content) => {
+    /\[!COMPARE\s+a="([^"]+)"\s+b="([^"]+)"(?:\s+c="([^"]*)")?\](?:([\s\S]*?)\[\/!COMPARE\])?/g,
+    (_, labelA, labelB, labelC, content) => {
+      const threeCol = !!labelC;
+      const parseRow = (line: string) => {
+        const parts = line.split("|");
+        const cells = [formatInline(parts[0]?.trim() ?? ""), formatInline(parts[1]?.trim() ?? "")];
+        if (threeCol) cells.push(formatInline(parts[2]?.trim() ?? ""));
+        return `<tr>${cells.map((c) => `<td>${c}</td>`).join("")}</tr>`;
+      };
       const rows = content
-        .trim()
-        .split("\n")
-        .filter(Boolean)
-        .map((line: string) => {
-          const parts = line.split("|");
-          const cellA = parts[0]?.trim() ?? "";
-          const cellB = parts[1]?.trim() ?? "";
-          return `<tr><td>${formatInline(cellA)}</td><td>${formatInline(
-            cellB
-          )}</td></tr>`;
-        })
-        .join("");
+        ? content.trim().split("\n").filter(Boolean).map(parseRow).join("")
+        : `<tr><td colspan="${threeCol ? 3 : 2}" style="text-align:center;padding:14px;color:var(--text3)">—</td></tr>`;
+      const headers = [escapeHtml(labelA), escapeHtml(labelB)];
+      if (threeCol) headers.push(escapeHtml(labelC));
       return register(
-        `<div class="compare-block"><table class="compare-table"><thead><tr><th>${escapeHtml(
-          labelA
-        )}</th><th>${escapeHtml(labelB)}</th></tr></thead><tbody>${rows}</tbody></table></div>`
+        `<div class="compare-block"><table class="compare-table"><thead><tr>${headers.map((h) => `<th>${h}</th>`).join("")}</tr></thead><tbody>${rows}</tbody></table></div>`
       );
     }
   );

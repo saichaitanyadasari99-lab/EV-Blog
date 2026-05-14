@@ -2013,12 +2013,12 @@ a {
 .layout {
   align-items: start;
   display: grid;
-  gap: 64px;
-  grid-template-columns: minmax(0, 720px) 280px;
+  gap: 40px;
+  grid-template-columns: minmax(0, 768px) 280px;
 }
 
 .article {
-  max-width: 720px;
+  max-width: 768px;
 }
 
 .article h1 {
@@ -6716,22 +6716,22 @@ tr.winner-row {
   }
   
   .article-content {
-    font-size: 16px;
+    font-size: 15px;
     line-height: 1.75;
-    padding: 18px 16px;
+    padding: 22px 20px;
   }
   
   .article-content h2 {
-    font-size: 1.4rem;
+    font-size: 1.3rem;
     margin: 32px 0 14px;
   }
   
   .article-content h3 {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
   }
   
   .article-content p {
-    font-size: 16px;
+    font-size: 15px;
     margin-bottom: 16px;
   }
   
