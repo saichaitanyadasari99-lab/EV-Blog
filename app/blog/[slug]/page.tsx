@@ -14,7 +14,6 @@ import { ReadingProgress } from "@/components/ReadingProgress";
 import { TableOfContents } from "@/components/TableOfContents";
 import { getArticleSchema, getFAQSchema, getBreadcrumbSchema } from "@/lib/schema";
 import { ArticleContent } from "@/components/ArticleContent";
-import { ReactionBar } from "@/components/ReactionBar";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { MobileTOC } from "@/components/MobileTOC";
 import { BottomTabBar } from "@/components/BottomTabBar";
@@ -336,8 +335,6 @@ export default async function BlogPostPage({ params }: Params) {
           <section className="article-content prose">
             <ArticleContent html={cleanHtml} quizzes={quizzes} />
           </section>
-
-          <ReactionBar />
 
           {/* Author Bio - E-E-A-T Signal */}
           <section className="author-bio">

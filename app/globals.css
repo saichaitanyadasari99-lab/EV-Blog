@@ -2015,6 +2015,8 @@ a {
   display: grid;
   gap: 40px;
   grid-template-columns: minmax(0, 768px) 280px;
+  max-width: 1100px;
+  margin: 0 auto;
 }
 
 .article {
@@ -3717,7 +3719,7 @@ a {
 
 .compare-table thead th:not(:first-child) {
   text-align: center;
-  padding: 12px 8px;
+  padding: 14px 16px;
   font-family: var(--font-syne), sans-serif;
   font-weight: 700;
   font-size: 0.9rem;
@@ -3728,12 +3730,12 @@ a {
   color: var(--text2);
   font-size: 0.82rem;
   background: var(--surface2);
-  padding: 10px 14px;
+  padding: 12px 16px;
 }
 
 .compare-table tbody td:not(:first-child) {
   text-align: center;
-  padding: 10px 8px;
+  padding: 12px 16px;
 }
 
 .compare-table tbody tr:hover td {
@@ -6744,6 +6746,19 @@ tr.winner-row {
     display: block;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
+  }
+
+  .article-content .compare-block {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .article-content .callout-body {
+    font-size: 0.88rem;
+  }
+
+  .article-content .compare-table {
+    font-size: 0.8rem;
   }
 
   .article-faqs {

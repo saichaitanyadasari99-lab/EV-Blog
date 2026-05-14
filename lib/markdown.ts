@@ -422,7 +422,7 @@ function preprocessCustomBlocks(markdown: string): {
   );
 
   text = text.replace(
-    /\[!FIGURE\s+src="([^"]+)"(?:\s+caption="([^"]*)")?(?:\s+credit="([^"]*)")?(?:\s+creditUrl="([^"]*)")?\]\[\/!FIGURE\]/g,
+    /\[!FIGURE\s+src="([^"]+)"(?:\s+caption="([^"]*)")?(?:\s+credit="([^"]*)")?(?:\s+creditUrl="([^"]*)")?(?:\s*\/)?\](?:\s*\[\/!FIGURE\])?/g,
     (_, src, caption, credit, creditUrl) => {
       const captionHtml = caption
         ? `<figcaption>${escapeHtml(caption)}${

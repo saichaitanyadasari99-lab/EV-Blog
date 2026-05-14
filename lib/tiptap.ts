@@ -255,7 +255,7 @@ function processCustomBlocks(html: string): string {
 
   // Figure
   html = html.replace(
-    /(?:<p>)?\[!FIGURE\s+src="([^"]+)"(?:\s+caption="([^"]*)")?(?:\s+credit="([^"]*)")?(?:\s+creditUrl="([^"]*)")?\]\[\/!FIGURE\](?:<\/p>)?/gi,
+    /(?:<p>)?\[!FIGURE\s+src="([^"]+)"(?:\s+caption="([^"]*)")?(?:\s+credit="([^"]*)")?(?:\s+creditUrl="([^"]*)")?(?:\s*\/)?\](?:\s*\[\/!FIGURE\])?(?:<\/p>)?/gi,
     (_, src, caption, credit, creditUrl) => {
       const creditHtml = credit
         ? `<span class="img-credit">Source: ${creditUrl ? `<a href="${creditUrl}" target="_blank" rel="noopener noreferrer">${credit}</a>` : credit}</span>`

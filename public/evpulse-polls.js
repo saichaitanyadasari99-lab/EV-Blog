@@ -8,12 +8,20 @@ window.evpulsePollVote = async function(pollId, idx) {
       body: JSON.stringify({pollId: pollId, optionIndex: idx})
     });
     if (res.status === 409) { localStorage.setItem(storageKey, '1'); return; }
-    if (!res.ok) return;
-    var data = await res.json();
-    localStorage.setItem(storageKey, '1');
-    var btns = document.querySelectorAll('[data-poll="' + pollId + '"]');
-    evpulseShowPollResults(pollId, data.counts, data.total);
+    if (res.ok) {
+      var data = await res.json();
+      localStorage.setItem(storageKey, '1');
+      if (data && data.counts) {
+        evpulseShowPollResults(pollId, data.counts, data.total);
+        return;
+      }
+    }
   } catch(e) {}
+  // Fallback: store vote locally even if API fails
+  localStorage.setItem(storageKey, '1');
+  var localCounts = {};
+  localCounts[idx] = 1;
+  evpulseShowPollResults(pollId, localCounts, 1);
 };
 window.evpulseShowPollResults = function(pollId, counts, total) {
   var btns = document.querySelectorAll('[data-poll="' + pollId + '"]');
