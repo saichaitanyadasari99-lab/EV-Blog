@@ -322,6 +322,12 @@ function getEmailHtml(posts: Post[], unsubUrl: string) {
       .card { padding: 24px 20px !important; }
       .split-left, .split-right { display: block !important; width: 100% !important; }
       .split-img-mobile { width: 100% !important; height: 180px !important; margin-bottom: 16px !important; }
+      .split-img-mobile img { width: 100% !important; height: 180px !important; object-fit: cover !important; }
+      .card h1 { font-size: 18px !important; }
+      .card h2 { font-size: 17px !important; }
+      .card p { font-size: 13px !important; }
+      .split-right h2, .split-left h2 { font-size: 14px !important; }
+      .split-right p, .split-left p { font-size: 11px !important; line-height: 1.4 !important; }
       .btn { display: block !important; text-align: center !important; }
     }
   </style>
@@ -360,7 +366,7 @@ function getEmailHtml(posts: Post[], unsubUrl: string) {
             <h1 style="margin:0 0 14px 0; font-size:22px; font-weight:700; line-height:1.25; letter-spacing:-0.02em; color:#0a0a0a; font-family:${fp};">
               ${heroTitle}
             </h1>
-            <div style="border-radius:12px; overflow:hidden; margin-bottom:18px; background-color:#f0fafb;">
+            <div style="border-radius:12px; overflow:hidden; margin-bottom:18px; background-color:#f0fafb; text-align:center;">
               ${heroCover ? `<img src="${heroCover}" alt="" width="100%" style="width:100%; height:auto; max-height:300px; object-fit:cover; display:block;" />` : ''}
             </div>
             <p style="margin:0 0 16px 0; font-size:14px; line-height:1.65; color:#4b5563; font-family:${fp};">
@@ -406,8 +412,8 @@ function getEmailHtml(posts: Post[], unsubUrl: string) {
             <table width="100%" cellpadding="0" cellspacing="0" border="0">
               <tr>
                 ${isLeftImg ? `
-                <td class="split-left split-img-mobile" valign="top" style="width:140px; padding-right:18px;">
-                  ${c.cover ? `<img src="${c.cover}" alt="" width="140" style="width:140px; height:100px; object-fit:cover; border-radius:8px; display:block;" />` : `<div style="width:140px; height:100px; background:linear-gradient(135deg,#e0f2fe,#bae6fd); border-radius:8px;"></div>`}
+                <td class="split-left split-img-mobile" valign="top" style="width:140px; padding-right:18px; text-align:center;">
+                  ${c.cover ? `<img src="${c.cover}" alt="" style="width:100%; max-width:140px; height:100px; object-fit:cover; border-radius:8px; display:block;" />` : `<div style="width:140px; height:100px; background:linear-gradient(135deg,#e0f2fe,#bae6fd); border-radius:8px;"></div>`}
                 </td>
                 <td class="split-right" valign="top">
                   ${c.badge ? `<p style="margin:0 0 6px 0;">${c.badge}</p>` : ''}
@@ -421,8 +427,8 @@ function getEmailHtml(posts: Post[], unsubUrl: string) {
                   <p style="margin:0 0 10px 0; font-size:12px; line-height:1.55; color:#6b7280; font-family:${fp};">${c.excerpt}</p>
                   <a href="${BASE_URL}/blog/${c.slug}" target="_blank" style="font-size:12px; font-weight:700; color:#0099b8; font-family:${fp};">Read article →</a>
                 </td>
-                <td class="split-right split-img-mobile" valign="top" style="width:140px;">
-                  ${c.cover ? `<img src="${c.cover}" alt="" width="140" style="width:140px; height:100px; object-fit:cover; border-radius:8px; display:block;" />` : `<div style="width:140px; height:100px; background:linear-gradient(135deg,#e0f2fe,#bae6fd); border-radius:8px;"></div>`}
+                <td class="split-right split-img-mobile" valign="top" style="width:140px; text-align:center;">
+                  ${c.cover ? `<img src="${c.cover}" alt="" style="width:100%; max-width:140px; height:100px; object-fit:cover; border-radius:8px; display:block;" />` : `<div style="width:140px; height:100px; background:linear-gradient(135deg,#e0f2fe,#bae6fd); border-radius:8px;"></div>`}
                 </td>`}
               </tr>
             </table>
