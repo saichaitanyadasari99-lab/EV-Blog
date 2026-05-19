@@ -333,9 +333,9 @@ function getEmailHtml(posts: Post[], unsubUrl: string) {
   </div>
   <!--<![endif]-->
 <div style="background-color:#f0efea; padding:0; margin:0;">
-  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f0efea; padding:32px 16px;">
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f0efea;">
     <tr>
-      <td align="center">
+      <td align="center" style="padding:32px 16px;">
       <table width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;">
         <!-- BRANDED HEADER -->
         <tr>
@@ -435,13 +435,7 @@ function getEmailHtml(posts: Post[], unsubUrl: string) {
             <table cellpadding="0" cellspacing="0" border="0" align="center" style="margin-bottom:18px;">
               <tr>
                 <td style="padding:0 8px;">
-                  <a href="${BASE_URL}" target="_blank" style="display:inline-block; width:34px; height:34px; background-color:#e5e7eb; border-radius:50%; text-align:center; line-height:34px; font-size:12px; font-weight:700; color:#374151; font-family:${fp};">W</a>
-                </td>
-                <td style="padding:0 8px;">
-                  <a href="https://www.linkedin.com/company/evpulse" target="_blank" style="display:inline-block; width:34px; height:34px; background-color:#e5e7eb; border-radius:50%; text-align:center; line-height:34px; font-size:12px; font-weight:700; color:#374151; font-family:${fp};">in</a>
-                </td>
-                <td style="padding:0 8px;">
-                  <a href="${BASE_URL}" target="_blank" style="display:inline-block; width:34px; height:34px; background-color:#e5e7eb; border-radius:50%; text-align:center; line-height:34px; font-size:12px; font-weight:700; color:#374151; font-family:${fp};">X</a>
+                  <a href="${BASE_URL}" target="_blank" style="display:inline-block; width:34px; height:34px; background-color:#e5e7eb; border-radius:50%; text-align:center; line-height:34px; font-size:12px; font-weight:700; color:#374151; font-family:${fp};">in</a>
                 </td>
               </tr>
             </table>
@@ -475,6 +469,7 @@ async function sendEmailBrevo(toEmail: string, subject: string, html: string) {
     },
     body: JSON.stringify({
       sender: { email: "chaitanya_dasari@evpulse.co.in", name: "EVPulse" },
+      replyTo: { email: "chaitanya_dasari@evpulse.co.in", name: "EVPulse" },
       to: [{ email: toEmail }],
       subject: subject,
       htmlContent: html,
