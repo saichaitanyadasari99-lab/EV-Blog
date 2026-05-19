@@ -322,7 +322,8 @@ function getEmailHtml(posts: Post[], unsubUrl: string) {
       .card { padding: 24px 20px !important; }
       .split-left, .split-right { display: block !important; width: 100% !important; }
       .split-img-mobile { width: 100% !important; height: 180px !important; margin-bottom: 16px !important; }
-      .split-img-mobile img { width: 100% !important; height: 180px !important; object-fit: cover !important; }
+      .split-img-mobile img { width: 100% !important; height: 180px !important; object-fit: cover !important; max-width: none !important; }
+      .split-img-mobile div { width: 100% !important; height: 180px !important; max-width: none !important; }
       .card h1 { font-size: 18px !important; }
       .card h2 { font-size: 17px !important; }
       .card p { font-size: 13px !important; }
@@ -441,7 +442,10 @@ function getEmailHtml(posts: Post[], unsubUrl: string) {
             <table cellpadding="0" cellspacing="0" border="0" align="center" style="margin-bottom:18px;">
               <tr>
                 <td style="padding:0 8px;">
-                  <a href="${BASE_URL}" target="_blank" style="display:inline-block; width:34px; height:34px; background-color:#e5e7eb; border-radius:50%; text-align:center; line-height:34px; font-size:12px; font-weight:700; color:#374151; font-family:${fp};">in</a>
+                  <a href="https://www.linkedin.com/in/dasarisaisrinivasachaitanya/" target="_blank" style="display:inline-block; width:34px; height:34px; background-color:#e5e7eb; border-radius:50%; text-align:center; line-height:34px; font-size:12px; font-weight:700; color:#374151; font-family:${fp};">in</a>
+                </td>
+                <td style="padding:0 8px;">
+                  <a href="https://github.com/saichaitanyadasari99-lab" target="_blank" style="display:inline-block; width:34px; height:34px; background-color:#e5e7eb; border-radius:50%; text-align:center; line-height:34px; font-size:12px; font-weight:700; color:#374151; font-family:${fp};">GH</a>
                 </td>
               </tr>
             </table>
