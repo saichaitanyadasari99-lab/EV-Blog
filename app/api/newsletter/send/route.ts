@@ -351,10 +351,13 @@ function getEmailHtml(posts: Post[], unsubUrl: string) {
             <p style="margin:6px 0 0 0; font-size:12px; color:rgba(255,255,255,0.8); font-family:${fp};">Battery Engineering Dispatch · Issue #${issueNum}</p>
           </td>
         </tr>
-        <!-- AUTHOR INTRO -->
+        <!-- PULL QUOTE -->
         <tr>
-          <td class="card" style="background-color:#ffffff; padding:28px 32px 12px; border-bottom:1px solid #e5e7eb;">
-            <p style="margin:0 0 8px 0; font-size:14px; line-height:1.7; color:#4b5563; font-family:${fp};">Hey — Chaitanya here. This week I'm sharing the latest battery engineering analysis, benchmarks, and tools from EVPulse. Thanks for reading.</p>
+          <td class="card" style="background-color:#ffffff; padding:24px 32px; border-bottom:1px solid #e5e7eb;">
+            <div style="border-left:4px solid #0099b8; padding-left:16px;">
+              <p style="margin:0 0 4px 0; font-size:13px; line-height:1.6; color:#4b5563; font-style:italic; font-family:${fp};">&ldquo;${getPullQuote(post0)}&rdquo;</p>
+              <p style="margin:0; font-size:11px; color:#9ca3af; font-family:${fp};">&mdash; Key insight from this issue</p>
+            </div>
           </td>
         </tr>
         <!-- LEAD STORY -->
