@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>EVPulse — Article Design Mockup</title>
+<style>
+/* ─── TOKENS ─────────────────────────────────────────────── */
+:root {
+  --brand:      #00B4D8;
+  --brand-dim:  rgba(0,180,216,.12);
+  --brand-dark: #0096B4;
+
+  /* dark mode */
+  --bg:         #0B1120;
+  --surface:    #101828;
+  --surface2:   #1A2540;
+  --border:     rgba(255,255,255,.08);
+  --border2:    rgba(255,255,255,.13);
+  --text1:      #F0F4FF;
+  --text2:      #8FA3C0;
+  --text3:      #4D6080;
+
+  --amber:      #F59E0B;
+  --amber-dim:  rgba(245,158,11,.1);
+  --green:      #10B981;
+  --green-dim:  rgba(16,185,129,.1);
+  --red:        #EF4444;
+  --red-dim:    rgba(239,68,68,.1);
+  --purple:     #A78BFA;
+  --purple-dim: rgba(167,139,250,.1);
+
+  --r-sm:  6px;
+  --r-md:  10px;
+  --r-lg:  14px;
+  --r-xl:  20px;
+
+  --serif: Georgia, "Times New Roman", serif;
+  --mono:  "JetBrains Mono", "Fira Code", "Courier New", monospace;
+  --sans:  -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+
+  --shadow-sm: 0 1px 3px rgba(0,0,0,.4);
+  --shadow-md: 0 4px 16px rgba(0,0,0,.45);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,.55);
+}
+[data-theme="light"] {
+  --bg:      #F8FAFB;
+  --surface: #FFFFFF;
+  --surface2:#F1F5F9;
+  --border:  rgba(0,0,0,.09);
+  --border2: rgba(0,0,0,.14);
+  --text1:   #0F172A;
+  --text2:   #475569;
+  --text3:   #94A3B8;
+}
+
+/* ─── RESET ──────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { background: var(--bg); color: var(--text1); font-family: var(--sans); font-size: 16px; line-height: 1.7; }
+img { display: block; max-width: 100%; }
+a { text-decoration: none; color: inherit; }
+
+/* ─── THEME TOGGLE ───────────────────────────────────────── */
+.theme-btn {
+  position: fixed; top: 16px; right: 20px; z-index: 999;
+  background: var(--surface); border: 1px solid var(--border2);
+  color: var(--text2); padding: 6px 14px; border-radius: 100px;
+  font-size: 12px; font-weight: 600; cursor: pointer; letter-spacing: .04em;
+  transition: all .2s;
+}
+.theme-btn:hover { border-color: var(--brand); color: var(--brand); }
+
+/* ─── READING PROGRESS ───────────────────────────────────── */
+#progress-bar {
+  position: fixed; top: 0; left: 0; height: 2px; z-index: 1000;
+  background: linear-gradient(90deg, var(--brand), var(--purple));
+  width: 45%; transition: width .1s linear;
+}
+
+/* ─── NAV ────────────────────────────────────────────────── */
+.nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(11,17,32,.85);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 32px;
+  height: 56px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+[data-theme="light"] .nav { background: rgba(248,250,251,.9); }
+.nav-logo { font-size: 18px; font-weight: 800; color: var(--text1); }
+.nav-logo span { color: var(--brand); }
+.nav-links { display: flex; gap: 28px; }
+.nav-links a { font-size: 13px; font-weight: 500; color: var(--text2); transition: color .18s; }
+.nav-links a:hover { color: var(--brand); }
+.nav-cta {
+  background: var(--brand); color: #fff;
+  padding: 7px 18px; border-radius: 100px;
+  font-size: 12px; font-weight: 700; letter-spacing: .05em;
+  transition: background .18s;
+}
+.nav-cta:hover { background: var(--brand-dark); color: #fff; }
+
+/* ─── BREADCRUMB ─────────────────────────────────────────── */
+.crumb {
+  max-width: 1100px; margin: 0 auto;
+  padding: 16px 32px 0;
+  display: flex; align-items: center; gap: 8px;
+  font-size: 12px; color: var(--text3);
+  font-family: var(--mono);
+}
+.crumb a { color: var(--text3); transition: color .18s; }
+.crumb a:hover { color: var(--brand); }
+.crumb-sep { color: var(--text3); opacity: .5; }
+.crumb-current { color: var(--text2); }
+
+/* ─── ARTICLE HERO ───────────────────────────────────────── */
+.article-hero {
+  max-width: 1100px; margin: 0 auto;
+  padding: 24px 32px 0;
+}
+.hero-cover {
+  width: 100%;
+  aspect-ratio: 21/8;
+  border-radius: var(--r-xl);
+  overflow: hidden;
+  position: relative;
+  background: linear-gradient(135deg, #071428 0%, #0E2444 40%, #091C38 70%, #071428 100%);
+  display: flex; align-items: flex-end;
+  border: 1px solid var(--border2);
+}
+/* decorative circuit pattern */
+.hero-cover::before {
+  content: "";
+  position: absolute; inset: 0;
+  background-image:
+    radial-gradient(circle at 20% 50%, rgba(0,180,216,.15) 0%, transparent 50%),
+    radial-gradient(circle at 80% 30%, rgba(167,139,250,.08) 0%, transparent 45%);
+}
+.hero-cover-svg {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  opacity: .18;
+}
+.hero-cover-content {
+  position: relative; z-index: 2;
+  padding: 40px 48px;
+  width: 100%;
+  background: linear-gradient(to top, rgba(7,20,40,.95) 0%, rgba(7,20,40,.6) 60%, transparent 100%);
+}
+.hero-badges {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 16px;
+}
+.badge-cat {
+  font-size: 10px; font-weight: 700; letter-spacing: .1em;
+  text-transform: uppercase; padding: 4px 12px;
+  border-radius: 100px;
+  background: var(--brand-dim); color: var(--brand);
+  border: 1px solid rgba(0,180,216,.25);
+  font-family: var(--mono);
+}
+.badge-tier {
+  font-size: 10px; font-weight: 700; letter-spacing: .1em;
+  text-transform: uppercase; padding: 4px 12px;
+  border-radius: 100px;
+  background: var(--purple-dim); color: var(--purple);
+  border: 1px solid rgba(167,139,250,.25);
+  font-family: var(--mono);
+}
+.hero-cover-content h1 {
+  font-size: clamp(22px, 3vw, 36px);
+  font-weight: 700; line-height: 1.25;
+  color: #fff; max-width: 700px;
+  font-family: var(--sans);
+  letter-spacing: -.01em;
+}
+.hero-meta {
+  margin-top: 14px;
+  display: flex; align-items: center; gap: 16px;
+  font-size: 12px; color: rgba(255,255,255,.55);
+  font-family: var(--mono);
+}
+.hero-meta-dot { opacity: .4; }
+.hero-read-time {
+  display: flex; align-items: center; gap: 5px;
+}
+
+/* ─── TWO COLUMN LAYOUT ──────────────────────────────────── */
+.article-shell {
+  max-width: 1100px; margin: 0 auto;
+  padding: 32px 32px 80px;
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 48px;
+  align-items: start;
+}
+
+/* ─── TOC SIDEBAR ────────────────────────────────────────── */
+.toc {
+  position: sticky; top: 72px;
+  max-height: calc(100vh - 90px);
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+.toc::-webkit-scrollbar { display: none; }
+.toc-label {
+  font-size: 10px; font-weight: 700; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--text3);
+  margin-bottom: 14px; font-family: var(--mono);
+  display: flex; align-items: center; gap: 8px;
+}
+.toc-label::after {
+  content: ""; flex: 1; height: 1px; background: var(--border);
+}
+.toc-list { list-style: none; }
+.toc-list li + li { margin-top: 2px; }
+.toc-link {
+  display: block; padding: 5px 10px;
+  font-size: 12.5px; color: var(--text3);
+  border-left: 2px solid transparent;
+  border-radius: 0 var(--r-sm) var(--r-sm) 0;
+  transition: all .18s; line-height: 1.4;
+}
+.toc-link:hover { color: var(--text2); border-left-color: var(--border2); }
+.toc-link.active {
+  color: var(--brand); border-left-color: var(--brand);
+  background: var(--brand-dim);
+  font-weight: 600;
+}
+.toc-link.h3 { padding-left: 22px; font-size: 12px; }
+
+/* ─── ARTICLE BODY ───────────────────────────────────────── */
+.article-body { min-width: 0; max-width: 720px; }
+
+/* pullquote */
+.pullquote {
+  border-left: 3px solid var(--brand);
+  padding: 16px 24px;
+  margin: 0 0 40px;
+  background: var(--brand-dim);
+  border-radius: 0 var(--r-md) var(--r-md) 0;
+}
+.pullquote p {
+  font-size: 15px; line-height: 1.6;
+  color: var(--text2); font-style: italic;
+}
+
+/* headings */
+.article-body h2 {
+  font-family: var(--sans);
+  font-size: 22px; font-weight: 700;
+  color: var(--text1); margin: 48px 0 14px;
+  letter-spacing: -.01em; line-height: 1.3;
+  padding-top: 8px;
+}
+.article-body h2:first-child { margin-top: 0; }
+.article-body h3 {
+  font-size: 16px; font-weight: 600;
+  color: var(--text1); margin: 32px 0 10px;
+}
+.article-body p {
+  font-size: 15.5px; line-height: 1.8;
+  color: var(--text2); margin-bottom: 18px;
+}
+.article-body strong { color: var(--text1); font-weight: 600; }
+
+/* ─── STATS BLOCK ────────────────────────────────────────── */
+.block-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin: 32px 0;
+}
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 20px 18px;
+  text-align: center;
+  transition: border-color .2s, transform .2s;
+  position: relative; overflow: hidden;
+}
+.stat-card::before {
+  content: ""; position: absolute;
+  top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, var(--brand), var(--purple));
+  opacity: 0; transition: opacity .2s;
+}
+.stat-card:hover { border-color: var(--border2); transform: translateY(-2px); }
+.stat-card:hover::before { opacity: 1; }
+.stat-label {
+  font-size: 9px; font-weight: 700; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--text3);
+  margin-bottom: 8px; font-family: var(--mono);
+}
+.stat-value {
+  font-size: 26px; font-weight: 800;
+  color: var(--text1); letter-spacing: -.02em;
+  line-height: 1;
+  font-family: var(--mono);
+}
+.stat-unit {
+  font-size: 11px; font-weight: 500;
+  color: var(--text3); margin-top: 4px;
+}
+.stat-card.highlight .stat-value { color: var(--brand); }
+.stat-card.highlight { border-color: rgba(0,180,216,.2); }
+
+/* ─── KEY CALLOUT ────────────────────────────────────────── */
+.block-key {
+  display: flex; gap: 14px;
+  background: var(--brand-dim);
+  border: 1px solid rgba(0,180,216,.2);
+  border-radius: var(--r-lg);
+  padding: 18px 20px;
+  margin: 28px 0;
+}
+.block-key-icon {
+  font-size: 18px; flex-shrink: 0; margin-top: 1px;
+}
+.block-key-body {}
+.block-key-title {
+  font-size: 11px; font-weight: 700; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--brand);
+  margin-bottom: 6px; font-family: var(--mono);
+}
+.block-key-text {
+  font-size: 14px; line-height: 1.65; color: var(--text2);
+}
+
+/* ─── WARNING CALLOUT ────────────────────────────────────── */
+.block-warning {
+  display: flex; gap: 14px;
+  background: var(--amber-dim);
+  border: 1px solid rgba(245,158,11,.2);
+  border-radius: var(--r-lg);
+  padding: 18px 20px;
+  margin: 28px 0;
+}
+.block-warning-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+.block-warning-title {
+  font-size: 11px; font-weight: 700; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--amber);
+  margin-bottom: 6px; font-family: var(--mono);
+}
+.block-warning-text { font-size: 14px; line-height: 1.65; color: var(--text2); }
+
+/* ─── NOTE CALLOUT ───────────────────────────────────────── */
+.block-note {
+  display: flex; gap: 14px;
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-left: 3px solid var(--text3);
+  border-radius: 0 var(--r-lg) var(--r-lg) 0;
+  padding: 16px 20px;
+  margin: 28px 0;
+}
+.block-note-icon { font-size: 16px; flex-shrink: 0; color: var(--text3); }
+.block-note-text { font-size: 14px; line-height: 1.65; color: var(--text2); }
+
+/* ─── COMPARE TABLE ──────────────────────────────────────── */
+.block-compare { margin: 32px 0; overflow: hidden; border-radius: var(--r-lg); border: 1px solid var(--border2); }
+.block-compare table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+.block-compare thead tr { background: var(--surface2); }
+.block-compare thead th {
+  padding: 12px 16px; text-align: left;
+  font-size: 10px; font-weight: 700; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--text3);
+  font-family: var(--mono); border-bottom: 1px solid var(--border2);
+}
+.block-compare thead th:first-child { color: var(--text2); }
+.block-compare thead th.col-a { color: var(--brand); }
+.block-compare thead th.col-b { color: var(--amber); }
+.block-compare tbody tr { border-bottom: 1px solid var(--border); transition: background .15s; }
+.block-compare tbody tr:last-child { border-bottom: none; }
+.block-compare tbody tr:hover { background: var(--surface2); }
+.block-compare tbody td { padding: 11px 16px; color: var(--text2); vertical-align: top; line-height: 1.5; }
+.block-compare tbody td:first-child { color: var(--text1); font-weight: 500; font-size: 12.5px; font-family: var(--mono); }
+.block-compare tbody td.better { color: var(--green); font-weight: 600; }
+.block-compare tbody td.worse { color: var(--red); }
+
+/* ─── PROSCONS ───────────────────────────────────────────── */
+.block-proscons {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 14px; margin: 32px 0;
+}
+.pros, .cons {
+  border-radius: var(--r-lg); padding: 20px;
+  border: 1px solid var(--border);
+}
+.pros { border-top: 2px solid var(--green); background: var(--green-dim); }
+.cons { border-top: 2px solid var(--red); background: var(--red-dim); }
+.pc-label {
+  font-size: 10px; font-weight: 700; letter-spacing: .1em;
+  text-transform: uppercase; font-family: var(--mono);
+  margin-bottom: 12px;
+}
+.pros .pc-label { color: var(--green); }
+.cons .pc-label { color: var(--red); }
+.pc-list { list-style: none; }
+.pc-list li {
+  font-size: 13.5px; color: var(--text2);
+  padding: 4px 0; display: flex; gap: 8px; align-items: flex-start;
+  line-height: 1.5;
+}
+.pc-list li::before { flex-shrink: 0; margin-top: 2px; }
+.pros .pc-list li::before { content: "✓"; color: var(--green); font-weight: 700; }
+.cons .pc-list li::before { content: "✗"; color: var(--red); font-weight: 700; }
+
+/* ─── STEPS ──────────────────────────────────────────────── */
+.block-steps { margin: 32px 0; }
+.step-item {
+  display: flex; gap: 16px;
+  margin-bottom: 20px;
+  position: relative;
+}
+.step-item + .step-item::before {
+  content: ""; position: absolute;
+  left: 15px; top: -14px; height: 14px;
+  width: 1px; background: var(--border2);
+}
+.step-num {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: var(--brand-dim); border: 1px solid rgba(0,180,216,.3);
+  color: var(--brand); font-size: 12px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; font-family: var(--mono);
+}
+.step-body {}
+.step-title {
+  font-size: 14px; font-weight: 600; color: var(--text1);
+  margin-bottom: 4px;
+}
+.step-desc { font-size: 13.5px; color: var(--text2); line-height: 1.6; }
+
+/* ─── CODE BLOCK ─────────────────────────────────────────── */
+.code-wrap {
+  margin: 24px 0;
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  border: 1px solid var(--border2);
+}
+.code-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 16px;
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border);
+}
+.code-lang {
+  font-size: 10px; font-weight: 700; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--text3); font-family: var(--mono);
+}
+.code-copy {
+  font-size: 10px; font-weight: 600; color: var(--text3);
+  cursor: pointer; padding: 3px 10px; border-radius: 4px;
+  border: 1px solid var(--border2); background: none;
+  transition: all .18s; font-family: var(--mono); letter-spacing: .05em;
+}
+.code-copy:hover { color: var(--brand); border-color: var(--brand); }
+pre {
+  margin: 0; padding: 20px;
+  background: #080F1E;
+  font-family: var(--mono); font-size: 13px; line-height: 1.7;
+  overflow-x: auto;
+  color: #CBD5E1;
+}
+[data-theme="light"] pre { background: #1E293B; }
+.tk-kw  { color: #7DD3FC; }   /* keywords */
+.tk-fn  { color: #C4B5FD; }   /* functions */
+.tk-str { color: #86EFAC; }   /* strings */
+.tk-num { color: #FCA5A5; }   /* numbers */
+.tk-cm  { color: #4D6080; }   /* comments */
+
+/* ─── REFERENCES ─────────────────────────────────────────── */
+.references-section {
+  margin-top: 64px;
+  padding-top: 32px;
+  border-top: 1px solid var(--border);
+}
+.references-label {
+  font-size: 10px; font-weight: 700; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--text3);
+  font-family: var(--mono); margin-bottom: 16px;
+}
+.ref-list { list-style: none; }
+.ref-item {
+  display: flex; gap: 12px; align-items: flex-start;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px; color: var(--text3); line-height: 1.5;
+}
+.ref-item:last-child { border-bottom: none; }
+.ref-num {
+  font-family: var(--mono); font-size: 10px; font-weight: 700;
+  color: var(--brand); min-width: 22px;
+}
+.ref-text strong { color: var(--text2); font-weight: 500; }
+.ref-text a { color: var(--brand); }
+.ref-text a:hover { text-decoration: underline; }
+
+/* ─── AUTHOR ROW ─────────────────────────────────────────── */
+.author-row {
+  display: flex; align-items: center; gap: 14px;
+  padding: 24px;
+  margin: 40px 0 0;
+  background: var(--surface);
+  border-radius: var(--r-lg);
+  border: 1px solid var(--border);
+}
+.author-avatar {
+  width: 44px; height: 44px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--brand), var(--purple));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; font-weight: 700; color: #fff; flex-shrink: 0;
+}
+.author-name { font-size: 14px; font-weight: 600; color: var(--text1); }
+.author-bio { font-size: 12.5px; color: var(--text3); margin-top: 2px; }
+
+/* ─── ANNOTATION LABELS ──────────────────────────────────── */
+.annotation {
+  position: absolute;
+  background: rgba(245, 158, 11, .9);
+  color: #000; font-size: 10px; font-weight: 700;
+  padding: 3px 8px; border-radius: 4px;
+  white-space: nowrap; pointer-events: none;
+  letter-spacing: .04em; z-index: 10;
+}
+
+/* ─── MOCKUP LABEL OVERLAY ───────────────────────────────── */
+.section-label {
+  font-size: 9px; font-weight: 700; letter-spacing: .14em;
+  text-transform: uppercase; color: var(--brand);
+  font-family: var(--mono); margin-bottom: 8px;
+  opacity: .7;
+}
+
+/* ─── FAQs ───────────────────────────────────────────────── */
+.faq-list { margin: 32px 0; }
+.faq-item {
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  margin-bottom: 8px;
+  overflow: hidden;
+  transition: border-color .2s;
+}
+.faq-item:hover { border-color: var(--border2); }
+.faq-q {
+  padding: 14px 18px;
+  font-size: 14px; font-weight: 600; color: var(--text1);
+  display: flex; align-items: center; justify-content: space-between;
+  cursor: pointer; background: var(--surface);
+}
+.faq-q span { opacity: .5; font-size: 16px; }
+.faq-a {
+  padding: 0 18px 14px;
+  font-size: 13.5px; color: var(--text2); line-height: 1.65;
+  background: var(--surface);
+}
+
+/* ─── SCROLL HINT ────────────────────────────────────────── */
+.hint-bar {
+  position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+  background: var(--surface2); border: 1px solid var(--border2);
+  border-radius: 100px; padding: 8px 20px;
+  font-size: 12px; color: var(--text3); font-family: var(--mono);
+  z-index: 50; pointer-events: none;
+  animation: fadeUp 2s ease forwards;
+}
+@keyframes fadeUp {
+  0% { opacity: 0; transform: translateX(-50%) translateY(10px); }
+  20% { opacity: 1; transform: translateX(-50%) translateY(0); }
+  80% { opacity: 1; }
+  100% { opacity: 0; }
+}
+</style>
+</head>
+<body>
+
+<!-- Reading Progress -->
+<div id="progress-bar"></div>
+
+<!-- Theme Toggle -->
+<button class="theme-btn" onclick="toggleTheme()">☀ Light</button>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-logo">EV<span>Pulse</span></div>
+  <div class="nav-links">
+    <a href="#">Home</a>
+    <a href="#">Articles</a>
+    <a href="#">Tools</a>
+    <a href="#">Glossary</a>
+  </div>
+  <a href="#" class="nav-cta">Subscribe</a>
+</nav>
+
+<!-- BREADCRUMB -->
+<div class="crumb">
+  <a href="#">Home</a>
+  <span class="crumb-sep">/</span>
+  <a href="#">Articles</a>
+  <span class="crumb-sep">/</span>
+  <a href="#">Cell Chemistry</a>
+  <span class="crumb-sep">/</span>
+  <span class="crumb-current">NMC vs LFP</span>
+</div>
+
+<!-- ARTICLE HERO -->
+<div class="article-hero">
+  <div class="hero-cover">
+    <!-- decorative SVG -->
+    <svg class="hero-cover-svg" viewBox="0 0 1200 360" fill="none" preserveAspectRatio="xMidYMid slice">
+      <!-- grid lines -->
+      <line x1="0" y1="60" x2="1200" y2="60" stroke="white" stroke-width=".5"/>
+      <line x1="0" y1="120" x2="1200" y2="120" stroke="white" stroke-width=".5"/>
+      <line x1="0" y1="180" x2="1200" y2="180" stroke="white" stroke-width=".5"/>
+      <line x1="0" y1="240" x2="1200" y2="240" stroke="white" stroke-width=".5"/>
+      <line x1="0" y1="300" x2="1200" y2="300" stroke="white" stroke-width=".5"/>
+      <line x1="200" y1="0" x2="200" y2="360" stroke="white" stroke-width=".5"/>
+      <line x1="400" y1="0" x2="400" y2="360" stroke="white" stroke-width=".5"/>
+      <line x1="600" y1="0" x2="600" y2="360" stroke="white" stroke-width=".5"/>
+      <line x1="800" y1="0" x2="800" y2="360" stroke="white" stroke-width=".5"/>
+      <line x1="1000" y1="0" x2="1000" y2="360" stroke="white" stroke-width=".5"/>
+      <!-- NMC energy density bar -->
+      <rect x="80" y="80" width="80" height="200" rx="4" fill="#00B4D8" opacity=".4"/>
+      <text x="120" y="72" fill="#00B4D8" font-size="11" text-anchor="middle" font-family="monospace" opacity=".8">NMC</text>
+      <!-- LFP energy density bar -->
+      <rect x="200" y="140" width="80" height="140" rx="4" fill="#F59E0B" opacity=".35"/>
+      <text x="240" y="132" fill="#F59E0B" font-size="11" text-anchor="middle" font-family="monospace" opacity=".8">LFP</text>
+      <!-- cycle life chart -->
+      <path d="M 500 280 L 560 200 L 620 180 L 680 160 L 740 150 L 800 148" stroke="#10B981" stroke-width="2" fill="none" opacity=".6"/>
+      <path d="M 500 280 L 560 240 L 620 210 L 680 190 L 740 180 L 800 150" stroke="#00B4D8" stroke-width="2" fill="none" opacity=".6"/>
+      <text x="810" y="148" fill="#10B981" font-size="9" font-family="monospace" opacity=".7">LFP</text>
+      <text x="810" y="165" fill="#00B4D8" font-size="9" font-family="monospace" opacity=".7">NMC</text>
+      <text x="500" y="298" fill="white" font-size="8" font-family="monospace" opacity=".35">0</text>
+      <text x="650" y="298" fill="white" font-size="8" font-family="monospace" opacity=".35">Cycles →</text>
+      <!-- molecule dots -->
+      <circle cx="980" cy="120" r="18" stroke="#A78BFA" stroke-width="1.5" fill="none" opacity=".4"/>
+      <circle cx="1040" cy="100" r="12" stroke="#A78BFA" stroke-width="1.5" fill="none" opacity=".35"/>
+      <circle cx="1060" cy="150" r="22" stroke="#00B4D8" stroke-width="1" fill="none" opacity=".3"/>
+      <line x1="980" y1="120" x2="1040" y2="100" stroke="#A78BFA" stroke-width="1" opacity=".3"/>
+      <line x1="1040" y1="100" x2="1060" y2="150" stroke="#A78BFA" stroke-width="1" opacity=".3"/>
+      <circle cx="980" cy="120" r="4" fill="#A78BFA" opacity=".6"/>
+      <circle cx="1040" cy="100" r="4" fill="#A78BFA" opacity=".5"/>
+      <circle cx="1060" cy="150" r="5" fill="#00B4D8" opacity=".5"/>
+    </svg>
+
+    <div class="hero-cover-content">
+      <div class="hero-badges">
+        <span class="badge-cat">Cell Chemistry</span>
+        <span class="badge-tier">Intermediate</span>
+      </div>
+      <h1>NMC vs LFP for Commercial EV Fleets:<br>The Pack-Level Engineering Decision</h1>
+      <div class="hero-meta">
+        <span>June 6, 2026</span>
+        <span class="hero-meta-dot">·</span>
+        <span class="hero-read-time">
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="8" cy="8" r="6"/><path d="M8 5v3.5l2 2"/></svg>
+          14 min read
+        </span>
+        <span class="hero-meta-dot">·</span>
+        <span>Chaitanya Dasari</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TWO COLUMN LAYOUT -->
+<div class="article-shell">
+
+  <!-- TOC SIDEBAR -->
+  <aside class="toc">
+    <p class="toc-label">In This Article</p>
+    <ul class="toc-list">
+      <li><a class="toc-link" href="#">The Question Teams Get Wrong</a></li>
+      <li><a class="toc-link" href="#">The Chemistry in One Paragraph</a></li>
+      <li><a class="toc-link" href="#">Energy Density: Cell vs Pack</a></li>
+      <li><a class="toc-link active" href="#">Cycle Life & Fleet Economics</a></li>
+      <li><a class="toc-link h3" href="#">The Degradation Pattern</a></li>
+      <li><a class="toc-link" href="#">Thermal Behavior (AIS-156)</a></li>
+      <li><a class="toc-link" href="#">Application Selection</a></li>
+      <li><a class="toc-link" href="#">Indian Market Reality 2025</a></li>
+      <li><a class="toc-link" href="#">SOC Estimation Challenge</a></li>
+      <li><a class="toc-link" href="#">Decision Checklist</a></li>
+      <li><a class="toc-link" href="#">Key Takeaways</a></li>
+    </ul>
+  </aside>
+
+  <!-- ARTICLE BODY -->
+  <article class="article-body">
+
+    <!-- Pullquote -->
+    <div class="pullquote">
+      <p>"Selecting a cell chemistry is not just a spec-sheet comparison. It is a systems engineering decision that propagates through every subsystem of the pack — from the BMS firmware to the thermal management hardware to the warranty model."</p>
+    </div>
+
+    <!-- Intro text -->
+    <p>In 2023, two major Indian fleet operators made opposite cell chemistry decisions for their 3-wheeler EV fleets. One chose NMC 811, the other chose LFP. By 2025, both were right — for their specific use cases. This is the engineering story of why that's not a contradiction.</p>
+
+    <h2>The Chemistry in One Paragraph</h2>
+    <p>NMC (Nickel Manganese Cobalt) and LFP (Lithium Iron Phosphate) differ at the cathode. NMC uses a layered oxide structure that packs more lithium ions per unit volume — hence higher energy density. LFP uses an olivine phosphate structure with covalent P–O bonds that are intrinsically more stable at high temperatures. That single structural difference cascades into every engineering tradeoff you'll spend the next 14 minutes reading about.</p>
+
+    <!-- STATS BLOCK -->
+    <div class="block-stats">
+      <div class="stat-card highlight">
+        <div class="stat-label">NMC Energy Density</div>
+        <div class="stat-value">265</div>
+        <div class="stat-unit">Wh/kg cell level</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">LFP Energy Density</div>
+        <div class="stat-value">180</div>
+        <div class="stat-unit">Wh/kg cell level</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">NMC Cycle Life</div>
+        <div class="stat-value">1,500</div>
+        <div class="stat-unit">typical cycles</div>
+      </div>
+      <div class="stat-card highlight">
+        <div class="stat-label">LFP Cycle Life</div>
+        <div class="stat-value">3,000</div>
+        <div class="stat-unit">typical cycles</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">NMC Thermal Runaway</div>
+        <div class="stat-value">~180°C</div>
+        <div class="stat-unit">onset temperature</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">LFP Thermal Runaway</div>
+        <div class="stat-value">~270°C</div>
+        <div class="stat-unit">onset temperature</div>
+      </div>
+    </div>
+
+    <!-- KEY CALLOUT -->
+    <div class="block-key">
+      <div class="block-key-icon">🔑</div>
+      <div class="block-key-body">
+        <div class="block-key-title">Key Insight</div>
+        <div class="block-key-text">The pack-level energy density gap between NMC and LFP is smaller than the cell-level gap. Once you add thermal management hardware, structural elements, and BMS, LFP packs typically land at 120–140 Wh/kg versus NMC's 160–190 Wh/kg — a 25% difference, not the 47% the cell specs suggest.</div>
+      </div>
+    </div>
+
+    <h2>Energy Density: Cell Level vs Pack Level</h2>
+    <p>This is where most procurement engineers make their first mistake. The cell spec says NMC 811 delivers 280 Wh/kg. LFP delivers 180 Wh/kg. That's a 56% advantage for NMC. At pack level, that gap compresses dramatically.</p>
+
+    <!-- COMPARE TABLE -->
+    <div class="block-compare">
+      <table>
+        <thead>
+          <tr>
+            <th>Metric</th>
+            <th class="col-a">NMC 811</th>
+            <th class="col-b">LFP</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Cell energy density</td>
+            <td class="better">250–280 Wh/kg</td>
+            <td class="worse">160–200 Wh/kg</td>
+          </tr>
+          <tr>
+            <td>Pack energy density</td>
+            <td class="better">160–190 Wh/kg</td>
+            <td class="worse">120–140 Wh/kg</td>
+          </tr>
+          <tr>
+            <td>Pack density gap</td>
+            <td colspan="2" style="color: var(--text3); font-style: italic;">Shrinks from ~56% to ~30–35% at pack level</td>
+          </tr>
+          <tr>
+            <td>Thermal management overhead</td>
+            <td class="worse">Higher (liquid cooling required)</td>
+            <td class="better">Lower (air cooling feasible)</td>
+          </tr>
+          <tr>
+            <td>BMS complexity</td>
+            <td class="worse">High (SOC estimation harder)</td>
+            <td class="better">Moderate (flat OCV curve is a tradeoff)</td>
+          </tr>
+          <tr>
+            <td>AIS-156 thermal runaway propagation</td>
+            <td class="worse">Harder to contain</td>
+            <td class="better">Easier containment</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- WARNING -->
+    <div class="block-warning">
+      <div class="block-warning-icon">⚠️</div>
+      <div>
+        <div class="block-warning-title">Real-World Caveat</div>
+        <div class="block-warning-text">Cycle life numbers from cell datasheets assume controlled lab conditions: 25°C, 1C discharge, 100% DoD, no calendar aging. Commercial fleet operation does none of these consistently. Budget for 70–80% of datasheet cycle life under Indian field conditions.</div>
+      </div>
+    </div>
+
+    <h2>Thermal Behavior: The AIS-156 Dimension</h2>
+    <p>AIS-156 (India's EV battery safety standard) mandates that a thermal event in one cell must not propagate to adjacent cells within five minutes. This requirement hits NMC and LFP very differently due to the chemistry's thermal stability window.</p>
+
+    <!-- CODE BLOCK (example for engineering tools) -->
+    <div class="code-wrap">
+      <div class="code-header">
+        <span class="code-lang">Python — TCO Model</span>
+        <button class="code-copy">Copy</button>
+      </div>
+      <pre><span class="tk-cm"># Simplified TCO comparison over fleet lifecycle</span>
+<span class="tk-kw">def</span> <span class="tk-fn">calculate_tco</span>(chemistry: <span class="tk-fn">str</span>, fleet_size: <span class="tk-num">int</span>) -> <span class="tk-fn">dict</span>:
+    params = {
+        <span class="tk-str">"NMC"</span>: {<span class="tk-str">"cell_cost_kwh"</span>: <span class="tk-num">120</span>, <span class="tk-str">"cycle_life"</span>: <span class="tk-num">1500</span>, <span class="tk-str">"pack_eff"</span>: <span class="tk-num">0.88</span>},
+        <span class="tk-str">"LFP"</span>: {<span class="tk-str">"cell_cost_kwh"</span>: <span class="tk-num">95</span>,  <span class="tk-str">"cycle_life"</span>: <span class="tk-num">3000</span>, <span class="tk-str">"pack_eff"</span>: <span class="tk-num">0.92</span>},
+    }[chemistry]
+    <span class="tk-kw">return</span> {
+        <span class="tk-str">"total_cost"</span>: params[<span class="tk-str">"cell_cost_kwh"</span>] * fleet_size / params[<span class="tk-str">"pack_eff"</span>],
+        <span class="tk-str">"cost_per_cycle"</span>: params[<span class="tk-str">"cell_cost_kwh"</span>] / params[<span class="tk-str">"cycle_life"</span>],
+    }</pre>
+    </div>
+
+    <h2>Application Selection Framework</h2>
+    <p>Use the decision framework below. The goal is to match the chemistry's inherent tradeoffs to your use case's dominant constraints — not to find the "best" chemistry in the abstract.</p>
+
+    <!-- PROS CONS -->
+    <div class="block-proscons">
+      <div class="pros">
+        <div class="pc-label">Choose NMC When</div>
+        <ul class="pc-list">
+          <li>Range is the primary constraint (interstate highways, cargo trucks)</li>
+          <li>Payload weight directly impacts revenue (aviation GSE)</li>
+          <li>Fast charging &gt;2C is required operationally</li>
+          <li>Premium vehicle positioning justifies cell cost</li>
+          <li>Controlled temperature environment (climate-controlled depot)</li>
+        </ul>
+      </div>
+      <div class="cons">
+        <div class="pc-label">Choose LFP When</div>
+        <ul class="pc-list">
+          <li>Fleet cycles daily in 45°C+ ambient conditions</li>
+          <li>TCO over 5+ years is the primary metric</li>
+          <li>AIS-156 compliance is the top priority</li>
+          <li>Charging infrastructure is slow/AC (overnight depots)</li>
+          <li>Volume procurement &gt;500 units drives cell cost down</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- STEPS -->
+    <h2>Decision Checklist</h2>
+    <p>Walk through this in order. If any gate fails, that chemistry is eliminated for your application.</p>
+    <div class="block-steps">
+      <div class="step-item">
+        <div class="step-num">01</div>
+        <div class="step-body">
+          <div class="step-title">Define the range requirement at worst-case payload</div>
+          <div class="step-desc">Calculate the minimum pack energy needed at maximum payload and ambient temperature. If LFP can meet this requirement at your maximum allowable pack volume, proceed with LFP. If not, NMC may be necessary.</div>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">02</div>
+        <div class="step-body">
+          <div class="step-title">Run a 5-year TCO model at your cycle frequency</div>
+          <div class="step-desc">Include cell cost, replacement cost, thermal management OPEX, and insurance premium differences. LFP almost always wins on 5-year TCO for fleets doing &gt;1 cycle/day.</div>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">03</div>
+        <div class="step-body">
+          <div class="step-title">Validate AIS-156 propagation compliance with your pack design</div>
+          <div class="step-desc">Run thermal abuse simulation with your BMS cutoff thresholds. NMC packs require active propagation barriers; LFP packs may achieve compliance with passive insulation alone.</div>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">04</div>
+        <div class="step-body">
+          <div class="step-title">Confirm SOC estimation strategy for your BMS team</div>
+          <div class="step-desc">LFP's flat OCV curve requires Coulomb counting or EKF-based SOC estimation. If your BMS supplier doesn't have proven LFP SOC algorithms, add 6 months to your NPI timeline or choose NMC.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NOTE -->
+    <div class="block-note">
+      <div class="block-note-icon">📌</div>
+      <div class="block-note-text"><strong>Series context:</strong> This article is part of the Cell Chemistry series. The next article covers LFP SOC estimation strategies in depth, including EKF implementation details for flat OCV curves.</div>
+    </div>
+
+    <!-- FAQs -->
+    <h2>Frequently Asked Questions</h2>
+    <div class="faq-list">
+      <div class="faq-item">
+        <div class="faq-q">Can you mix NMC and LFP cells in the same pack? <span>+</span></div>
+        <div class="faq-a">No — different voltage windows, charging profiles, and degradation curves make mixed-chemistry packs impractical. The BMS would need to manage two completely separate electrochemical systems, and balancing becomes unsolvable at scale.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Is LFP safe in Indian summers (45°C ambient)? <span>+</span></div>
+        <div class="faq-a">Yes — LFP's 270°C thermal runaway onset gives significantly more headroom. However, capacity fade accelerates above 40°C for both chemistries. Passive thermal management with LFP is viable; active cooling is still recommended for fast-charging applications.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">What is the realistic pack-level energy density difference? <span>+</span></div>
+        <div class="faq-a">At pack level, NMC delivers roughly 160–190 Wh/kg and LFP delivers 120–140 Wh/kg. The 56% cell-level gap compresses to about 30–35% at pack level once you account for thermal hardware, BMS, and structural elements.</div>
+      </div>
+    </div>
+
+    <!-- REFERENCES -->
+    <div class="references-section">
+      <p class="references-label">References</p>
+      <ul class="ref-list">
+        <li class="ref-item">
+          <span class="ref-num">[1]</span>
+          <span class="ref-text"><strong>Nitta, N. et al.</strong> "Li-ion battery materials: present and future." <em>Materials Today</em>, 2015. <a href="#">doi:10.1016/j.mattod.2014.10.040</a></span>
+        </li>
+        <li class="ref-item">
+          <span class="ref-num">[2]</span>
+          <span class="ref-text"><strong>AIS-156, Amendment 2.</strong> Automotive Research Association of India, 2023. <a href="#">ARAI Publication</a></span>
+        </li>
+        <li class="ref-item">
+          <span class="ref-num">[3]</span>
+          <span class="ref-text"><strong>BloombergNEF.</strong> Electric Vehicle Outlook 2024. <a href="#">BNEF Report</a></span>
+        </li>
+        <li class="ref-item">
+          <span class="ref-num">[4]</span>
+          <span class="ref-text"><strong>Zubi, G. et al.</strong> "The lithium-ion battery: State of the art and future perspectives." <em>Renewable and Sustainable Energy Reviews</em>, 2018.</span>
+        </li>
+      </ul>
+    </div>
+
+    <!-- AUTHOR -->
+    <div class="author-row">
+      <div class="author-avatar">CD</div>
+      <div>
+        <div class="author-name">Chaitanya Dasari</div>
+        <div class="author-bio">EV Battery Engineer · Writing about pack design, cell selection, and BMS architecture</div>
+      </div>
+    </div>
+
+  </article>
+</div>
+
+<div class="hint-bar">↕ Scroll to explore the design mockup</div>
+
+<script>
+function toggleTheme() {
+  const html = document.documentElement;
+  const btn  = document.querySelector('.theme-btn');
+  if (html.dataset.theme === 'dark') {
+    html.dataset.theme = 'light';
+    btn.textContent = '🌙 Dark';
+  } else {
+    html.dataset.theme = 'dark';
+    btn.textContent = '☀ Light';
+  }
+}
+
+// Reading progress
+window.addEventListener('scroll', () => {
+  const doc  = document.documentElement;
+  const prog = (doc.scrollTop / (doc.scrollHeight - doc.clientHeight)) * 100;
+  document.getElementById('progress-bar').style.width = prog + '%';
+});
+</script>
+</body>
+</html>
