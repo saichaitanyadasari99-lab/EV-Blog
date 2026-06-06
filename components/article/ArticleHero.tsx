@@ -90,9 +90,9 @@ export function ArticleHero({ coverUrl, category, tier, title }: Props) {
             textTransform: "uppercase",
             padding: "4px 12px",
             borderRadius: 100,
-            background: "rgba(59,130,246,.2)",
-            border: "1px solid rgba(59,130,246,.35)",
-            color: "#93c5fd",
+            background: "rgba(0,153,184,.2)",
+            border: "1px solid rgba(0,153,184,.35)",
+            color: "#5bc8dc",
             fontFamily: "var(--font-mono, monospace)",
           }}
         >

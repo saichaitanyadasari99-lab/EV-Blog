@@ -7,71 +7,75 @@
   --font-mono:    "JetBrains Mono", monospace;
 
   /* Expose CSS variables as Tailwind color tokens */
-  --color-brand:   var(--brand, #3b82f6);
-  --color-brand2:  var(--brand-dark, #2563eb);
-  --color-surface: var(--surface, #1f2937);
-  --color-surface2:var(--surface2, #374151);
-  --color-surface3:var(--surface3, #4b5563);
-  --color-bg:      var(--bg, #22272f);
-  --color-border:  var(--border, rgba(255,255,255,.07));
-  --color-border2: var(--border2, rgba(255,255,255,.13));
-  --color-text:    var(--text, #f9fafb);
-  --color-text2:   var(--text2, #d1d5db);
-  --color-text3:   var(--text3, #6b7280);
+  --color-brand:   var(--brand, #0099b8);
+  --color-brand2:  var(--brand-dark, #007a94);
+  --color-surface: var(--surface, #161b22);
+  --color-surface2:var(--surface2, #21262d);
+  --color-surface3:var(--surface3, #30363d);
+  --color-bg:      var(--bg, #0d1117);
+  --color-border:  var(--border, rgba(255,255,255,.08));
+  --color-border2: var(--border2, rgba(255,255,255,.14));
+  --color-text:    var(--text, #f0f6fc);
+  --color-text2:   var(--text2, #8b949e);
+  --color-text3:   var(--text3, #484f58);
 }
 
 /* ============================================================
-   DESIGN TOKENS — dark mode (default)
-   codewithclaude.net aesthetic: ink/paper, Space Grotesk, blue brand
+   DESIGN TOKENS
+   EVPulse: codewithclaude.net aesthetic — warm paper light / deep ink dark
+   Brand: EVPulse cyan #0099b8
    ============================================================ */
+
+/* Dark mode (default — user can toggle to light) */
 :root {
-  --bg:         #22272f;
-  --surface:    #1f2937;
-  --surface2:   #374151;
-  --surface3:   #4b5563;
-  --border:     rgba(255,255,255,.07);
-  --border2:    rgba(255,255,255,.13);
+  --bg:         #0d1117;
+  --surface:    #161b22;
+  --surface2:   #21262d;
+  --surface3:   #30363d;
+  --border:     rgba(255,255,255,.08);
+  --border2:    rgba(255,255,255,.14);
 
-  --text:       #f9fafb;
-  --text2:      #d1d5db;
-  --text3:      #6b7280;
+  --text:       #f0f6fc;
+  --text2:      #8b949e;
+  --text3:      #484f58;
 
-  --brand:      #3b82f6;
-  --brand-dark: #2563eb;
-  --brand-xdark:#1d4ed8;
-  --brand-bg:   rgba(59,130,246,.1);
-  --brand-muted:#93c5fd;
+  --brand:      #0099b8;
+  --brand-dark: #007a94;
+  --brand-xdark:#005f74;
+  --brand-bg:   rgba(0,153,184,.1);
+  --brand-muted:#4ecde6;
 
   --orange:     #f97316;
-  --green:      #10b981;
-  --yellow:     #fbbf24;
-  --yellow-dim: rgba(251,191,36,.12);
-  --purple:     #a78bfa;
-  --red:        #ef4444;
+  --green:      #3fb950;
+  --yellow:     #d29922;
+  --yellow-dim: rgba(210,153,34,.12);
+  --purple:     #bc8cff;
+  --red:        #f85149;
 }
 
+/* Light mode — codewithclaude.net warm paper aesthetic */
 [data-theme="light"] {
-  --bg:         #fefdfb;
+  --bg:         #fdfaf8;
   --surface:    #ffffff;
-  --surface2:   #f3f4f6;
-  --surface3:   #e5e7eb;
-  --border:     rgba(0,0,0,.08);
-  --border2:    rgba(0,0,0,.14);
+  --surface2:   #f6f5f3;
+  --surface3:   #ede9e5;
+  --border:     rgba(0,0,0,.07);
+  --border2:    rgba(0,0,0,.13);
 
-  --text:       #111827;
-  --text2:      #4b5563;
-  --text3:      #9ca3af;
+  --text:       #0f172a;
+  --text2:      #475569;
+  --text3:      #94a3b8;
 
-  --brand:      #3b82f6;
-  --brand-dark: #2563eb;
-  --brand-xdark:#1d4ed8;
-  --brand-bg:   #eff6ff;
-  --brand-muted:#60a5fa;
+  --brand:      #0099b8;
+  --brand-dark: #007a94;
+  --brand-xdark:#005f74;
+  --brand-bg:   rgba(0,153,184,.08);
+  --brand-muted:#22bcd4;
 
   --orange:     #ea580c;
-  --green:      #059669;
-  --yellow:     #d97706;
-  --yellow-dim: rgba(217,119,6,.1);
+  --green:      #16a34a;
+  --yellow:     #ca8a04;
+  --yellow-dim: rgba(202,138,4,.1);
   --purple:     #7c3aed;
   --red:        #dc2626;
 }
@@ -94,7 +98,22 @@ body {
   line-height: 1.65;
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
-  transition: background 0.2s, color 0.2s;
+  transition: background 0.3s, color 0.2s;
+}
+
+/* ── codewithclaude.net signature: warm radial glow on light mode ── */
+[data-theme="light"] body {
+  background:
+    radial-gradient(ellipse 80% 60% at 85% 35%, rgba(0,200,230,.07) 0%, transparent 55%),
+    radial-gradient(ellipse 70% 55% at 15% 80%, rgba(255,160,100,.06) 0%, transparent 50%),
+    #fdfaf8;
+}
+
+/* ── Dark mode gets a subtle cyan glow at top ── */
+:root body {
+  background:
+    radial-gradient(ellipse 60% 40% at 70% 0%, rgba(0,153,184,.06) 0%, transparent 60%),
+    #0d1117;
 }
 
 a { color: inherit; text-decoration: none; }
@@ -228,17 +247,20 @@ h1, h2, h3, h4, h5, h6 {
 .header-btn:hover { color: var(--text); background: var(--surface2); }
 
 .header-cta {
-  padding: 7px 16px;
+  padding: 7px 18px;
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 700;
   color: #fff;
-  background: var(--brand);
-  border-radius: 6px;
-  transition: background 0.15s;
+  background: var(--text);
+  border-radius: 8px;
+  transition: background 0.15s, opacity 0.15s;
   cursor: pointer;
   border: none;
+  letter-spacing: 0.01em;
 }
-.header-cta:hover { background: var(--brand-dark); }
+.header-cta:hover { background: var(--text); opacity: 0.85; color: #fff; }
+[data-theme="light"] .header-cta { background: #0f172a; }
+[data-theme="light"] .header-cta:hover { background: #1e293b; opacity: 1; }
 
 /* Hamburger */
 .hamburger-new {
@@ -379,14 +401,21 @@ h1, h2, h3, h4, h5, h6 {
 }
 .sec-link:hover { opacity: 0.75; }
 
+/* codewithclaude.net-style soft pill section label */
 .section-label {
-  display: inline-block;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 1px;
-  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 14px;
+  background: var(--brand-bg);
+  border: 1px solid rgba(0,153,184,.18);
+  border-radius: 100px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
   color: var(--brand);
   margin-bottom: 16px;
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif;
 }
 .section-keywords {
   font-size: 13px;
@@ -419,7 +448,18 @@ h1, h2, h3, h4, h5, h6 {
 .a-card:hover {
   border-color: var(--brand);
   transform: translateY(-2px);
-  box-shadow: 0 8px 28px rgba(59,130,246,0.12);
+  box-shadow: 0 8px 28px rgba(0,153,184,0.13);
+}
+
+/* Light-mode cards: clean white, software shadow like codewithclaude.net */
+[data-theme="light"] .a-card {
+  background: #ffffff;
+  border-color: rgba(0,0,0,.07);
+  box-shadow: 0 1px 3px rgba(0,0,0,.05);
+}
+[data-theme="light"] .a-card:hover {
+  border-color: var(--brand);
+  box-shadow: 0 6px 24px rgba(0,153,184,.12);
 }
 .a-card-link-image {
   display: block;
@@ -1127,7 +1167,7 @@ h1, h2, h3, h4, h5, h6 {
   background: var(--brand-bg);
   color: var(--brand);
   border-radius: 20px;
-  border: 1px solid rgba(0,153,184,0.2);
+  border: 1px solid rgba(0,153,184,.2);
 }
 .filter-remove {
   background: none; border: none;
@@ -1166,12 +1206,12 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 600;
   color: var(--brand);
   background: var(--brand-bg);
-  border: 1px solid rgba(0,153,184,0.2);
+  border: 1px solid rgba(0,153,184,.2);
   border-radius: 8px;
   transition: background 0.15s, border-color 0.15s;
   cursor: pointer;
 }
-.btn-accent:hover { background: rgba(0,153,184,0.15); border-color: var(--brand); }
+.btn-accent:hover { background: rgba(0,153,184,.15); border-color: var(--brand); }
 .secondary { color: var(--text2); }
 .sidebar-empty {
   padding: 24px;
@@ -2094,16 +2134,17 @@ h1, h2, h3, h4, h5, h6 {
 .hero-badge {
   display: inline-flex;
   align-items: center;
-  padding: 4px 14px;
-  border: 1.5px solid var(--brand);
+  gap: 6px;
+  padding: 6px 16px;
+  background: var(--brand-bg);
   color: var(--brand);
+  border: 1px solid rgba(0,153,184,.2);
   border-radius: 100px;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  margin-bottom: 24px;
-  font-family: var(--font-mono, monospace);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  margin-bottom: 20px;
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif;
 }
 
 .page-title {
@@ -2112,7 +2153,8 @@ h1, h2, h3, h4, h5, h6 {
   line-height: 1.1;
   color: var(--text);
   margin: 0 0 16px;
-  font-family: var(--font-mono, monospace);
+  font-family: "Space Grotesk", system-ui, sans-serif;
+  letter-spacing: -0.03em;
 }
 
 .page-subtitle {
@@ -2147,7 +2189,8 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 700;
   color: var(--text);
   margin: 0;
-  font-family: var(--font-mono, monospace);
+  font-family: "Space Grotesk", system-ui, sans-serif;
+  letter-spacing: -0.01em;
 }
 
 /* ============================================================
@@ -2221,7 +2264,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 .calc-card:hover {
   border-color: var(--brand);
-  box-shadow: 0 8px 32px rgba(0,153,184,0.10);
+  box-shadow: 0 8px 32px rgba(0,153,184,.10);
   transform: translateY(-2px);
 }
 
@@ -2329,6 +2372,11 @@ h1, h2, h3, h4, h5, h6 {
   flex-direction: column;
   gap: 4px;
 }
+[data-theme="light"] .blogs-sidebar {
+  background: #ffffff;
+  border-color: rgba(0,0,0,.07);
+  box-shadow: 0 1px 4px rgba(0,0,0,.05);
+}
 @media (max-width: 960px) {
   .blogs-sidebar { position: static; flex-direction: row; flex-wrap: wrap; }
   .blogs-search-wrap { width: 100%; }
@@ -2398,7 +2446,7 @@ h1, h2, h3, h4, h5, h6 {
   transition: background 0.15s, color 0.15s;
 }
 .blogs-cat-btn.active .blogs-cat-count {
-  background: rgba(0,153,184,0.12);
+  background: rgba(0,153,184,.12);
   color: var(--brand);
 }
 
@@ -2436,7 +2484,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 .blogs-featured:hover {
   border-color: var(--brand);
-  box-shadow: 0 14px 48px rgba(59,130,246,0.12);
+  box-shadow: 0 14px 48px rgba(0,153,184,0.12);
   transform: translateY(-2px);
 }
 @media (max-width: 640px) {
@@ -2520,7 +2568,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 .blogs-article-card:hover {
   border-color: var(--brand);
-  box-shadow: 0 8px 28px rgba(59,130,246,0.12);
+  box-shadow: 0 8px 28px rgba(0,153,184,0.12);
   transform: translateY(-2px);
 }
 .blogs-article-card:hover .blogs-article-arrow {
@@ -2621,7 +2669,7 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--brand);
   background: var(--brand-bg);
   transform: translateY(-2px);
-  box-shadow: 0 4px 14px rgba(0,153,184,0.12);
+  box-shadow: 0 4px 14px rgba(0,153,184,.12);
 }
 .cat-tab-active {
   background: var(--brand);
