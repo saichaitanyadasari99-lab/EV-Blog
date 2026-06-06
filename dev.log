@@ -183,3 +183,583 @@ https://react.dev/link/hydration-mismatch
 [browser] Image with src "https://ars.els-cdn.com/content/image/1-s2.0-S0960148122018882-ga1.jpg" has "fill" and parent element with invalid "position". Provided "static" should be one of absolute,fixed,relative. (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_115brz8._.js:2431:13)
 [browser] Image with src "https://blogs.sw.siemens.com/wp-content/uploads/sites/6/2025/02/Battery-Thermal-Runaway-Fire.png" has "fill" and parent element with invalid "position". Provided "static" should be one of absolute,fixed,relative. (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_115brz8._.js:2431:13)
 [browser] Image with src "https://www.batterydesign.net/wp-content/uploads/2023/05/Figure-5-Thermal-runaway-1.jpg" has "fill" and parent element with invalid "position". Provided "static" should be one of absolute,fixed,relative. (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_115brz8._.js:2431:13)
+✓ Compiled in 2.3s
+ GET /calculators 200 in 383ms (next.js: 193ms, proxy.ts: 56ms, application-code: 133ms)
+○ Compiling /calculators/[slug] ...
+ GET / 200 in 9.0s (next.js: 129ms, proxy.ts: 43ms, application-code: 8.8s)
+ GET / 200 in 7.6s (next.js: 76ms, proxy.ts: 66ms, application-code: 7.5s)
+ GET /calculators/pack-size 200 in 49s (next.js: 48s, proxy.ts: 38ms, generate-params: 10.9s, application-code: 1233ms)
+ GET /blogs 200 in 13.9s (next.js: 204ms, proxy.ts: 149ms, application-code: 13.5s)
+ GET / 200 in 14.0s (next.js: 232ms, proxy.ts: 326ms, application-code: 13.5s)
+[browser] In HTML, <button> cannot be a descendant of <button>.
+This will cause a hydration error.
+
+  ...
+    <AppDevOverlayErrorBoundary globalError={[...]}>
+      <ReplaySsrOnlyErrors>
+      <DevRootHTTPAccessFallbackBoundary>
+        <HTTPAccessFallbackBoundary notFound={<NotAllowedRootHTTPFallbackError>}>
+          <HTTPAccessFallbackErrorBoundary pathname="/" notFound={<NotAllowedRootHTTPFallbackError>} ...>
+            <RedirectBoundary>
+              <RedirectErrorBoundary router={{...}}>
+                <Head>
+                <__next_root_layout_boundary__>
+                  <SegmentViewNode type="layout" pagePath="layout.tsx">
+                    <SegmentTrieNode>
+                    <link>
+                    <script>
+                    <script>
+                    <script>
+                    <RootLayout>
+                      <html lang="en" data-theme="light" suppressHydrationWarning={true} className="syne_ba40f...">
+                        <head>
+                        <body className="min-h-full...">
+                          <a>
+                          <SiteHeader>
+                            <header className={"header-new "}>
+                              <div className="header-inner">
+                                <LinkComponent>
+                                <nav>
+                                <div className="header-act...">
+                                  <LinkComponent>
+>                                 <button className="header-btn theme-btn-new" aria-label="Toggle theme">
+                                    <ThemeToggle>
+>                                     <button
+>                                       onClick={function cycleTheme}
+>                                       className="theme-icon-btn"
+>                                       aria-label="Toggle theme"
+>                                       type="button"
+>                                     >
+                                  ...
+                            ...
+                          ...
+                ...
+ 
+    at validateDOMNesting (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:1963:372)
+    at beginWork (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:6758:104)
+    at runWithFiberInDEV (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:965:74)
+    at performUnitOfWork (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:9555:97)
+    at workLoopConcurrentByScheduler (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:9551:58)
+    at renderRootConcurrent (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:9534:71)
+    at performWorkOnRoot (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:9061:150)
+    at performWorkOnRootViaSchedulerTask (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:10255:9)
+    at MessagePort.performWorkUntilDeadline (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_0rpq4pf._.js:2647:64) (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:1963:372)
+[browser] <button> cannot contain a nested <button>.
+See this log for the ancestor stack trace. 
+    at <unknown> (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:1965:21)
+    at runWithFiberInDEV (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:965:74)
+    at validateDOMNesting (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:1964:178)
+    at beginWork (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:6758:104)
+    at runWithFiberInDEV (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:965:74)
+    at performUnitOfWork (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:9555:97)
+    at workLoopConcurrentByScheduler (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:9551:58)
+    at renderRootConcurrent (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:9534:71)
+    at performWorkOnRoot (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:9061:150)
+    at performWorkOnRootViaSchedulerTask (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:10255:9)
+    at MessagePort.performWorkUntilDeadline (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_0rpq4pf._.js:2647:64) (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:1965:21)
+[browser] Encountered a script tag while rendering React component. Scripts inside React components are never executed when rendering on the client. Consider using template tag instead (https://developer.mozilla.org/en-US/docs/Web/HTML/Element/template). 
+    at completeWork (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:6945:102)
+    at runWithFiberInDEV (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:965:74)
+    at completeUnitOfWork (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:9622:23)
+    at performUnitOfWork (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:9557:28)
+    at workLoopSync (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:9449:40)
+    at renderRootSync (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:9433:13)
+    at performWorkOnRoot (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:9098:47)
+    at performWorkOnRootViaSchedulerTask (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:10255:9)
+    at MessagePort.performWorkUntilDeadline (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_0rpq4pf._.js:2647:64) (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:6945:102)
+[browser] Uncaught Error: Hydration failed because the server rendered HTML didn't match the client. As a result this tree will be regenerated on the client. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+https://react.dev/link/hydration-mismatch
+    at <unknown> (https://react.dev/link/hydration-mismatch)
+    at throwOnHydrationMismatch (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:3318:56)
+    at beginWork (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:6758:918)
+    at runWithFiberInDEV (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:965:74)
+    at performUnitOfWork (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:9555:97)
+    at workLoopConcurrentByScheduler (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:9551:58)
+    at renderRootConcurrent (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:9534:71)
+    at performWorkOnRoot (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:9061:150)
+    at performWorkOnRootViaSchedulerTask (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:10255:9)
+    at MessagePort.performWorkUntilDeadline (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_0rpq4pf._.js:2647:64)
+    at button (<anonymous>)
+    at ThemeToggle (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/components_0bfpkb.._.js:40:214)
+    at SiteHeader (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/components_0bfpkb.._.js:324:249)
+    at RootLayout (app\layout.tsx:140:9)
+  138 |       <body className="min-h-full flex flex-col">
+  139 |         <SkipLink />
+> 140 |         <SiteHeader />
+      |         ^
+  141 |         <main id="main-content" className="flex-1 main-content-with-header" tabIndex={-1}>
+  142 |           {children}
+  143 |         </main>
+[browser] Image with src "https://utfs.io/f/0rxUlG6U2WS40hXl2eq6U2WS4wEFI5sNpGVtqCKo7LBzgxMv" has "fill" and parent element with invalid "position". Provided "static" should be one of absolute,fixed,relative. (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_115brz8._.js:2431:13)
+[browser] Image with src "https://utfs.io/f/0rxUlG6U2WS4eUb7M2TScmdyuolB8jT2XC5giAhDrLINfkb9" has "fill" and parent element with invalid "position". Provided "static" should be one of absolute,fixed,relative. (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_115brz8._.js:2431:13)
+[browser] Image with src "https://utfs.io/f/0rxUlG6U2WS4IeRQv4JasHxofhqVkD51KprSZMI2tLyEmRWi" has "fill" and parent element with invalid "position". Provided "static" should be one of absolute,fixed,relative. (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_115brz8._.js:2431:13)
+[browser] Image with src "https://utfs.io/f/0rxUlG6U2WS4egO60nYTScmdyuolB8jT2XC5giAhDrLINfkb" has "fill" and parent element with invalid "position". Provided "static" should be one of absolute,fixed,relative. (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_115brz8._.js:2431:13)
+[browser] Image with src "https://utfs.io/f/0rxUlG6U2WS4LnzywEO65W7ir9Oyb0Gn4XSTtIA3epvUuVCY" has "fill" and parent element with invalid "position". Provided "static" should be one of absolute,fixed,relative. (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_115brz8._.js:2431:13)
+[browser] Image with src "https://utfs.io/f/0rxUlG6U2WS4HUtLMNuMV4YzFTWRy2hAx8uKnS1Qd56obcX3" has "fill" and parent element with invalid "position". Provided "static" should be one of absolute,fixed,relative. (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_115brz8._.js:2431:13)
+○ Compiling /category/[slug] ...
+ GET /category/cell-chemistry 200 in 14.2s (next.js: 9.1s, proxy.ts: 43ms, generate-params: 5.5s, application-code: 5.1s)
+[browser] Detected `scroll-behavior: smooth` on the `<html>` element. To disable smooth scrolling during route transitions, add `data-scroll-behavior="smooth"` to your <html> element. Learn more: https://nextjs.org/docs/messages/missing-data-scroll-behavior (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_115brz8._.js:2431:13)
+[browser] Image with src "https://emzrbrlfgkxsyogogjbn.supabase.co/storage/v1/object/public/media/cover-1775808077582-hehqd2ubv8k.webp" has "fill" and parent element with invalid "position". Provided "static" should be one of absolute,fixed,relative. (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_115brz8._.js:2431:13)
+ GET / 200 in 1934ms (next.js: 24ms, proxy.ts: 14ms, application-code: 1896ms)
+ GET / 200 in 2.2s (next.js: 20ms, proxy.ts: 21ms, application-code: 2.1s)
+[browser] In HTML, <button> cannot be a descendant of <button>.
+This will cause a hydration error.
+
+  ...
+    <AppDevOverlayErrorBoundary globalError={[...]}>
+      <ReplaySsrOnlyErrors>
+      <DevRootHTTPAccessFallbackBoundary>
+        <HTTPAccessFallbackBoundary notFound={<NotAllowedRootHTTPFallbackError>}>
+          <HTTPAccessFallbackErrorBoundary pathname="/" notFound={<NotAllowedRootHTTPFallbackError>} ...>
+            <RedirectBoundary>
+              <RedirectErrorBoundary router={{...}}>
+                <Head>
+                <__next_root_layout_boundary__>
+                  <SegmentViewNode type="layout" pagePath="layout.tsx">
+                    <SegmentTrieNode>
+                    <link>
+                    <script>
+                    <script>
+                    <script>
+                    <RootLayout>
+                      <html lang="en" data-theme="light" suppressHydrationWarning={true} className="syne_ba40f...">
+                        <head>
+                        <body className="min-h-full...">
+                          <a>
+                          <SiteHeader>
+                            <header className={"header-new "}>
+                              <div className="header-inner">
+                                <LinkComponent>
+                                <nav>
+                                <div className="header-act...">
+                                  <LinkComponent>
+>                                 <button className="header-btn theme-btn-new" aria-label="Toggle theme">
+                                    <ThemeToggle>
+>                                     <button
+>                                       onClick={function cycleTheme}
+>                                       className="theme-icon-btn"
+>                                       aria-label="Toggle theme"
+>                                       type="button"
+>                                     >
+                                  ...
+                            ...
+                          ...
+                ...
+ 
+    at validateDOMNesting (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:1963:372)
+    at beginWork (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:6758:104)
+    at runWithFiberInDEV (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:965:74)
+    at performUnitOfWork (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:9555:97)
+    at workLoopConcurrentByScheduler (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:9551:58)
+    at renderRootConcurrent (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:9534:71)
+    at performWorkOnRoot (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:9061:150)
+    at performWorkOnRootViaSchedulerTask (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:10255:9)
+    at MessagePort.performWorkUntilDeadline (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_0rpq4pf._.js:2647:64) (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:1963:372)
+[browser] <button> cannot contain a nested <button>.
+See this log for the ancestor stack trace. 
+    at <unknown> (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:1965:21)
+    at runWithFiberInDEV (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:965:74)
+    at validateDOMNesting (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:1964:178)
+    at beginWork (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:6758:104)
+    at runWithFiberInDEV (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:965:74)
+    at performUnitOfWork (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:9555:97)
+    at workLoopConcurrentByScheduler (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:9551:58)
+    at renderRootConcurrent (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:9534:71)
+    at performWorkOnRoot (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:9061:150)
+    at performWorkOnRootViaSchedulerTask (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:10255:9)
+    at MessagePort.performWorkUntilDeadline (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_0rpq4pf._.js:2647:64) (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:1965:21)
+[browser] Encountered a script tag while rendering React component. Scripts inside React components are never executed when rendering on the client. Consider using template tag instead (https://developer.mozilla.org/en-US/docs/Web/HTML/Element/template). 
+    at completeWork (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:6945:102)
+    at runWithFiberInDEV (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:965:74)
+    at completeUnitOfWork (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:9622:23)
+    at performUnitOfWork (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:9557:28)
+    at workLoopSync (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:9449:40)
+    at renderRootSync (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:9433:13)
+    at performWorkOnRoot (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:9098:47)
+    at performWorkOnRootViaSchedulerTask (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:10255:9)
+    at MessagePort.performWorkUntilDeadline (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_0rpq4pf._.js:2647:64) (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:6945:102)
+[browser] Uncaught Error: Hydration failed because the server rendered HTML didn't match the client. As a result this tree will be regenerated on the client. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+https://react.dev/link/hydration-mismatch
+    at <unknown> (https://react.dev/link/hydration-mismatch)
+    at throwOnHydrationMismatch (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:3318:56)
+    at beginWork (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:6758:918)
+    at runWithFiberInDEV (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:965:74)
+    at performUnitOfWork (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:9555:97)
+    at workLoopConcurrentByScheduler (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:9551:58)
+    at renderRootConcurrent (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:9534:71)
+    at performWorkOnRoot (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:9061:150)
+    at performWorkOnRootViaSchedulerTask (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:10255:9)
+    at MessagePort.performWorkUntilDeadline (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_0rpq4pf._.js:2647:64)
+    at button (<anonymous>)
+    at ThemeToggle (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/components_0bfpkb.._.js:40:214)
+    at SiteHeader (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/components_0bfpkb.._.js:324:249)
+    at RootLayout (app\layout.tsx:140:9)
+  138 |       <body className="min-h-full flex flex-col">
+  139 |         <SkipLink />
+> 140 |         <SiteHeader />
+      |         ^
+  141 |         <main id="main-content" className="flex-1 main-content-with-header" tabIndex={-1}>
+  142 |           {children}
+  143 |         </main>
+[browser] Image with src "https://utfs.io/f/0rxUlG6U2WS40hXl2eq6U2WS4wEFI5sNpGVtqCKo7LBzgxMv" has "fill" and parent element with invalid "position". Provided "static" should be one of absolute,fixed,relative. (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_115brz8._.js:2431:13)
+[browser] Image with src "https://utfs.io/f/0rxUlG6U2WS4eUb7M2TScmdyuolB8jT2XC5giAhDrLINfkb9" has "fill" and parent element with invalid "position". Provided "static" should be one of absolute,fixed,relative. (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_115brz8._.js:2431:13)
+[browser] Image with src "https://utfs.io/f/0rxUlG6U2WS4IeRQv4JasHxofhqVkD51KprSZMI2tLyEmRWi" has "fill" and parent element with invalid "position". Provided "static" should be one of absolute,fixed,relative. (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_115brz8._.js:2431:13)
+[browser] Image with src "https://utfs.io/f/0rxUlG6U2WS4egO60nYTScmdyuolB8jT2XC5giAhDrLINfkb" has "fill" and parent element with invalid "position". Provided "static" should be one of absolute,fixed,relative. (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_115brz8._.js:2431:13)
+[browser] Image with src "https://utfs.io/f/0rxUlG6U2WS4LnzywEO65W7ir9Oyb0Gn4XSTtIA3epvUuVCY" has "fill" and parent element with invalid "position". Provided "static" should be one of absolute,fixed,relative. (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_115brz8._.js:2431:13)
+[browser] Image with src "https://utfs.io/f/0rxUlG6U2WS4HUtLMNuMV4YzFTWRy2hAx8uKnS1Qd56obcX3" has "fill" and parent element with invalid "position". Provided "static" should be one of absolute,fixed,relative. (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_115brz8._.js:2431:13)
+[browser] In HTML, <button> cannot be a descendant of <button>.
+This will cause a hydration error.
+
+  ...
+    <AppDevOverlayErrorBoundary globalError={[...]}>
+      <ReplaySsrOnlyErrors>
+      <DevRootHTTPAccessFallbackBoundary>
+        <HTTPAccessFallbackBoundary notFound={<NotAllowedRootHTTPFallbackError>}>
+          <HTTPAccessFallbackErrorBoundary pathname="/blogs" notFound={<NotAllowedRootHTTPFallbackError>} ...>
+            <RedirectBoundary>
+              <RedirectErrorBoundary router={{...}}>
+                <Head>
+                <__next_root_layout_boundary__>
+                  <SegmentViewNode type="layout" pagePath="layout.tsx">
+                    <SegmentTrieNode>
+                    <link>
+                    <script>
+                    <script>
+                    <script>
+                    <RootLayout>
+                      <html lang="en" data-theme="light" suppressHydrationWarning={true} className="syne_ba40f...">
+                        <head>
+                        <body className="min-h-full...">
+                          <a>
+                          <SiteHeader>
+                            <header className={"header-new "}>
+                              <div className="header-inner">
+                                <LinkComponent>
+                                <nav>
+                                <div className="header-act...">
+                                  <LinkComponent>
+>                                 <button className="header-btn theme-btn-new" aria-label="Toggle theme">
+                                    <ThemeToggle>
+>                                     <button
+>                                       onClick={function cycleTheme}
+>                                       className="theme-icon-btn"
+>                                       aria-label="Toggle theme"
+>                                       type="button"
+>                                     >
+                                  ...
+                            ...
+                          ...
+                ...
+ 
+    at validateDOMNesting (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:1963:372)
+    at beginWork (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:6758:104)
+    at runWithFiberInDEV (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:965:74)
+    at performUnitOfWork (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:9555:97)
+    at workLoopConcurrentByScheduler (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:9551:58)
+    at renderRootConcurrent (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:9534:71)
+    at performWorkOnRoot (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:9061:150)
+    at performWorkOnRootViaSchedulerTask (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:10255:9)
+    at MessagePort.performWorkUntilDeadline (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_0rpq4pf._.js:2647:64) (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:1963:372)
+[browser] <button> cannot contain a nested <button>.
+See this log for the ancestor stack trace. 
+    at <unknown> (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:1965:21)
+    at runWithFiberInDEV (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:965:74)
+    at validateDOMNesting (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:1964:178)
+    at beginWork (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:6758:104)
+    at runWithFiberInDEV (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:965:74)
+    at performUnitOfWork (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:9555:97)
+    at workLoopConcurrentByScheduler (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:9551:58)
+    at renderRootConcurrent (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:9534:71)
+    at performWorkOnRoot (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:9061:150)
+    at performWorkOnRootViaSchedulerTask (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:10255:9)
+    at MessagePort.performWorkUntilDeadline (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_0rpq4pf._.js:2647:64) (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:1965:21)
+[browser] Encountered a script tag while rendering React component. Scripts inside React components are never executed when rendering on the client. Consider using template tag instead (https://developer.mozilla.org/en-US/docs/Web/HTML/Element/template). 
+    at completeWork (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:6945:102)
+    at runWithFiberInDEV (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:965:74)
+    at completeUnitOfWork (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:9622:23)
+    at performUnitOfWork (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:9557:28)
+    at workLoopSync (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:9449:40)
+    at renderRootSync (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:9433:13)
+    at performWorkOnRoot (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:9098:47)
+    at performWorkOnRootViaSchedulerTask (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:10255:9)
+    at MessagePort.performWorkUntilDeadline (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_0rpq4pf._.js:2647:64) (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:6945:102)
+[browser] Uncaught Error: Hydration failed because the server rendered HTML didn't match the client. As a result this tree will be regenerated on the client. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+https://react.dev/link/hydration-mismatch
+    at <unknown> (https://react.dev/link/hydration-mismatch)
+    at throwOnHydrationMismatch (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:3318:56)
+    at beginWork (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:6758:918)
+    at runWithFiberInDEV (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:965:74)
+    at performUnitOfWork (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:9555:97)
+    at workLoopConcurrentByScheduler (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:9551:58)
+    at renderRootConcurrent (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:9534:71)
+    at performWorkOnRoot (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:9061:150)
+    at performWorkOnRootViaSchedulerTask (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:10255:9)
+    at MessagePort.performWorkUntilDeadline (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_0rpq4pf._.js:2647:64)
+    at button (<anonymous>)
+    at ThemeToggle (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/components_0bfpkb.._.js:40:214)
+    at SiteHeader (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/components_0bfpkb.._.js:324:249)
+    at RootLayout (app\layout.tsx:140:9)
+  138 |       <body className="min-h-full flex flex-col">
+  139 |         <SkipLink />
+> 140 |         <SiteHeader />
+      |         ^
+  141 |         <main id="main-content" className="flex-1 main-content-with-header" tabIndex={-1}>
+  142 |           {children}
+  143 |         </main>
+ GET /blogs 200 in 3.4s (next.js: 11ms, proxy.ts: 21ms, application-code: 3.3s)
+[browser] Uncaught TypeError: Cannot read properties of null (reading 'parentNode')
+    at $RS (http://localhost:3000/blogs:1:1522954)
+    at <unknown> (http://localhost:3000/blogs:1:1523023)
+[browser] Uncaught TypeError: Cannot read properties of null (reading 'parentNode')
+    at $RS (http://localhost:3000/blogs:1:1522954)
+    at <unknown> (http://localhost:3000/blogs:1:1525917)
+[browser] Uncaught TypeError: Cannot read properties of null (reading 'parentNode')
+    at $RS (http://localhost:3000/blogs:1:1522954)
+    at <unknown> (http://localhost:3000/blogs:1:1528695)
+[browser] Uncaught TypeError: Cannot read properties of null (reading 'parentNode')
+    at $RS (http://localhost:3000/blogs:1:1522954)
+    at <unknown> (http://localhost:3000/blogs:1:1531387)
+[browser] Uncaught TypeError: Cannot read properties of null (reading 'parentNode')
+    at $RS (http://localhost:3000/blogs:1:1522954)
+    at <unknown> (http://localhost:3000/blogs:1:1534211)
+[browser] Uncaught TypeError: Cannot read properties of null (reading 'parentNode')
+    at $RS (http://localhost:3000/blogs:1:1522954)
+    at <unknown> (http://localhost:3000/blogs:1:1537090)
+[browser] Uncaught TypeError: Cannot read properties of null (reading 'parentNode')
+    at $RS (http://localhost:3000/blogs:1:1522954)
+    at <unknown> (http://localhost:3000/blogs:1:1539998)
+[browser] Uncaught TypeError: Cannot read properties of null (reading 'parentNode')
+    at $RS (http://localhost:3000/blogs:1:1522954)
+    at <unknown> (http://localhost:3000/blogs:1:1542805)
+[browser] Uncaught TypeError: Cannot read properties of null (reading 'parentNode')
+    at $RS (http://localhost:3000/blogs:1:1522954)
+    at <unknown> (http://localhost:3000/blogs:1:1553792)
+[browser] Uncaught TypeError: Cannot read properties of null (reading 'parentNode')
+    at $RS (http://localhost:3000/blogs:1:1522954)
+    at <unknown> (http://localhost:3000/blogs:1:1545653)
+[browser] Uncaught TypeError: Cannot read properties of null (reading 'parentNode')
+    at $RS (http://localhost:3000/blogs:1:1522954)
+    at <unknown> (http://localhost:3000/blogs:1:1556476)
+[browser] Uncaught TypeError: Cannot read properties of null (reading 'parentNode')
+    at $RS (http://localhost:3000/blogs:1:1522954)
+    at <unknown> (http://localhost:3000/blogs:1:1548273)
+[browser] Uncaught TypeError: Cannot read properties of null (reading 'parentNode')
+    at $RS (http://localhost:3000/blogs:1:1522954)
+    at <unknown> (http://localhost:3000/blogs:1:1559088)
+[browser] Uncaught TypeError: Cannot read properties of null (reading 'parentNode')
+    at $RS (http://localhost:3000/blogs:1:1522954)
+    at <unknown> (http://localhost:3000/blogs:1:1551086)
+[browser] Uncaught TypeError: Cannot read properties of null (reading 'parentNode')
+    at $RS (http://localhost:3000/blogs:1:1522954)
+    at <unknown> (http://localhost:3000/blogs:1:1561527)
+[browser] Uncaught TypeError: Cannot read properties of null (reading 'parentNode')
+    at $RS (http://localhost:3000/blogs:1:1522954)
+    at <unknown> (http://localhost:3000/blogs:1:1564347)
+[browser] Uncaught TypeError: Cannot read properties of null (reading 'parentNode')
+    at $RS (http://localhost:3000/blogs:1:1522954)
+    at <unknown> (http://localhost:3000/blogs:1:1567014)
+[browser] Uncaught TypeError: Cannot read properties of null (reading 'parentNode')
+    at $RS (http://localhost:3000/blogs:1:1522954)
+    at <unknown> (http://localhost:3000/blogs:1:1570019)
+[browser] Uncaught TypeError: Cannot read properties of null (reading 'parentNode')
+    at $RS (http://localhost:3000/blogs:1:1522954)
+    at <unknown> (http://localhost:3000/blogs:1:1572917)
+[browser] Image with src "https://www.ti.com/content/dam/ticom/images/products/ic/power-management/battery-management/boards/bq76pl536evm-3-top.png" has "fill" and parent element with invalid "position". Provided "static" should be one of absolute,fixed,relative. (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_115brz8._.js:2431:13)
+[browser] Image with src "https://www.integrasources.com/media/files/d1489974-da56-427e-9507-5159803aa280.png" has "fill" and parent element with invalid "position". Provided "static" should be one of absolute,fixed,relative. (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_115brz8._.js:2431:13)
+[browser] Image with src "https://utfs.io/f/0rxUlG6U2WS40hXl2eq6U2WS4wEFI5sNpGVtqCKo7LBzgxMv" has "fill" and parent element with invalid "position". Provided "static" should be one of absolute,fixed,relative. (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_115brz8._.js:2431:13)
+[browser] Image with src "https://utfs.io/f/0rxUlG6U2WS4eUb7M2TScmdyuolB8jT2XC5giAhDrLINfkb9" has "fill" and parent element with invalid "position". Provided "static" should be one of absolute,fixed,relative. (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_115brz8._.js:2431:13)
+[browser] Image with src "https://www.nxp.com/assets/images/en/dev-board-image/RD33775ACNTEVB_ISO.jpg" has "fill" and parent element with invalid "position". Provided "static" should be one of absolute,fixed,relative. (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_115brz8._.js:2431:13)
+[browser] Image with src "https://utfs.io/f/0rxUlG6U2WS4IeRQv4JasHxofhqVkD51KprSZMI2tLyEmRWi" has "fill" and parent element with invalid "position". Provided "static" should be one of absolute,fixed,relative. (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_115brz8._.js:2431:13)
+[browser] Image with src "https://utfs.io/f/0rxUlG6U2WS4bTEkPZ7BXMTlHNWe6asL57mCb13DIhF2gikP" has "fill" and parent element with invalid "position". Provided "static" should be one of absolute,fixed,relative. (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_115brz8._.js:2431:13)
+[browser] Image with src "https://e-amrit.niti.gov.in/assets/admin/dist/img/new-fronend-img/national-policy.jpg" has "fill" and parent element with invalid "position". Provided "static" should be one of absolute,fixed,relative. (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_115brz8._.js:2431:13)
+[browser] Image with src "https://emzrbrlfgkxsyogogjbn.supabase.co/storage/v1/object/public/media/cover-1775708263443-gnq1slg2j5u.png" has "fill" and parent element with invalid "position". Provided "static" should be one of absolute,fixed,relative. (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_115brz8._.js:2431:13)
+[browser] Image with src "https://utfs.io/f/0rxUlG6U2WS4T6TGUNF2jcgmyCVOYhB34fZIWDvs6Tiuwl9J" has "fill" and parent element with invalid "position". Provided "static" should be one of absolute,fixed,relative. (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_115brz8._.js:2431:13)
+[browser] Image with src "https://emzrbrlfgkxsyogogjbn.supabase.co/storage/v1/object/public/media/cover-a3dbe7ad-a56d-4f6f-b670-ffb75047ca7b.png" has "fill" and parent element with invalid "position". Provided "static" should be one of absolute,fixed,relative. (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_115brz8._.js:2431:13)
+[browser] Image with src "https://fireisolator.com/wp-content/uploads/2023/06/thermal-runaway.jpg" has "fill" and parent element with invalid "position". Provided "static" should be one of absolute,fixed,relative. (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_115brz8._.js:2431:13)
+[browser] Image with src "https://www.batterydesign.net/wp-content/uploads/2023/05/Figure-5-Thermal-runaway-1.jpg" has "fill" and parent element with invalid "position". Provided "static" should be one of absolute,fixed,relative. (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_115brz8._.js:2431:13)
+[browser] Image with src "https://emzrbrlfgkxsyogogjbn.supabase.co/storage/v1/object/public/media/cover-1775635235974-8etygya6b3d.webp" has "fill" and parent element with invalid "position". Provided "static" should be one of absolute,fixed,relative. (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_115brz8._.js:2431:13)
+[browser] Image with src "https://emzrbrlfgkxsyogogjbn.supabase.co/storage/v1/object/public/media/cover-1775638955184-l7o8385u5d.jpg" has "fill" and parent element with invalid "position". Provided "static" should be one of absolute,fixed,relative. (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_115brz8._.js:2431:13)
+[browser] Image with src "https://emzrbrlfgkxsyogogjbn.supabase.co/storage/v1/object/public/media/cover-1775639284342-wryy2yo6rqd.webp" has "fill" and parent element with invalid "position". Provided "static" should be one of absolute,fixed,relative. (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_115brz8._.js:2431:13)
+[browser] Image with src "https://blogs.sw.siemens.com/wp-content/uploads/sites/6/2025/02/Battery-Thermal-Runaway-Fire.png" has "fill" and parent element with invalid "position". Provided "static" should be one of absolute,fixed,relative. (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_115brz8._.js:2431:13)
+[browser] Image with src "https://emzrbrlfgkxsyogogjbn.supabase.co/storage/v1/object/public/media/cover-1775629611253-2f00cv4ph1w.webp" has "fill" and parent element with invalid "position". Provided "static" should be one of absolute,fixed,relative. (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_115brz8._.js:2431:13)
+[browser] Image with src "https://ars.els-cdn.com/content/image/1-s2.0-S0960148122018882-ga1.jpg" has "fill" and parent element with invalid "position". Provided "static" should be one of absolute,fixed,relative. (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_115brz8._.js:2431:13)
+[browser] Image with src "https://utfs.io/f/0rxUlG6U2WS4SCSnacKkUiD9EX2q10BvQLHgwNnlGWJh4Oaj" has "fill" and parent element with invalid "position". Provided "static" should be one of absolute,fixed,relative. (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_115brz8._.js:2431:13)
+[browser] Image with src "https://utfs.io/f/0rxUlG6U2WS4BOmrZz2pWg9iGEheYjSTqZcoLvw8HdbVMs1r" has "fill" and parent element with invalid "position". Provided "static" should be one of absolute,fixed,relative. (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_115brz8._.js:2431:13)
+[browser] Image with src "https://emzrbrlfgkxsyogogjbn.supabase.co/storage/v1/object/public/media/cover-3a9b89d0-9edd-4b53-b88a-614ef9bbf0b8.webp" has "fill" and parent element with invalid "position". Provided "static" should be one of absolute,fixed,relative. (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_115brz8._.js:2431:13)
+[browser] Image with src "https://emzrbrlfgkxsyogogjbn.supabase.co/storage/v1/object/public/media/cover-1775638587543-q0aals9hrs.jpg" has "fill" and parent element with invalid "position". Provided "static" should be one of absolute,fixed,relative. (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_115brz8._.js:2431:13)
+[browser] Image with src "https://emzrbrlfgkxsyogogjbn.supabase.co/storage/v1/object/public/media/cover-1775735775162-uqw4lolz8an.webp" has "fill" and parent element with invalid "position". Provided "static" should be one of absolute,fixed,relative. (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_115brz8._.js:2431:13)
+[browser] Image with src "https://emzrbrlfgkxsyogogjbn.supabase.co/storage/v1/object/public/media/cover-1775808077582-hehqd2ubv8k.webp" has "fill" and parent element with invalid "position". Provided "static" should be one of absolute,fixed,relative. (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_115brz8._.js:2431:13)
+[browser] Image with src "https://utfs.io/f/0rxUlG6U2WS4NIy9TvntzbOhqyCRkpTXAFuDJY9r4smKNjw2" has "fill" and parent element with invalid "position". Provided "static" should be one of absolute,fixed,relative. (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_115brz8._.js:2431:13)
+[browser] Image with src "https://www.ag-elec.com/uploads/images/four-charging-modes-for-electric-cars.webp" has "fill" and parent element with invalid "position". Provided "static" should be one of absolute,fixed,relative. (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_115brz8._.js:2431:13)
+[browser] Image with src "https://utfs.io/f/0rxUlG6U2WS4egO60nYTScmdyuolB8jT2XC5giAhDrLINfkb" has "fill" and parent element with invalid "position". Provided "static" should be one of absolute,fixed,relative. (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_115brz8._.js:2431:13)
+[browser] Image with src "https://utfs.io/f/0rxUlG6U2WS4LnzywEO65W7ir9Oyb0Gn4XSTtIA3epvUuVCY" has "fill" and parent element with invalid "position". Provided "static" should be one of absolute,fixed,relative. (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_115brz8._.js:2431:13)
+[browser] Image with src "https://utfs.io/f/0rxUlG6U2WS4HUtLMNuMV4YzFTWRy2hAx8uKnS1Qd56obcX3" has "fill" and parent element with invalid "position". Provided "static" should be one of absolute,fixed,relative. (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_115brz8._.js:2431:13)
+[browser] Image with src "https://emzrbrlfgkxsyogogjbn.supabase.co/storage/v1/object/public/media/cover-1775627533633-0r1lml2wu6y.png" has "fill" and parent element with invalid "position". Provided "static" should be one of absolute,fixed,relative. (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_115brz8._.js:2431:13)
+ GET / 200 in 2.8s (next.js: 25ms, proxy.ts: 19ms, application-code: 2.7s)
+[browser] In HTML, <button> cannot be a descendant of <button>.
+This will cause a hydration error.
+
+  ...
+    <AppDevOverlayErrorBoundary globalError={[...]}>
+      <ReplaySsrOnlyErrors>
+      <DevRootHTTPAccessFallbackBoundary>
+        <HTTPAccessFallbackBoundary notFound={<NotAllowedRootHTTPFallbackError>}>
+          <HTTPAccessFallbackErrorBoundary pathname="/" notFound={<NotAllowedRootHTTPFallbackError>} ...>
+            <RedirectBoundary>
+              <RedirectErrorBoundary router={{...}}>
+                <Head>
+                <__next_root_layout_boundary__>
+                  <SegmentViewNode type="layout" pagePath="layout.tsx">
+                    <SegmentTrieNode>
+                    <link>
+                    <script>
+                    <script>
+                    <script>
+                    <RootLayout>
+                      <html lang="en" data-theme="light" suppressHydrationWarning={true} className="syne_ba40f...">
+                        <head>
+                        <body className="min-h-full...">
+                          <a>
+                          <SiteHeader>
+                            <header className={"header-new "}>
+                              <div className="header-inner">
+                                <LinkComponent>
+                                <nav>
+                                <div className="header-act...">
+                                  <LinkComponent>
+>                                 <button className="header-btn theme-btn-new" aria-label="Toggle theme">
+                                    <ThemeToggle>
+>                                     <button
+>                                       onClick={function cycleTheme}
+>                                       className="theme-icon-btn"
+>                                       aria-label="Toggle theme"
+>                                       type="button"
+>                                     >
+                                  ...
+                            ...
+                          ...
+                ...
+ 
+    at validateDOMNesting (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:1963:372)
+    at beginWork (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:6758:104)
+    at runWithFiberInDEV (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:965:74)
+    at performUnitOfWork (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:9555:97)
+    at workLoopConcurrentByScheduler (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:9551:58)
+    at renderRootConcurrent (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:9534:71)
+    at performWorkOnRoot (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:9061:150)
+    at performWorkOnRootViaSchedulerTask (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:10255:9)
+    at MessagePort.performWorkUntilDeadline (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_0rpq4pf._.js:2647:64) (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:1963:372)
+[browser] <button> cannot contain a nested <button>.
+See this log for the ancestor stack trace. 
+    at <unknown> (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:1965:21)
+    at runWithFiberInDEV (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:965:74)
+    at validateDOMNesting (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:1964:178)
+    at beginWork (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:6758:104)
+    at runWithFiberInDEV (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:965:74)
+    at performUnitOfWork (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:9555:97)
+    at workLoopConcurrentByScheduler (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:9551:58)
+    at renderRootConcurrent (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:9534:71)
+    at performWorkOnRoot (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:9061:150)
+    at performWorkOnRootViaSchedulerTask (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:10255:9)
+    at MessagePort.performWorkUntilDeadline (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_0rpq4pf._.js:2647:64) (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:1965:21)
+[browser] Encountered a script tag while rendering React component. Scripts inside React components are never executed when rendering on the client. Consider using template tag instead (https://developer.mozilla.org/en-US/docs/Web/HTML/Element/template). 
+    at completeWork (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:6945:102)
+    at runWithFiberInDEV (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:965:74)
+    at completeUnitOfWork (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:9622:23)
+    at performUnitOfWork (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:9557:28)
+    at workLoopSync (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:9449:40)
+    at renderRootSync (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:9433:13)
+    at performWorkOnRoot (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:9098:47)
+    at performWorkOnRootViaSchedulerTask (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:10255:9)
+    at MessagePort.performWorkUntilDeadline (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_0rpq4pf._.js:2647:64) (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:6945:102)
+[browser] Uncaught Error: Hydration failed because the server rendered HTML didn't match the client. As a result this tree will be regenerated on the client. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+https://react.dev/link/hydration-mismatch
+    at <unknown> (https://react.dev/link/hydration-mismatch)
+    at throwOnHydrationMismatch (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:3318:56)
+    at beginWork (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:6758:918)
+    at runWithFiberInDEV (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:965:74)
+    at performUnitOfWork (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:9555:97)
+    at workLoopConcurrentByScheduler (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:9551:58)
+    at renderRootConcurrent (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:9534:71)
+    at performWorkOnRoot (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:9061:150)
+    at performWorkOnRootViaSchedulerTask (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:10255:9)
+    at MessagePort.performWorkUntilDeadline (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_compiled_0rpq4pf._.js:2647:64)
+    at button (<anonymous>)
+    at ThemeToggle (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/components_0bfpkb.._.js:40:214)
+    at SiteHeader (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/components_0bfpkb.._.js:324:249)
+    at RootLayout (app\layout.tsx:140:9)
+  138 |       <body className="min-h-full flex flex-col">
+  139 |         <SkipLink />
+> 140 |         <SiteHeader />
+      |         ^
+  141 |         <main id="main-content" className="flex-1 main-content-with-header" tabIndex={-1}>
+  142 |           {children}
+  143 |         </main>
+[browser] Image with src "https://utfs.io/f/0rxUlG6U2WS40hXl2eq6U2WS4wEFI5sNpGVtqCKo7LBzgxMv" has "fill" and parent element with invalid "position". Provided "static" should be one of absolute,fixed,relative. (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_115brz8._.js:2431:13)
+[browser] Image with src "https://utfs.io/f/0rxUlG6U2WS4eUb7M2TScmdyuolB8jT2XC5giAhDrLINfkb9" has "fill" and parent element with invalid "position". Provided "static" should be one of absolute,fixed,relative. (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_115brz8._.js:2431:13)
+[browser] Image with src "https://utfs.io/f/0rxUlG6U2WS4IeRQv4JasHxofhqVkD51KprSZMI2tLyEmRWi" has "fill" and parent element with invalid "position". Provided "static" should be one of absolute,fixed,relative. (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_115brz8._.js:2431:13)
+[browser] Image with src "https://utfs.io/f/0rxUlG6U2WS4egO60nYTScmdyuolB8jT2XC5giAhDrLINfkb" has "fill" and parent element with invalid "position". Provided "static" should be one of absolute,fixed,relative. (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_115brz8._.js:2431:13)
+[browser] Image with src "https://utfs.io/f/0rxUlG6U2WS4LnzywEO65W7ir9Oyb0Gn4XSTtIA3epvUuVCY" has "fill" and parent element with invalid "position". Provided "static" should be one of absolute,fixed,relative. (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_115brz8._.js:2431:13)
+[browser] Image with src "https://utfs.io/f/0rxUlG6U2WS4HUtLMNuMV4YzFTWRy2hAx8uKnS1Qd56obcX3" has "fill" and parent element with invalid "position". Provided "static" should be one of absolute,fixed,relative. (file://C:/Users/Chaitanya Dasari/Desktop/Github/EV-Blog-main/.next/dev/static/chunks/node_modules_next_dist_115brz8._.js:2431:13)
+✓ Compiled in 362ms
+ GET /category/cell-chemistry 200 in 475ms (next.js: 388ms, proxy.ts: 7ms, generate-params: 11ms, application-code: 80ms)
+ GET / 200 in 490ms (next.js: 220ms, proxy.ts: 7ms, application-code: 264ms)
+ GET /category/cell-chemistry 200 in 503ms (next.js: 376ms, proxy.ts: 9ms, generate-params: 13ms, application-code: 118ms)
+ GET / 200 in 508ms (next.js: 148ms, proxy.ts: 9ms, application-code: 352ms)
+✓ Compiled in 162ms
+ GET /category/cell-chemistry 200 in 662ms (next.js: 507ms, proxy.ts: 26ms, generate-params: 12ms, application-code: 129ms)
+ GET / 200 in 682ms (next.js: 265ms, proxy.ts: 16ms, application-code: 401ms)
+✓ Compiled in 338ms
+ GET /category/cell-chemistry 200 in 764ms (next.js: 520ms, proxy.ts: 28ms, generate-params: 16ms, application-code: 216ms)
+ GET / 200 in 787ms (next.js: 270ms, proxy.ts: 29ms, application-code: 488ms)
+ GET /category/cell-chemistry 200 in 342ms (next.js: 279ms, proxy.ts: 7ms, generate-params: 7ms, application-code: 55ms)
+ GET / 200 in 350ms (next.js: 162ms, proxy.ts: 8ms, application-code: 180ms)
+✓ Compiled in 151ms
+ GET /category/cell-chemistry 200 in 515ms (next.js: 388ms, proxy.ts: 12ms, generate-params: 14ms, application-code: 115ms)
+ GET / 200 in 525ms (next.js: 192ms, proxy.ts: 15ms, application-code: 318ms)
+✓ Compiled in 191ms
+ GET /category/cell-chemistry 200 in 484ms (next.js: 315ms, proxy.ts: 13ms, generate-params: 10ms, application-code: 156ms)
+ GET / 200 in 504ms (next.js: 193ms, proxy.ts: 13ms, application-code: 297ms)
+✓ Compiled in 136ms
+ GET /category/cell-chemistry 200 in 402ms (next.js: 271ms, proxy.ts: 22ms, generate-params: 9ms, application-code: 109ms)
+ GET / 200 in 404ms (next.js: 155ms, proxy.ts: 16ms, application-code: 234ms)
+✓ Compiled in 84ms
+ GET /category/cell-chemistry 200 in 410ms (next.js: 269ms, proxy.ts: 8ms, generate-params: 13ms, application-code: 133ms)
+ GET / 200 in 419ms (next.js: 146ms, proxy.ts: 9ms, application-code: 264ms)
+ GET / 200 in 2.2s (next.js: 5ms, proxy.ts: 7ms, application-code: 2.2s)
