@@ -526,6 +526,31 @@ export function markdownToHtml(markdown: string) {
       continue;
     }
 
+    // Fenced code block: ```lang\ncode\n```
+    if (line.startsWith("```")) {
+      flushAll();
+      const lang = (line.slice(3).trim() || "text").toLowerCase();
+      const codeLines: string[] = [];
+      i += 1;
+      while (i < lines.length && !lines[i].trim().startsWith("```")) {
+        codeLines.push(lines[i]);
+        i += 1;
+      }
+      const raw = codeLines.join("\n").trimEnd();
+      const escaped = raw
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+      const copyJs = `navigator.clipboard.writeText(this.closest('.code-block').querySelector('code').innerText).then(()=>{this.textContent='Copied';setTimeout(()=>this.textContent='Copy',2000)})`;
+      blocks.push(
+        `<div class="code-block">` +
+        `<div class="code-block-header"><span class="lang-tag">${lang.toUpperCase()}</span>` +
+        `<button type="button" class="copy-btn" onclick="${copyJs}">Copy</button></div>` +
+        `<pre class="language-${lang}"><code class="language-${lang}">${escaped}</code></pre></div>`
+      );
+      continue;
+    }
+
     if (line === "$$") {
       flushAll();
       const formulaLines: string[] = [];

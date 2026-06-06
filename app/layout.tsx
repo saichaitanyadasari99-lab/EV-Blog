@@ -1,10 +1,17 @@
 import type { Metadata, Viewport } from "next";
-import { DM_Sans, DM_Serif_Display, IBM_Plex_Mono, Plus_Jakarta_Sans, JetBrains_Mono, Syne } from "next/font/google";
+import { DM_Sans, DM_Serif_Display, IBM_Plex_Mono, Plus_Jakarta_Sans, JetBrains_Mono, Syne, Space_Grotesk } from "next/font/google";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SkipLink } from "@/components/SkipLink";
 import "./globals.css";
 import { ORGANIZATION_SCHEMA, WEBSITE_SCHEMA } from "@/lib/schema";
+
+const spaceGrotesk = Space_Grotesk({
+  variable: "--font-space-grotesk",
+  subsets: ["latin"],
+  weight: ["500", "600", "700"],
+  display: "swap",
+});
 
 const syne = Syne({
   variable: "--font-syne",
@@ -115,7 +122,7 @@ export default function RootLayout({
       lang="en"
       data-theme="light"
       suppressHydrationWarning
-      className={`${syne.variable} ${dmSerifDisplay.variable} ${dmSans.variable} ${ibmMono.variable} ${plusJakarta.variable} ${jetBrainsMono.variable} h-full antialiased`}
+      className={`${spaceGrotesk.variable} ${syne.variable} ${dmSerifDisplay.variable} ${dmSans.variable} ${ibmMono.variable} ${plusJakarta.variable} ${jetBrainsMono.variable} h-full antialiased`}
     >
       <head>
         <meta name="theme-color" content="#0099b8" />
