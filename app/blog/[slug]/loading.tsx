@@ -1,4 +1,4 @@
-function SkeletonLine({ width = "100%", height = 14, mt = 0 }: { width?: string; height?: number; mt?: number }) {
+function SkeletonLine({ width = "100%", height = 14, mt = 0 }: { width?: string | number; height?: number; mt?: number }) {
   return (
     <div
       className="skeleton"
