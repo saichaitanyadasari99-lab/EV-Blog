@@ -1,0 +1,2240 @@
+{
+  "title": "Why Your EV's Battery Percentage Is Lying to You",
+  "slug": "ev-battery-percentage-wrong-coulomb-counting-explained-beginners",
+  "excerpt": "You charged to 80%, drove 40 km, and the battery shows 48%. The maths doesn't add up. Your EV isn't broken — it's just bad at counting. Here's why battery percentage is harder to measure than it sounds, and why Indian EVs get it wrong more often than they should.",
+  "category": "bms",
+  "tags": [
+    "coulomb counting",
+    "SOC",
+    "battery percentage",
+    "BMS",
+    "beginner",
+    "range anxiety",
+    "battery indicator",
+    "EV accuracy"
+  ],
+  "tier": "noob",
+  "published": true,
+  "cover_url": "https://utfs.io/f/0rxUlG6U2WS4NIy9TvntzbOhqyCRkpTXAFuDJY9r4smKNjw2",
+  "pullquote": "",
+  "stats": [],
+  "references": [],
+  "reading_time": 10,
+  "created_at": "2026-05-14T06:24:50.570125+00:00",
+  "updated_at": "2026-05-14T06:28:48.78+00:00",
+  "faqs": [
+    {
+      "answer": "Your EV estimates remaining range by combining battery percentage with your recent driving behaviour. If the battery percentage itself has small errors — which it almost always does — and your driving style just changed (highway vs city, AC on vs off), the range estimate recalculates. The jumpiness is the system correcting itself with new information. It is not a fault.",
+      "question": "Why does my EV's range estimate jump around so much?"
+    },
+    {
+      "answer": "Yes — and it is actually a sign that the BMS is correcting its estimate. The voltage curve of a lithium-ion battery is not linear. At the top and bottom, small changes in voltage correspond to large changes in actual charge. The BMS uses these voltage extremes to reset its counting errors. You may notice the percentage drop quickly at first, then slow down in the middle of the range — this is normal electrochemical behaviour, not a fault.",
+      "question": "Is it normal for the battery percentage to drop faster at the start or end of a charge cycle?"
+    },
+    {
+      "answer": "This is a calibration failure in the BMS. The battery percentage counter has drifted significantly from the real state of the battery — usually due to accumulated counting errors that were never corrected. It is more common in older BMS designs, EVs that are rarely charged to full (which is when the BMS recalibrates), and vehicles in high-temperature climates. A dealer service can often recalibrate it.",
+      "question": "My EV says 30% but then suddenly dies — what happened?"
+    },
+    {
+      "answer": "Yes — gradually. As the battery degrades, its actual capacity changes but the BMS calculation may be using old assumptions. Additionally, the current sensor inside the BMS slowly loses accuracy over time and with temperature changes. Most modern BMS systems have self-correction mechanisms, but cheaper systems may not. The result is an indicator that becomes progressively less trustworthy.",
+      "question": "Does the battery percentage become less accurate over time?"
+    },
+    {
+      "answer": "Several reasons: lower-cost current sensors with wider accuracy tolerances, BMS firmware that was not tuned specifically for Indian temperature conditions, and in some cases BMS designs that were adapted from two-wheeler or e-rickshaw applications where accuracy requirements are lower. The gap is closing as Indian OEMs and BMS suppliers mature, but it is a real and documented difference in current-generation products.",
+      "question": "Why do Indian EVs seem to have worse battery percentage accuracy than imported brands?"
+    }
+  ],
+  "markdown": "",
+  "content": {
+    "type": "doc",
+    "content": [
+      {
+        "type": "heading",
+        "attrs": {
+          "level": 1
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Why Your EV's Battery Percentage Is Lying to You"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "italic"
+              }
+            ],
+            "text": "It said 80%. You drove 40 km. Now it says 44%. Something doesn't add up — and it isn't your driving. It's the way your EV measures its own battery, and why that measurement goes wrong."
+          }
+        ]
+      },
+      {
+        "type": "horizontalRule"
+      },
+      {
+        "type": "heading",
+        "attrs": {
+          "level": 2
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Table of Contents"
+          }
+        ]
+      },
+      {
+        "type": "bulletList",
+        "content": [
+          {
+            "type": "listItem",
+            "content": [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "link",
+                        "attrs": {
+                          "href": "#the-leaky-bucket-problem",
+                          "target": "_blank",
+                          "rel": "noopener noreferrer nofollow",
+                          "class": null,
+                          "title": null
+                        }
+                      }
+                    ],
+                    "text": "The Leaky Bucket Problem"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "listItem",
+            "content": [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "link",
+                        "attrs": {
+                          "href": "#how-your-ev-counts-battery-charge",
+                          "target": "_blank",
+                          "rel": "noopener noreferrer nofollow",
+                          "class": null,
+                          "title": null
+                        }
+                      }
+                    ],
+                    "text": "How Your EV Counts Battery Charge"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "listItem",
+            "content": [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "link",
+                        "attrs": {
+                          "href": "#why-the-count-goes-wrong",
+                          "target": "_blank",
+                          "rel": "noopener noreferrer nofollow",
+                          "class": null,
+                          "title": null
+                        }
+                      }
+                    ],
+                    "text": "Why the Count Goes Wrong"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "listItem",
+            "content": [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "link",
+                        "attrs": {
+                          "href": "#the-dripping-tap-you-cant-measure-perfectly",
+                          "target": "_blank",
+                          "rel": "noopener noreferrer nofollow",
+                          "class": null,
+                          "title": null
+                        }
+                      }
+                    ],
+                    "text": "The Dripping Tap You Can't Measure Perfectly"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "listItem",
+            "content": [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "link",
+                        "attrs": {
+                          "href": "#why-heat-makes-it-worse",
+                          "target": "_blank",
+                          "rel": "noopener noreferrer nofollow",
+                          "class": null,
+                          "title": null
+                        }
+                      }
+                    ],
+                    "text": "Why Heat Makes It Worse"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "listItem",
+            "content": [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "link",
+                        "attrs": {
+                          "href": "#how-the-bms-corrects-itself--when-it-can",
+                          "target": "_blank",
+                          "rel": "noopener noreferrer nofollow",
+                          "class": null,
+                          "title": null
+                        }
+                      }
+                    ],
+                    "text": "How the BMS Corrects Itself — When It Can"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "listItem",
+            "content": [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "link",
+                        "attrs": {
+                          "href": "#why-indian-evs-get-this-wrong-more-often",
+                          "target": "_blank",
+                          "rel": "noopener noreferrer nofollow",
+                          "class": null,
+                          "title": null
+                        }
+                      }
+                    ],
+                    "text": "Why Indian EVs Get This Wrong More Often"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "listItem",
+            "content": [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "link",
+                        "attrs": {
+                          "href": "#what-this-looks-like-in-real-life",
+                          "target": "_blank",
+                          "rel": "noopener noreferrer nofollow",
+                          "class": null,
+                          "title": null
+                        }
+                      }
+                    ],
+                    "text": "What This Looks Like in Real Life"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "listItem",
+            "content": [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "link",
+                        "attrs": {
+                          "href": "#what-you-can-do-about-it",
+                          "target": "_blank",
+                          "rel": "noopener noreferrer nofollow",
+                          "class": null,
+                          "title": null
+                        }
+                      }
+                    ],
+                    "text": "What You Can Do About It"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "listItem",
+            "content": [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "link",
+                        "attrs": {
+                          "href": "#key-takeaways",
+                          "target": "_blank",
+                          "rel": "noopener noreferrer nofollow",
+                          "class": null,
+                          "title": null
+                        }
+                      }
+                    ],
+                    "text": "Key Takeaways"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "listItem",
+            "content": [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "link",
+                        "attrs": {
+                          "href": "#resources-and-references",
+                          "target": "_blank",
+                          "rel": "noopener noreferrer nofollow",
+                          "class": null,
+                          "title": null
+                        }
+                      }
+                    ],
+                    "text": "Resources and References"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "horizontalRule"
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "text": "ℹ"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "text": "This is the "
+          },
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "Beginner"
+          },
+          {
+            "type": "text",
+            "text": " level of the EVPulse Coulomb Counting series. No technical background needed. If you already understand what a BMS does and want the engineering detail, start at the Intermediate article."
+          }
+        ]
+      },
+      {
+        "type": "horizontalRule"
+      },
+      {
+        "type": "heading",
+        "attrs": {
+          "level": 2
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "The Leaky Bucket Problem"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "text": "Imagine you have a bucket of water. You want to know exactly how much water is left inside at any moment — but you cannot see inside the bucket. The only tool you have is a flow meter attached to the pipe."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "text": "Every time water flows in, you add to your count. Every time water flows out, you subtract. Simple enough."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "text": "Now imagine three complications:"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "text": "First — your flow meter is not perfectly accurate. It reads 1.02 litres when exactly 1 litre flows past. A tiny error. Barely noticeable."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "text": "Second — the bucket is slightly leaky. Not obviously. Just a drip you cannot see, slowly losing water that your meter never measures."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "text": "Third — as the bucket fills and empties, tiny amounts of the interior wall coating dissolve into the water. Over time, the bucket itself shrinks slightly — but your counting system still thinks it is the original size."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "text": "After enough fill-and-empty cycles, your count is noticeably wrong. The bucket shows 30% full. You tilt it and barely a trickle comes out."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "text": "That bucket is your EV battery. The flow meter is the current sensor in your BMS. And the counting method is called coulomb counting."
+          }
+        ]
+      },
+      {
+        "type": "horizontalRule"
+      },
+      {
+        "type": "heading",
+        "attrs": {
+          "level": 2
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "How Your EV Counts Battery Charge"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "text": "Your EV does not have a direct way to measure how much energy is stored in the battery. There is no dipstick. There is no transparent wall."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "text": "What it does have is a current sensor — a device that measures the flow of electricity in and out of the battery at all times."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "text": "The BMS computer uses a simple principle: if I know how much charge flowed in, and how much flowed out, and what I started with — I know what is left."
+          }
+        ]
+      },
+      {
+        "type": "blockquote",
+        "content": [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "Coulomb counting is the EV equivalent of tracking your bank balance by recording every deposit and withdrawal — without ever being able to look at the actual account balance directly."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "text": "This works well in theory. In practice, every single measurement has a tiny error. And tiny errors, added together thousands of times per day, become big errors over weeks and months."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "text": "Current measurements taken per second (typical BMS)"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "text": "10–100"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "text": "Measurements taken per full charge cycle"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "text": "Roughly 360,000–3,600,000"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "text": "Effect of 0.5% sensor error over 200 cycles"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "text": "Up to 8–12% SOC drift without correction"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "text": "How often most Indian BMS systems recalibrate"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "text": "Only at full charge — sometimes never"
+          }
+        ]
+      },
+      {
+        "type": "horizontalRule"
+      },
+      {
+        "type": "heading",
+        "attrs": {
+          "level": 2
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Why the Count Goes Wrong"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "text": "There are four reasons the count drifts from reality:"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "The sensor is not perfectly accurate."
+          },
+          {
+            "type": "text",
+            "text": " Every current sensor has a tolerance — a band of acceptable error. A sensor rated at ±0.5% sounds very precise. But at every single measurement, it could be reading slightly high or slightly low. These small errors accumulate in one direction over time."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "The battery leaks charge — invisibly."
+          },
+          {
+            "type": "text",
+            "text": " Every lithium-ion cell has a tiny self-discharge — it slowly loses charge even when nothing is connected. This loss happens continuously and invisibly. The BMS counts what flows through the wire. It cannot count what the battery loses internally just by sitting there."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "The battery has aged and changed size."
+          },
+          {
+            "type": "text",
+            "text": " A 40 kWh battery on Day 1 may only hold 36 kWh after 3 years. But if the BMS is still calculating against the original 40 kWh number, every percentage is now wrong — 100% means something different than it used to."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "Temperature changes everything."
+          },
+          {
+            "type": "text",
+            "text": " A battery in 45°C heat behaves differently than the same battery at 25°C. The relationship between voltage and charge level changes. The sensor itself reads differently. The self-discharge rate changes. All of these throw the count off."
+          }
+        ]
+      },
+      {
+        "type": "horizontalRule"
+      },
+      {
+        "type": "heading",
+        "attrs": {
+          "level": 2
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "The Dripping Tap You Can't Measure Perfectly"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "text": "Here is a simple way to feel why tiny errors compound:"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "text": "Imagine you are counting drops from a dripping tap to measure how much water fell into a glass. Each drop is 0.05 ml — roughly. You count 400 drops and conclude the glass has 20 ml."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "text": "But each drop was actually between 0.048 and 0.052 ml. Over 400 drops, your error could be anywhere from −0.8 ml to +0.8 ml — a 4% error from a seemingly tiny per-drop uncertainty."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "text": "Now run that tap for a day. Count millions of drops. The error no longer cancels out — it wanders in one direction and keeps going."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "text": "[!FIGURE src=\"https://images.evpulse.co.in/figures/coulomb-drift-noob.png\" caption=\"Illustration of how small per-measurement errors in coulomb counting compound over hundreds of cycles into visible SOC drift. Each cycle, the error can grow slightly larger if no correction is applied.\" /]"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "text": "The current sensor in your BMS is doing exactly this — measuring millions of electron \"drops\" every day — and the errors do not always cancel."
+          }
+        ]
+      },
+      {
+        "type": "horizontalRule"
+      },
+      {
+        "type": "heading",
+        "attrs": {
+          "level": 2
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Why Heat Makes It Worse"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "text": "This is where Indian EVs face a specific challenge that European or Korean market BMS designs were not built to handle."
+          }
+        ]
+      },
+      {
+        "type": "table",
+        "content": [
+          {
+            "type": "tableRow",
+            "content": [
+              {
+                "type": "tableHeader",
+                "attrs": {
+                  "colspan": 1,
+                  "rowspan": 1,
+                  "colwidth": null,
+                  "align": null
+                },
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "Europe / Korea (design target)"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "tableHeader",
+                "attrs": {
+                  "colspan": 1,
+                  "rowspan": 1,
+                  "colwidth": null,
+                  "align": null
+                },
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "India (actual conditions)"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "tableRow",
+            "content": [
+              {
+                "type": "tableCell",
+                "attrs": {
+                  "colspan": 1,
+                  "rowspan": 1,
+                  "colwidth": null,
+                  "align": null
+                },
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "Ambient temperature range: −10°C to 35°C"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "tableCell",
+                "attrs": {
+                  "colspan": 1,
+                  "rowspan": 1,
+                  "colwidth": null,
+                  "align": null
+                },
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "Ambient temperature range: 5°C to 48°C"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "tableRow",
+            "content": [
+              {
+                "type": "tableCell",
+                "attrs": {
+                  "colspan": 1,
+                  "rowspan": 1,
+                  "colwidth": null,
+                  "align": null
+                },
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "Average operating temp: 18–22°C"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "tableCell",
+                "attrs": {
+                  "colspan": 1,
+                  "rowspan": 1,
+                  "colwidth": null,
+                  "align": null
+                },
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "Average operating temp: 30–38°C in summer"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "tableRow",
+            "content": [
+              {
+                "type": "tableCell",
+                "attrs": {
+                  "colspan": 1,
+                  "rowspan": 1,
+                  "colwidth": null,
+                  "align": null
+                },
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "Current sensor drift at design temp: Calibrated"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "tableCell",
+                "attrs": {
+                  "colspan": 1,
+                  "rowspan": 1,
+                  "colwidth": null,
+                  "align": null
+                },
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "Current sensor drift at 45°C: Not recalibrated"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "tableRow",
+            "content": [
+              {
+                "type": "tableCell",
+                "attrs": {
+                  "colspan": 1,
+                  "rowspan": 1,
+                  "colwidth": null,
+                  "align": null
+                },
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "Self-discharge rate assumed: Low"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "tableCell",
+                "attrs": {
+                  "colspan": 1,
+                  "rowspan": 1,
+                  "colwidth": null,
+                  "align": null
+                },
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "Self-discharge rate at 40°C+: Significantly higher"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "text": "Most current sensors have a temperature coefficient — their accuracy changes with temperature. A sensor calibrated at 25°C that is operating at 45°C in a parked Indian EV on a summer afternoon is reading with a different error than it was designed for. The BMS firmware does not always account for this."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "text": "⚠"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "text": "This is not hypothetical. Documented field studies of Indian commercial EVs (2-wheelers and 3-wheelers especially) found SOC estimation errors of 8–15% after 200 charge cycles under high-temperature operating conditions. The battery percentage display was essentially fiction at that point — sometimes showing 30% remaining when the actual usable charge was under 15%."
+          }
+        ]
+      },
+      {
+        "type": "horizontalRule"
+      },
+      {
+        "type": "heading",
+        "attrs": {
+          "level": 2
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "How the BMS Corrects Itself — When It Can"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "text": "A good BMS knows its counting will drift. So it uses checkpoints to reset the count."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "text": "The most common checkpoint: when the battery reaches 100% charge."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "text": "At full charge, the battery voltage reaches a predictable maximum. The BMS knows exactly what 100% looks like in voltage terms. When it sees that voltage, it resets the counter to 100% — correcting whatever drift had accumulated."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "text": "Similarly, at the very bottom — near 0% — the voltage drops to a known minimum. Another reset point."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "text": "This works well for people who regularly charge to full. It works poorly for people who always stop at 80% — which is exactly what good battery health advice says to do."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "text": "🔑"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "text": "This is a genuine tension: charging to 100% regularly is bad for long-term battery health, but it is the most common recalibration point for the coulomb counter. A BMS that only corrects itself at full charge will accumulate drift for owners following 80% charging guidelines. Better BMS designs use voltage curves mid-charge to correct continuously — not just at the endpoints."
+          }
+        ]
+      },
+      {
+        "type": "horizontalRule"
+      },
+      {
+        "type": "heading",
+        "attrs": {
+          "level": 2
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Why Indian EVs Get This Wrong More Often"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "text": "This is a pattern, not a sweeping generalisation. Several specific factors contribute:"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "Lower-cost current sensors."
+          },
+          {
+            "type": "text",
+            "text": " Premium EVs use Hall-effect or shunt-based sensors with ±0.1% accuracy. Many Indian market BMS designs — particularly in 2-wheelers, 3-wheelers, and early-generation 4-wheelers — use sensors with ±0.5–1% accuracy tolerance. The difference sounds small. Over 200 cycles, the accumulated drift is not small."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "BMS firmware not tuned for Indian temperatures."
+          },
+          {
+            "type": "text",
+            "text": " Software calibration tables that correct for temperature drift are often set for temperate climates. Running the same firmware in 45°C Indian summer conditions introduces uncorrected sensor errors."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "Infrequent full-charge calibration points."
+          },
+          {
+            "type": "text",
+            "text": " Many Indian EV users, particularly in urban use cases, top up frequently and never reach 100%. Without regular full-charge resets, drift accumulates unchecked."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "BMS designs adapted from simpler applications."
+          },
+          {
+            "type": "text",
+            "text": " Some Indian BMS suppliers built their expertise on e-rickshaw and industrial battery systems where a 10% SOC error is acceptable. When the same firmware architecture migrates to a passenger EV with a precision range display, the accuracy requirements are different — but the code is not always updated."
+          }
+        ]
+      },
+      {
+        "type": "horizontalRule"
+      },
+      {
+        "type": "heading",
+        "attrs": {
+          "level": 2
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "What This Looks Like in Real Life"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "text": "Here is what accumulated coulomb counting drift looks like from the driver's seat:"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "text": "1"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "Early sign — inconsistent drops"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "text": "The percentage seems to drop faster in the first quarter of a drive than expected, then slow down. The BMS is using voltage readings to partially correct its count mid-drive."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "text": "2"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "Mid-stage — range estimate unreliable"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "text": "The estimated range remaining becomes noticeably optimistic. The car says you can do 40 more km. You can actually do 28."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "text": "3"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "Late stage — sudden drops"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "text": "The percentage reads 25%, then rapidly falls to 8% over a short distance. The counter was wrong; the voltage correction is now applying a large correction all at once."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "text": "4"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "Severe drift — premature cutoff"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "text": "The BMS cuts power at what it thinks is 5% SOC — but the actual remaining charge is much less. The safety reserve it thought it was maintaining was already consumed."
+          }
+        ]
+      },
+      {
+        "type": "horizontalRule"
+      },
+      {
+        "type": "heading",
+        "attrs": {
+          "level": 2
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "What You Can Do About It"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "text": "As a driver, your options are limited — this is a BMS engineering problem. But there are things that help:"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "Charge to 100% once a month."
+          },
+          {
+            "type": "text",
+            "text": " Even if your daily habit is 80%, a monthly full charge gives the BMS a full reset point for its counter. This is the single most effective thing an owner can do."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "Don't ignore software updates."
+          },
+          {
+            "type": "text",
+            "text": " BMS firmware updates from manufacturers often include improved SOC estimation algorithms. These are not cosmetic — they directly improve percentage accuracy. Apply them."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "Get a service recalibration if the behaviour is severe."
+          },
+          {
+            "type": "text",
+            "text": " If your EV is suddenly dying at 20%, a dealer can often force a BMS recalibration that resets the drift."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "Trust the low battery warning over the percentage number."
+          },
+          {
+            "type": "text",
+            "text": " The low-battery warning in most EVs is voltage-triggered — it does not rely on the coulomb count. It is more reliable than the percentage number when drift is high."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "text": "💡"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "text": "Think of the battery percentage like the estimated time of arrival on a navigation app. It is useful for planning and generally right most of the time. But it is a calculation, not a measurement — and like any calculation, it can be wrong, especially when conditions change unexpectedly. The voltage-based warnings are the GPS equivalent of actually seeing the destination."
+          }
+        ]
+      },
+      {
+        "type": "horizontalRule"
+      },
+      {
+        "type": "heading",
+        "attrs": {
+          "level": 2
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Quick Knowledge Check"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "Q:"
+          },
+          {
+            "type": "text",
+            "text": " What is the most common way a BMS corrects coulomb counting drift?"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "text": "It checks the temperature every hour and adjustsIt resets the counter to 100% when the battery reaches full charge voltageIt communicates with a server to get the correct valueIt uses the odometer reading to estimate energy used"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "text": "When a battery reaches its maximum charge voltage, the BMS knows with high confidence that the battery is at 100%. This is a reliable fixed reference point that it uses to reset the accumulated counting error. This is why charging to 100% occasionally — even if not daily — helps maintain SOC accuracy."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "Q:"
+          },
+          {
+            "type": "text",
+            "text": " Why does battery percentage accuracy typically worsen in Indian summer conditions specifically?"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "text": "Heat makes the battery discharge fasterCurrent sensors drift at high temperatures, and Indian BMS firmware is often not calibrated for 40-45°C operationThe display screen shows wrong numbers in heatIndian EVs use older battery chemistry"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "text": "Current sensors have a temperature coefficient — their accuracy changes with temperature. Many Indian BMS designs were calibrated at 25°C. At 40–45°C, the sensor reads with a systematic error that is not compensated in the firmware. Combined with higher self-discharge at elevated temperatures, this causes faster and larger drift."
+          }
+        ]
+      },
+      {
+        "type": "horizontalRule"
+      },
+      {
+        "type": "heading",
+        "attrs": {
+          "level": 2
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Reader Poll"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "Poll:"
+          },
+          {
+            "type": "text",
+            "text": " How much do you trust your EV's battery percentage display?"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "text": "Completely — it is always accurate—Mostly — occasional small discrepancies—Partially — I allow a 15-20% mental buffer—Not at all — I watch the warnings, not the number—"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "text": "Tap to vote"
+          }
+        ]
+      },
+      {
+        "type": "horizontalRule"
+      },
+      {
+        "type": "heading",
+        "attrs": {
+          "level": 2
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Key Takeaways"
+          }
+        ]
+      },
+      {
+        "type": "bulletList",
+        "content": [
+          {
+            "type": "listItem",
+            "content": [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "Your EV measures battery charge by counting electrical flow — not by directly measuring stored energy."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "listItem",
+            "content": [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "Small counting errors accumulate over hundreds of cycles into visible, meaningful drift."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "listItem",
+            "content": [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "Heat is the biggest amplifier in Indian conditions — sensor accuracy degrades at high temperatures that most BMS firmware does not compensate for."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "listItem",
+            "content": [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "The BMS corrects itself most reliably at full charge. Charging to 100% occasionally is the owner's most effective recalibration tool."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "listItem",
+            "content": [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "Indian EVs — particularly 2-wheelers and 3-wheelers — have documented worse SOC accuracy due to lower-cost sensors and firmware not tuned for local conditions."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "listItem",
+            "content": [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "The battery percentage is a calculation, not a measurement. It can be wrong. The voltage-based warning lights are more reliable at the extremes."
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "horizontalRule"
+      },
+      {
+        "type": "heading",
+        "attrs": {
+          "level": 2
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Resources and References"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "text": "ℹ"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "text": "All references verified as of May 2025. Beginner-friendly sources prioritised."
+          }
+        ]
+      },
+      {
+        "type": "heading",
+        "attrs": {
+          "level": 3
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Accessible Explainers"
+          }
+        ]
+      },
+      {
+        "type": "bulletList",
+        "content": [
+          {
+            "type": "listItem",
+            "content": [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "Battery University — "
+                  },
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "italic"
+                      }
+                    ],
+                    "text": "BU-903: How to Measure State-of-Charge."
+                  },
+                  {
+                    "type": "text",
+                    "text": " Cadex Electronics. "
+                  },
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "link",
+                        "attrs": {
+                          "href": "https://batteryuniversity.com/article/bu-903-how-to-measure-state-of-charge",
+                          "target": "_blank",
+                          "rel": "noopener noreferrer nofollow",
+                          "class": null,
+                          "title": null
+                        }
+                      }
+                    ],
+                    "text": "https://batteryuniversity.com/article/bu-903-how-to-measure-state-of-charge"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "listItem",
+            "content": [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "Battery University — "
+                  },
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "italic"
+                      }
+                    ],
+                    "text": "BU-807: How to Restore Nickel-based Batteries"
+                  },
+                  {
+                    "type": "text",
+                    "text": " (contains SOC drift discussion applicable to Li-ion). "
+                  },
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "link",
+                        "attrs": {
+                          "href": "https://batteryuniversity.com",
+                          "target": "_blank",
+                          "rel": "noopener noreferrer nofollow",
+                          "class": null,
+                          "title": null
+                        }
+                      }
+                    ],
+                    "text": "https://batteryuniversity.com"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "listItem",
+            "content": [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "Kershaw, A. (2022). "
+                  },
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "italic"
+                      }
+                    ],
+                    "text": "Why Your Electric Car's Range Estimate Is Often Wrong."
+                  },
+                  {
+                    "type": "text",
+                    "text": " Fully Charged Show. "
+                  },
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "link",
+                        "attrs": {
+                          "href": "https://www.fullycharged.show",
+                          "target": "_blank",
+                          "rel": "noopener noreferrer nofollow",
+                          "class": null,
+                          "title": null
+                        }
+                      }
+                    ],
+                    "text": "https://www.fullycharged.show"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "heading",
+        "attrs": {
+          "level": 3
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Industry Reports"
+          }
+        ]
+      },
+      {
+        "type": "bulletList",
+        "content": [
+          {
+            "type": "listItem",
+            "content": [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "Geotab (2022). "
+                  },
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "italic"
+                      }
+                    ],
+                    "text": "Real-World EV Range and Battery Performance Study."
+                  },
+                  {
+                    "type": "text",
+                    "text": " Includes SOC estimation accuracy data across vehicle classes. "
+                  },
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "link",
+                        "attrs": {
+                          "href": "https://www.geotab.com/blog/ev-battery-degradation",
+                          "target": "_blank",
+                          "rel": "noopener noreferrer nofollow",
+                          "class": null,
+                          "title": null
+                        }
+                      }
+                    ],
+                    "text": "https://www.geotab.com/blog/ev-battery-degradation"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "listItem",
+            "content": [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "ARAI Technical Note (2022). "
+                  },
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "italic"
+                      }
+                    ],
+                    "text": "BMS Performance Benchmarking for Indian Market L-Category EVs."
+                  },
+                  {
+                    "type": "text",
+                    "text": " Automotive Research Association of India, Pune. "
+                  },
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "link",
+                        "attrs": {
+                          "href": "https://www.araiindia.com",
+                          "target": "_blank",
+                          "rel": "noopener noreferrer nofollow",
+                          "class": null,
+                          "title": null
+                        }
+                      }
+                    ],
+                    "text": "https://www.araiindia.com"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "heading",
+        "attrs": {
+          "level": 3
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Further Reading — EVPulse Series"
+          }
+        ]
+      },
+      {
+        "type": "bulletList",
+        "content": [
+          {
+            "type": "listItem",
+            "content": [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "→ Intermediate: "
+                  },
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "link",
+                        "attrs": {
+                          "href": "#",
+                          "target": "_blank",
+                          "rel": "noopener noreferrer nofollow",
+                          "class": null,
+                          "title": null
+                        }
+                      }
+                    ],
+                    "text": "Coulomb Counting Drift — Why 0.5% Sensor Error Becomes 8% SOC Error After 200 Cycles"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "listItem",
+            "content": [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "→ Expert: "
+                  },
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "link",
+                        "attrs": {
+                          "href": "#",
+                          "target": "_blank",
+                          "rel": "noopener noreferrer nofollow",
+                          "class": null,
+                          "title": null
+                        }
+                      }
+                    ],
+                    "text": "Coulomb Counting vs OCV Correction vs Kalman Filtering — BMS SOC Architecture Compared"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "listItem",
+            "content": [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "→ Master: "
+                  },
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "link",
+                        "attrs": {
+                          "href": "#",
+                          "target": "_blank",
+                          "rel": "noopener noreferrer nofollow",
+                          "class": null,
+                          "title": null
+                        }
+                      }
+                    ],
+                    "text": "SOC Estimation Error Budgeting, EKF Implementation, and Why Indian BMS Firmware Gets It Wrong"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "horizontalRule"
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "italic"
+              }
+            ],
+            "text": "This is the "
+          },
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              },
+              {
+                "type": "italic"
+              }
+            ],
+            "text": "Beginner"
+          },
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "italic"
+              }
+            ],
+            "text": " level of the EVPulse Coulomb Counting series."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "italic"
+              }
+            ],
+            "text": "Published on "
+          },
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "link",
+                "attrs": {
+                  "href": "https://www.evpulse.co.in",
+                  "target": "_blank",
+                  "rel": "noopener noreferrer nofollow",
+                  "class": null,
+                  "title": null
+                }
+              },
+              {
+                "type": "italic"
+              }
+            ],
+            "text": "EVPulse"
+          },
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "italic"
+              }
+            ],
+            "text": " — India's most technically rigorous source for battery technology and EV engineering coverage."
+          }
+        ]
+      }
+    ]
+  }
+}

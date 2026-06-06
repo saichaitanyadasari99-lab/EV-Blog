@@ -1,0 +1,5 @@
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+BREVO_API_KEY=xkeysib-xxxxxxxxxxxxxxxxxxxx
+NEWSLETTER_SENDER_EMAIL=your-sender@email.com
+NEWSLETTER_SENDER_NAME=EVPulse

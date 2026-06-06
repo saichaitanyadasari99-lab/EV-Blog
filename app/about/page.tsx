@@ -1,0 +1,212 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import Image from "next/image";
+
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://www.evpulse.co.in";
+
+export const metadata: Metadata = {
+  title: "About",
+  description: "EVPulse is run by Sai Chaitanya Dasari, a Battery Systems Engineer at Volvo Eicher Commercial Vehicles. Deep-dive EV battery technical analysis, BMS design, cell chemistry, thermal management, and charging infrastructure insights.",
+  alternates: { canonical: `${baseUrl}/about` },
+  openGraph: {
+    title: "About — Battery Engineering Team | EVPulse",
+    description: "EVPulse is run by Sai Chaitanya Dasari, a Battery Systems Engineer at Volvo Eicher Commercial Vehicles. Deep-dive EV battery technical content and engineering tools.",
+  },
+};
+
+const marqueeTags = [
+  "BMS DESIGN", "LFP / NA-ION", "IMMERSION COOLING", "SWAPPABLE BATTERY",
+  "CAN / J1939", "SIMULINK MBD", "PACK ENGINEERING", "AIS-156"
+];
+
+const topics = [
+  {
+    icon: "⚡",
+    title: "BMS & Algorithm Design",
+    description: "SOC/SOH estimation, CAN architecture, J1939 protocol, Simulink MBD",
+  },
+  {
+    icon: "🔋",
+    title: "Cell Chemistry & Degradation",
+    description: "LFP, NMC, Na-ion, DCIR analysis, cycle aging",
+  },
+  {
+    icon: "🌡",
+    title: "Thermal & Pack Systems",
+    description: "Immersion cooling, swappable architectures, heat recovery, pack-level safety",
+  },
+  {
+    icon: "🔌",
+    title: "Charging Infrastructure",
+    description: "CCS, CHAdeMO, GB/T, V2G, ISO 15118 plug & charge",
+  },
+  {
+    icon: "📊",
+    title: "EV Benchmarks",
+    description: "Real-world range testing, charging curves, efficiency analysis",
+  },
+  {
+    icon: "📋",
+    title: "Standards & Compliance",
+    description: "UN ECE R100, UL 2580, IEC 61851, safety certifications",
+  },
+];
+
+const experience = [
+  {
+    role: "Deputy Manager — Battery Systems",
+    company: "Volvo Eicher Commercial Vehicles",
+    details: "End-to-end pack development across electric buses, trucks and LCVs. From architecture to homologation.",
+    duration: "3+ Years",
+    type: "Commercial EVs",
+  },
+  {
+    role: "M.E. Design Engineering",
+    company: "BITS Pilani · Postgraduate",
+    details: "GATE 2021 — All India Top 1%",
+    duration: "Masters",
+    type: "",
+  },
+  {
+    role: "B.Tech Mechanical Engineering",
+    company: "Andhra University",
+    details: "",
+    duration: "Undergraduate",
+    type: "",
+  },
+];
+
+export default function AboutPage() {
+  return (
+    <main className="page-main wrapper">
+      {/* Hero Section */}
+      <section className="about-hero-grid">
+        <div className="about-hero-left">
+          <p className="about-label">ABOUT VOLTPULSE</p>
+          <h1 className="about-hero-heading">
+            Hi, I&apos;m<br />
+            <span className="about-hero-name">Sai Chaitanya.</span>
+          </h1>
+          <p className="about-hero-subtitle">Battery Systems Engineer</p>
+          <p className="about-hero-text">
+            I&apos;ve spent 3+ years inside commercial EV development — designing packs, writing BMS logic, and navigating homologation. EVPulse is where I put what I&apos;ve actually learned into writing.
+          </p>
+          <div className="about-checkmarks">
+            <span className="about-check">✓</span>
+            <span>From cell to system — immersion cooling to swappable packs</span>
+          </div>
+          <div className="about-checkmarks">
+            <span className="about-check">✓</span>
+            <span>Standards-aware, not standards-obsessed</span>
+          </div>
+          <div className="about-checkmarks">
+            <span className="about-check">✓</span>
+            <span>Written from the bench, not the boardroom</span>
+          </div>
+          <div className="about-hero-buttons">
+            <Link href="/contact" className="about-btn-black">Let&apos;s Talk</Link>
+            <a href="https://www.linkedin.com/in/dasarisaisrinivasachaitanya" target="_blank" rel="noreferrer" className="about-btn-outline">LinkedIn <span aria-hidden="true">→</span></a>
+            <a href="https://github.com/saichaitanyadasari99-lab" target="_blank" rel="noreferrer" className="about-btn-outline">GitHub <span aria-hidden="true">→</span></a>
+          </div>
+        </div>
+        <div className="about-hero-right">
+          <div className="about-avatar-box">
+            <div className="about-profile-image">
+              <Image
+                src="/profile.jpg"
+                alt="Sai Chaitanya Dasari"
+                width={380}
+                height={380}
+                className="about-profile-img"
+              />
+            </div>
+            <p className="about-avatar-name">Sai Chaitanya Dasari</p>
+          </div>
+        </div>
+      </section>
+
+      {/* Social Links Bar */}
+      <section className="about-social-bar">
+        <a href="https://www.linkedin.com/in/dasarisaisrinivasachaitanya" target="_blank" rel="noreferrer">LINKEDIN</a>
+        <span className="about-social-divider">|</span>
+        <a href="https://github.com/saichaitanyadasari99-lab" target="_blank" rel="noreferrer">GITHUB</a>
+        <span className="about-social-divider">|</span>
+        <a href="mailto:saichaitanyadasari99@gmail.com">saichaitanyadasari99@gmail.com</a>
+        <span className="about-social-divider">|</span>
+        <Link href="/blogs">ALL ARTICLES</Link>
+      </section>
+
+      {/* Marquee Strip */}
+      <section className="about-marquee">
+        <div className="about-marquee-track">
+          {[...marqueeTags, ...marqueeTags].map((tag, idx) => (
+            <span key={idx} className="about-marquee-item">⚡ {tag}</span>
+          ))}
+        </div>
+      </section>
+
+      {/* Topics I Cover */}
+      <section className="about-section">
+        <div className="about-section-header">
+          <p className="about-label">WHAT I WRITE ABOUT</p>
+          <h2 className="about-section-title">Topics I cover</h2>
+        </div>
+        <div className="about-cards">
+          {topics.map((topic, idx) => (
+            <article key={idx} className="about-card">
+              <div className="about-card-icon-box">{topic.icon}</div>
+              <h3 className="about-card-title">{topic.title}</h3>
+              <p className="about-card-desc">{topic.description}</p>
+              <Link href="/blogs" className="about-card-link">Read more <span aria-hidden="true">→</span></Link>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      {/* Experience */}
+      <section className="about-section about-exp-section">
+        <p className="about-label">EXPERIENCE</p>
+        <div className="about-exp-list">
+          {experience.map((exp, idx) => (
+            <div key={idx} className="about-exp-row">
+              <div className="about-exp-left">
+                <h3 className="about-exp-role">{exp.role}</h3>
+                <p className="about-exp-company">{exp.company}</p>
+                {exp.details && <p className="about-exp-details">{exp.details}</p>}
+              </div>
+              <div className="about-exp-right">
+                <span className="about-exp-duration">{exp.duration}</span>
+                {exp.type && <span className="about-exp-type">{exp.type}</span>}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* What Makes EVPulse Different */}
+      <section className="about-section">
+        <div className="about-section-header">
+          <p className="about-label">WHY VOLTPULSE</p>
+          <h2 className="about-section-title">What makes this different</h2>
+        </div>
+        <div className="about-cards">
+          <article className="about-card">
+            <div className="about-card-icon-box">📐</div>
+            <h3 className="about-card-title">First Principles</h3>
+            <p className="about-card-desc">Every analysis starts from cell chemistry and physics — not marketing claims.</p>
+          </article>
+          <article className="about-card">
+            <div className="about-card-icon-box">🔧</div>
+            <h3 className="about-card-title">Real-World Data</h3>
+            <p className="about-card-desc">Bench testing, thermal imaging, and on-road benchmarks — not just theory.</p>
+          </article>
+          <article className="about-card">
+            <div className="about-card-icon-box">🏭</div>
+            <h3 className="about-card-title">Production Reality</h3>
+            <p className="about-card-desc">Writing from pack design and manufacturing — not research papers.</p>
+          </article>
+        </div>
+      </section>
+    </main>
+  );
+}

@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\Chaitanya Dasari\\\\Desktop\\\\Github\\\\EV-Blog-main\" -Force)",
+      "Bash(Select-Object Name, Mode)",
+      "Bash(Format-Table -AutoSize)",
+      "PowerShell(Get-ChildItem -Path \"C:\\\\Users\\\\Chaitanya Dasari\\\\Desktop\\\\Github\\\\EV-Blog-main\" -Force | Select-Object Name, @{Name='Type';Expression={if\\($_.PSIsContainer\\){'DIR'}else{'FILE'}}} | Format-Table -AutoSize)",
+      "PowerShell(Get-ChildItem -Path \"C:\\\\Users\\\\Chaitanya Dasari\\\\Desktop\\\\Github\\\\EV-Blog-main\\\\app\" -Recurse -Force | Select-Object FullName | ForEach-Object { $_.FullName.Replace\\(\"C:\\\\Users\\\\Chaitanya Dasari\\\\Desktop\\\\Github\\\\EV-Blog-main\\\\\", \"\"\\) } | Sort-Object)",
+      "PowerShell(Get-ChildItem -Path \"C:\\\\Users\\\\Chaitanya Dasari\\\\Desktop\\\\Github\\\\EV-Blog-main\\\\articles\" -Force | Select-Object Name, @{Name='Type';Expression={if\\($_.PSIsContainer\\){'DIR'}else{'FILE'}}})",
+      "PowerShell(Get-ChildItem -Path \"C:\\\\Users\\\\Chaitanya Dasari\\\\Desktop\\\\Github\\\\EV-Blog-main\\\\articles\" -Recurse -Force | Select-Object FullName | ForEach-Object { $_.FullName.Replace\\(\"C:\\\\Users\\\\Chaitanya Dasari\\\\Desktop\\\\Github\\\\EV-Blog-main\\\\articles\\\\\", \"\"\\) } | Sort-Object)",
+      "mcp__Claude_in_Chrome__list_connected_browsers",
+      "mcp__Claude_in_Chrome__switch_browser",
+      "Bash(npm run *)",
+      "Bash(taskkill /PID 1920 /F)",
+      "PowerShell(taskkill /PID 1920 /F)",
+      "Bash(curl -s http://localhost:3000/blogs)",
+      "Bash(curl -s http://localhost:3000/blog/nmc-stoichiometry-811-622-532-explained)",
+      "Bash(curl -v http://localhost:3000/blog/nmc-stoichiometry-811-622-532-explained)",
+      "Bash(curl -s http://localhost:3000/blog/nmc-stoichiometry-811-622-532-explained?test=1)",
+      "Bash(rm -f dev_output_new.log)",
+      "Bash(curl -s http://localhost:3000/blog/your-ev-has-a-brain-its-called-the-bms)",
+      "Bash(node -e \"const {generateHTML} = require\\('@tiptap/html'\\); const StarterKit = require\\('@tiptap/starter-kit'\\); const content = {type: 'doc', content: [{type: 'heading', attrs: {level: 2}, content: [{type: 'text', text: 'Hello'}]}, {type: 'paragraph', content: [{type: 'text', text: 'World'}]}]}; console.log\\(generateHTML\\(content, [StarterKit]\\)\\);\")"
+    ]
+  }
+}
