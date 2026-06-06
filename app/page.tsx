@@ -1,8 +1,8 @@
+import "@/app/home.css";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getPublishedPosts } from "@/lib/posts";
 import { PostCard } from "@/components/PostCard";
-import { getCategoryTone } from "@/lib/category-theme";
 import { NewsletterForm } from "@/components/NewsletterForm";
 import { HeroAnimation } from "@/components/HeroAnimation";
 import type { PostRecord } from "@/types/post";
@@ -24,16 +24,13 @@ export default async function HomePage() {
     console.error("Error loading posts:", err);
   }
   
-  const hero = posts[0];
-  const side = posts.slice(1, 4);
-  const topStories = posts.slice(0, 3);
-  const moreStories = posts.slice(3, 6);
-  const trending = posts.slice(0, 5);
-  const hot = posts.find(p => p.category?.toLowerCase().includes("hot") || p.title.toLowerCase().includes("analysis")) ?? posts[0];
+  const hero      = posts[0];
+  const deepDive  = posts[1] ?? posts[0];          // different from hero
+  const topStories = posts.slice(1, 4);            // skip hero – it's already featured
+  const moreStories = posts.slice(4, 8);           // next batch
+  const trending  = posts.slice(1, 6);             // skip hero from trending too
 
-  const tickerItems = posts.length
-    ? posts.slice(0, 6)
-    : [];
+  const tickerItems = posts.slice(0, 6);
 
   return (
 <main className="min-h-screen pt-20">
@@ -52,16 +49,10 @@ export default async function HomePage() {
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4">
-              <Link href="/blogs" style={{ background: "var(--brand)", color: "#fff", padding: "12px 32px", fontWeight: 600, borderRadius: 8, display: "inline-block", transition: "opacity .15s" }}
-                onMouseEnter={e => (e.currentTarget.style.opacity = ".85")}
-                onMouseLeave={e => (e.currentTarget.style.opacity = "1")}
-              >
+              <Link href="/blogs" className="btn-primary">
                 Explore Articles
               </Link>
-              <Link href="/calculators" style={{ border: "2px solid var(--border)", color: "var(--brand)", padding: "10px 32px", fontWeight: 600, borderRadius: 8, display: "inline-block", transition: "border-color .15s" }}
-                onMouseEnter={e => (e.currentTarget.style.borderColor = "var(--brand)")}
-                onMouseLeave={e => (e.currentTarget.style.borderColor = "var(--border)")}
-              >
+              <Link href="/calculators" className="btn-outline">
                 Try Calculators
               </Link>
             </div>
@@ -90,35 +81,40 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Live Ticker */}
-      <section className="wrapper border-y border-border py-4 my-8 overflow-hidden">
-        <div className="flex items-center gap-4">
-          <span className="text-xs font-bold text-red-500 animate-pulse">● LIVE</span>
-          <div className="flex gap-8 overflow-x-auto">
-            {tickerItems.slice(0, 6).map((post) => (
-              <Link key={post.id} href={`/blog/${post.slug}`} className="text-text2 hover:text-brand transition whitespace-nowrap text-sm">
-                {post.title}
-              </Link>
-            ))}
+      {/* Live Ticker — animated loop */}
+      {tickerItems.length > 0 && (
+        <div className="border-y border-border py-3 my-8">
+          <div className="wrapper flex items-center gap-4">
+            <span className="text-xs font-bold text-red-500 animate-pulse shrink-0 font-mono">● LIVE</span>
+            <div className="ticker-outer">
+              <div className="ticker-inner">
+                {/* Duplicated for seamless loop */}
+                {[...tickerItems, ...tickerItems].map((post, i) => (
+                  <Link key={`${post.id}-${i}`} href={`/blog/${post.slug}`} className="text-text2 hover:text-brand transition text-sm shrink-0 font-mono">
+                    {post.title}
+                  </Link>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
-      </section>
+      )}
 
       {/* Featured Article */}
       {hero && (
         <section className="wrapper py-16">
           <p className="text-xs font-bold tracking-widest uppercase text-brand mb-6">Featured</p>
-          <Link href={`/blog/${hero.slug}`} className="grid grid-cols-1 lg:grid-cols-2 gap-6 border border-border rounded-lg overflow-hidden hover:border-border-2 transition-all hover-lift bg-surface">
+          <Link href={`/blog/${hero.slug}`} className="grid grid-cols-1 lg:grid-cols-2 gap-5 border border-border rounded-2xl hover:border-brand transition-all hover-lift bg-surface p-4">
             <div
-              className="aspect-video bg-cover bg-center"
+              className="aspect-video bg-cover bg-center rounded-xl overflow-hidden"
               style={{
                 backgroundImage: hero.cover_url ? `url(${hero.cover_url})` : "linear-gradient(135deg,#0A1628 0%,#142040 40%,#0D2035 100%)"
               }}
             />
-            <div className="p-8 flex flex-col justify-center">
+            <div className="flex flex-col justify-center py-4 px-2">
               <span className="text-xs font-bold uppercase px-3 py-1 rounded bg-brand-bg text-brand w-fit mb-4">{hero.category}</span>
               <h2 className="text-2xl lg:text-3xl font-bold mb-3 leading-snug">{hero.title}</h2>
-              <p className="text-text2 mb-4 leading-relaxed">{hero.excerpt}</p>
+              <p className="text-text2 mb-4 leading-relaxed line-clamp-3">{hero.excerpt}</p>
               <div className="text-xs text-text3 space-x-2">
                 <span>{new Date(hero.created_at).toLocaleDateString()}</span>
                 <span>·</span>
@@ -130,16 +126,26 @@ export default async function HomePage() {
       )}
 
       {/* Category Tabs */}
-      <section className="wrapper py-8 flex gap-3 overflow-x-auto pb-4">
-        {["All", "Cell Chemistry", "BMS Design", "Thermal", "Charging"].map((item, idx) => (
-          <Link
-            key={item}
-            href={item === "All" ? "/blogs" : `/category/${item.toLowerCase().replace(/\s+/g, "-")}`}
-            className={`px-4 py-2 rounded text-sm font-medium whitespace-nowrap transition-all ${idx === 0 ? "bg-brand text-white" : "bg-surface border border-border text-text2 hover:border-brand hover:text-brand"}`}
-          >
-            {item}
-          </Link>
-        ))}
+      <section className="wrapper cat-tabs-section">
+        <p className="cat-tabs-label">Browse by Topic</p>
+        <div className="cat-tabs-row">
+          {[
+            { label: "All",           href: "/blogs" },
+            { label: "Cell Chemistry",href: "/category/cell-chemistry" },
+            { label: "BMS Design",    href: "/category/bms-design" },
+            { label: "Thermal",       href: "/category/thermal" },
+            { label: "Charging",      href: "/category/charging" },
+            { label: "Benchmarks",    href: "/category/ev-benchmarks" },
+          ].map(({ label, href }, idx) => (
+            <Link
+              key={label}
+              href={href}
+              className={`cat-tab${idx === 0 ? " cat-tab-active" : ""}`}
+            >
+              {label}
+            </Link>
+          ))}
+        </div>
       </section>
 
       {/* Top Stories Grid */}
@@ -167,15 +173,17 @@ export default async function HomePage() {
         </div>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-16">
           {[
-            { name: "Pack Designer", slug: "pack-size" },
-            { name: "Thermal Load", slug: "heat-generation" },
-            { name: "Cooling Sizing", slug: "cooling-plate" },
-            { name: "Bus Bar", slug: "bus-bar" },
-            { name: "SOC Estimator", slug: "soc-estimator" },
-            { name: "Charging Time", slug: "charging-time" },
+            { name: "Pack Designer",  slug: "pack-size",       cat: "Pack Design",     desc: "Cell count, SxP layout & density" },
+            { name: "Thermal Load",   slug: "heat-generation", cat: "Thermal",         desc: "Heat output across duty profiles" },
+            { name: "Cooling Plate",  slug: "cooling-plate",   cat: "Thermal",         desc: "Reynolds, Nusselt, pressure-drop" },
+            { name: "Bus Bar Sizing", slug: "bus-bar",         cat: "Electrical",      desc: "Cross-section & thermal rise" },
+            { name: "SOC Estimator",  slug: "soc-estimator",   cat: "BMS",             desc: "OCV-temperature SOC curve" },
+            { name: "Charging Time",  slug: "charging-time",   cat: "Charging",        desc: "CC-CV phase split & duration" },
           ].map((calc) => (
-            <Link key={calc.slug} href={`/calculators/${calc.slug}`} className="p-6 bg-surface border border-border rounded-lg text-center hover:border-brand hover:bg-opacity-50 transition-all hover-lift">
-              <span className="font-semibold">{calc.name}</span>
+            <Link key={calc.slug} href={`/calculators/${calc.slug}`} className="calc-card">
+              <span className="calc-cat">{calc.cat}</span>
+              <h3 className="calc-title">{calc.name}</h3>
+              <p className="calc-desc">{calc.desc}</p>
             </Link>
           ))}
         </div>
@@ -185,20 +193,20 @@ export default async function HomePage() {
       <section className="wrapper grid grid-cols-1 lg:grid-cols-3 gap-8 py-16">
         <div className="lg:col-span-2">
           <p className="text-xs font-bold tracking-widest uppercase text-brand mb-6">Deep Dive</p>
-          {hero ? (
-            <Link href={`/blog/${hero.slug}`} className="grid grid-cols-1 sm:grid-cols-2 gap-6 border border-border rounded-lg overflow-hidden hover:border-brand transition-all hover-lift">
+          {deepDive ? (
+            <Link href={`/blog/${deepDive.slug}`} className="grid grid-cols-1 sm:grid-cols-2 gap-4 border border-border rounded-2xl hover:border-brand transition-all hover-lift p-4">
               <div
-                className="aspect-video bg-cover bg-center"
+                className="aspect-video bg-cover bg-center rounded-xl overflow-hidden"
                 style={{
-                  backgroundImage: hero.cover_url ? `url(${hero.cover_url})` : "linear-gradient(135deg,#091830 0%,#0F2A4A 40%,#072038 100%)"
+                  backgroundImage: deepDive.cover_url ? `url(${deepDive.cover_url})` : "linear-gradient(135deg,#091830 0%,#0F2A4A 40%,#072038 100%)"
                 }}
               />
-              <div className="p-6 flex flex-col justify-center">
+              <div className="flex flex-col justify-center py-2">
                 <span className="text-xs font-bold uppercase px-2 py-1 rounded bg-purple-500 bg-opacity-10 text-purple-400 w-fit mb-3">Long Read</span>
-                <h3 className="text-xl font-bold mb-2">{hero.title}</h3>
-                <p className="text-text2 text-sm mb-4">{hero.excerpt ?? "Technical deep-dive content"}</p>
+                <h3 className="text-xl font-bold mb-2 line-clamp-3">{deepDive.title}</h3>
+                <p className="text-text2 text-sm mb-4 line-clamp-3">{deepDive.excerpt ?? "Technical deep-dive content"}</p>
                 <div className="text-xs text-text3">
-                  {new Date(hero.created_at).toLocaleDateString()} · {hero.reading_time ?? 10} min read
+                  {new Date(deepDive.created_at).toLocaleDateString()} · {deepDive.reading_time ?? 10} min read
                 </div>
               </div>
             </Link>
@@ -221,16 +229,19 @@ export default async function HomePage() {
       </section>
 
       {/* Newsletter CTA Section */}
-      <section id="newsletter" className="wrapper my-20 p-12 bg-surface border border-border rounded-lg">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          <div>
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Stay Ahead in EV Engineering</h2>
-            <p className="text-text2 mb-6 leading-relaxed">
-              Get weekly technical insights, battery design patterns, and engineering tools delivered to your inbox.
-            </p>
-            <p className="text-brand font-semibold">Join 500+ EV engineers</p>
+      <section id="newsletter" className="wrapper my-20">
+        <div className="nl-section">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div>
+              <p className="text-xs font-bold tracking-widest uppercase text-brand mb-3 font-mono">Newsletter</p>
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">Stay Ahead in EV Engineering</h2>
+              <p className="text-text2 mb-6 leading-relaxed">
+                Weekly technical insights, battery design patterns, and engineering tools — straight to your inbox.
+              </p>
+              <p className="text-sm text-text3 font-mono">↗ Joined by 500+ EV engineers</p>
+            </div>
+            <NewsletterForm />
           </div>
-          <NewsletterForm />
         </div>
       </section>
 

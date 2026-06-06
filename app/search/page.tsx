@@ -80,18 +80,19 @@ export default async function SearchPage({ searchParams }: Props) {
         </form>
         
         <div className="search-filters">
-          <form action="/search" className="filter-row">
+          <form action="/search" method="GET" className="filter-row">
             <input type="hidden" name="q" value={query} />
-            <select name="category" defaultValue={catFilter} className="field-select" onChange={(e) => e.currentTarget.form?.submit()}>
+            <select name="category" defaultValue={catFilter} className="field-select">
               {CATEGORIES.map((cat) => (
                 <option key={cat.value} value={cat.value}>{cat.label}</option>
               ))}
             </select>
-            <select name="date" defaultValue={date ?? ""} className="field-select" onChange={(e) => e.currentTarget.form?.submit()}>
+            <select name="date" defaultValue={date ?? ""} className="field-select">
               {DATE_OPTIONS.map((opt) => (
                 <option key={opt.value} value={opt.value}>{opt.label}</option>
               ))}
             </select>
+            <button type="submit" className="filter-submit">Apply Filters</button>
           </form>
         </div>
         

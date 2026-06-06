@@ -73,9 +73,7 @@ export function SiteHeader() {
               </svg>
             </Link>
             
-            <button className="header-btn theme-btn-new" aria-label="Toggle theme">
-              <ThemeToggle />
-            </button>
+            <ThemeToggle />
             
             <Link href="/#newsletter" className="header-cta">
               Subscribe
