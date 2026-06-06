@@ -108,7 +108,10 @@ export async function getPublishedPosts() {
     return loadSeedPosts();
   }
 
-  return (data ?? []) as PostRecord[];
+  // If Supabase returned no rows (e.g. table was cleared), serve from seed files
+  const posts = (data ?? []) as PostRecord[];
+  if (posts.length === 0) return loadSeedPosts();
+  return posts;
 }
 
 export async function getPublishedPostBySlug(slug: string) {
