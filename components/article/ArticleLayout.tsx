@@ -20,26 +20,9 @@ export function ArticleLayout({ headings, date, readingTime, level, children }: 
     <>
       <ReadingProgress />
 
-      <div
-        style={{
-          maxWidth: "1000px",
-          margin: "0 auto",
-          display: "grid",
-          gridTemplateColumns: "1fr",
-          gap: 0,
-          padding: "0 20px",
-        }}
-        className="lg:grid-cols-[240px_1fr] lg:gap-8 lg:padding-0"
-      >
-        <aside
-          className="hidden lg:block"
-          style={{
-            position: "sticky",
-            top: "80px",
-            maxHeight: "calc(100vh - 5rem)",
-            overflowY: "auto",
-          }}
-        >
+      <div className="article-layout-shell">
+        {/* Sidebar — hidden below lg breakpoint */}
+        <aside className="article-sidebar">
           <TableOfContents
             headings={headings}
             date={date}
@@ -48,13 +31,8 @@ export function ArticleLayout({ headings, date, readingTime, level, children }: 
           />
         </aside>
 
-        <main
-          id="article-body"
-          style={{
-            minWidth: 0,
-            maxWidth: "768px",
-          }}
-        >
+        {/* Main content */}
+        <main id="article-body" className="article-main">
           {children}
         </main>
       </div>

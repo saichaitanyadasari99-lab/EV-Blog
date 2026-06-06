@@ -44,7 +44,7 @@ export default async function HomePage() {
             <div>
               <p className="text-xs font-bold tracking-widest uppercase text-brand mb-4">EV Battery & Energy Technology</p>
               <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-6">
-                Engineering clarity for the <span style={{ backgroundImage: 'linear-gradient(135deg, var(--brand), var(--orange))', backgroundClip: 'text', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>EV era</span>
+                Engineering clarity for the <span style={{ color: "var(--brand)" }}>EV era</span>
               </h1>
               <p className="text-lg text-text2 leading-relaxed max-w-lg">
                 Deep-dive technical analysis, battery engineering insights, and engineering tools for EV professionals and enthusiasts.
@@ -52,10 +52,16 @@ export default async function HomePage() {
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4">
-              <Link href="/blogs" className="px-8 py-3 bg-brand text-white font-semibold rounded-lg hover:bg-opacity-90 transition-all text-center">
+              <Link href="/blogs" style={{ background: "var(--brand)", color: "#fff", padding: "12px 32px", fontWeight: 600, borderRadius: 8, display: "inline-block", transition: "opacity .15s" }}
+                onMouseEnter={e => (e.currentTarget.style.opacity = ".85")}
+                onMouseLeave={e => (e.currentTarget.style.opacity = "1")}
+              >
                 Explore Articles
               </Link>
-              <Link href="/calculators" className="px-8 py-3 border-2 border-border text-brand font-semibold rounded-lg hover:bg-brand-bg transition-all text-center">
+              <Link href="/calculators" style={{ border: "2px solid var(--border)", color: "var(--brand)", padding: "10px 32px", fontWeight: 600, borderRadius: 8, display: "inline-block", transition: "border-color .15s" }}
+                onMouseEnter={e => (e.currentTarget.style.borderColor = "var(--brand)")}
+                onMouseLeave={e => (e.currentTarget.style.borderColor = "var(--border)")}
+              >
                 Try Calculators
               </Link>
             </div>
