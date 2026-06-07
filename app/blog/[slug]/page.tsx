@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import type { CSSProperties } from "react";
 import { notFound } from "next/navigation";
 import { getPublishedPostBySlug, getPublishedPosts } from "@/lib/posts";
 import "katex/dist/katex.min.css";
@@ -12,9 +11,9 @@ import { MobileTOC } from "@/components/MobileTOC";
 import { BottomTabBar } from "@/components/BottomTabBar";
 import { ArticleLayout } from "@/components/article/ArticleLayout";
 import { ArticleHero } from "@/components/article/ArticleHero";
-import { ArticleMeta } from "@/components/article/ArticleMeta";
 import { SeriesNav } from "@/components/article/SeriesNav";
 import "@/styles/article-prose.css";
+import "@/styles/article-layout.css";
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://www.evpulse.co.in";
 
@@ -64,7 +63,7 @@ function extractHeadings(html: string) {
     if (text && id) items.push({ text, id, level: 3 });
   }
 
-  return items.slice(0, 12);
+  return items.slice(0, 16);
 }
 
 type QuizData = {
@@ -133,18 +132,16 @@ function stripQuizBlocks(html: string): string {
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { slug } = await params;
   const post = await getPublishedPostBySlug(slug);
-  
+
   if (!post) return {};
-  
+
   const description = post.excerpt ?? (post.content ? stripTags(post.content).slice(0, 160) : "EV battery insights and technical analysis");
   const canonicalUrl = `${baseUrl}/blog/${post.slug}`;
-  
+
   return {
     title: post.title,
     description,
-    alternates: {
-      canonical: canonicalUrl,
-    },
+    alternates: { canonical: canonicalUrl },
     openGraph: {
       title: post.title,
       description,
@@ -161,26 +158,12 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   };
 }
 
-const TIER_LABELS: Record<string, string> = {
-  basic: "Beginner",
-  intermediate: "Intermediate",
-  advanced: "Advanced",
-  expert: "Expert",
-};
-
-const TIER_CLASSES: Record<string, string> = {
-  basic: "level-beginner",
-  intermediate: "level-intermediate",
-  advanced: "level-advanced",
-  expert: "level-expert",
-};
-
 export default async function BlogPostPage({ params }: Params) {
   const { slug } = await params;
-  
+
   let post: PostRecord | null = null;
   let allPosts: PostRecord[] = [];
-  
+
   try {
     [post, allPosts] = await Promise.all([
       getPublishedPostBySlug(slug),
@@ -201,30 +184,30 @@ export default async function BlogPostPage({ params }: Params) {
   const references = postRecord.references ?? [];
   const headings = extractHeadings(cleanHtml);
 
-  const relatedByCategory = allPosts
-    .filter((item) => item.slug !== post?.slug && item.category === post?.category)
-    .slice(0, 4);
-
-  const postTags = Array.isArray(post?.tags) ? post.tags : typeof post?.tags === "string" ? [post.tags] : [];
-  const tagSet = new Set(postTags.map((tag) => tag.toLowerCase()));
-  const relatedByTags = allPosts
-    .filter(
-      (item) => {
-        const itemTags = Array.isArray(item.tags) ? item.tags : typeof item.tags === "string" ? [item.tags] : [];
-        return item.slug !== post?.slug && itemTags.some((tag) => tagSet.has(tag.toLowerCase()));
-      },
-    )
-    .slice(0, 4);
-
-  const coverUrl = post?.cover_url;
-  const faqs = postRecord.faqs ?? [];
-  const inlineFaqs = postRecord.markdown_content
-    ? extractInlineFaqs(postRecord.markdown_content)
+  const postTags = Array.isArray(post?.tags)
+    ? post.tags
+    : typeof post?.tags === "string"
+    ? [post.tags]
     : [];
+
+  const tagSet = new Set(postTags.map((t) => t.toLowerCase()));
+  const relatedByTags = allPosts
+    .filter((item) => {
+      const itemTags = Array.isArray(item.tags) ? item.tags : typeof item.tags === "string" ? [item.tags] : [];
+      return item.slug !== post?.slug && itemTags.some((t) => tagSet.has(t.toLowerCase()));
+    })
+    .slice(0, 4);
+
+  void relatedByTags; // used in future related articles section
+
+  const faqs = postRecord.faqs ?? [];
+  const inlineFaqs = postRecord.markdown_content ? extractInlineFaqs(postRecord.markdown_content) : [];
   const allFaqs = faqs.length > 0 ? faqs : inlineFaqs;
+
   const categorySlug = post?.category
     ? post.category.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "")
     : "";
+
   const articleSchema = getArticleSchema({
     title: post.title,
     description: post.excerpt ?? "",
@@ -246,33 +229,20 @@ export default async function BlogPostPage({ params }: Params) {
     { name: post.title, url: `${baseUrl}/blog/${post.slug}` },
   ]);
 
-  const tierOrder = ["basic", "intermediate", "advanced", "expert"];
-  const seriesPosts = post.tier ? allPosts
-    .filter((item) => item.slug !== post.slug && item.category === post.category && item.tier)
-    .sort((a, b) => {
-      return tierOrder.indexOf(a.tier || "basic") - tierOrder.indexOf(b.tier || "basic");
-    }) : [];
-
-  const prevInSeries = seriesPosts.length > 0
-    ? seriesPosts.filter((p) => {
-        return tierOrder.indexOf(p.tier || "basic") < tierOrder.indexOf(post.tier || "basic");
-      }).pop()
-    : null;
-
-  const nextInSeries = seriesPosts.length > 0
-    ? seriesPosts.find((p) => {
-        return tierOrder.indexOf(p.tier || "basic") > tierOrder.indexOf(post.tier || "basic");
-      })
-    : null;
+  const tierOrder = ["basic", "intermediate", "advanced", "expert", "master"];
+  const seriesPosts = post.tier
+    ? allPosts
+        .filter((item) => item.slug !== post.slug && item.category === post.category && item.tier)
+        .sort((a, b) => tierOrder.indexOf(a.tier || "basic") - tierOrder.indexOf(b.tier || "basic"))
+    : [];
 
   const allSeriesPosts = post.tier
-    ? [post, ...seriesPosts]
-        .sort((a, b) => tierOrder.indexOf(a.tier || "basic") - tierOrder.indexOf(b.tier || "basic"))
+    ? [post, ...seriesPosts].sort((a, b) => tierOrder.indexOf(a.tier || "basic") - tierOrder.indexOf(b.tier || "basic"))
     : [];
 
   return (
     <>
-      {/* JSON-LD Schema Scripts */}
+      {/* JSON-LD Schema */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
@@ -288,50 +258,46 @@ export default async function BlogPostPage({ params }: Params) {
         />
       )}
 
+      {/* Hero — full-width, outside the 3-col grid */}
+      <ArticleHero
+        title={post.title}
+        excerpt={post.excerpt}
+        category={post.category}
+        tier={post.tier}
+        createdAt={post.created_at}
+        readingTime={post.reading_time}
+        tags={postTags}
+      />
+
+      {/* 3-column layout */}
       <ArticleLayout
         headings={headings}
-        date={new Date(post.created_at).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
-        readingTime={post.reading_time ?? 1}
-        level={TIER_LABELS[post.tier ?? ""] || ""}
+        tier={post.tier}
+        tags={postTags}
       >
-        {/* Breadcrumb */}
-        <nav aria-label="Breadcrumb" className="font-mono text-[11px] text-[var(--text2)] mb-3" style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-          <a href="/" className="hover:underline" style={{ color: "var(--brand)" }}>Home</a>
-          <span>›</span>
-          <a href="/blogs" className="hover:underline" style={{ color: "var(--brand)" }}>Articles</a>
-          <span>›</span>
-          <span className="truncate" style={{ maxWidth: "200px" }}>{post.title}</span>
-        </nav>
-
-        {/* Category tag */}
-        {post.category && (
-          <div className="font-mono text-[10px] uppercase tracking-wide px-2.5 py-1 rounded mb-3" style={{ background: "var(--brand-bg)", color: "var(--brand-xdark)" }}>
-            {post.category}
-          </div>
-        )}
-
-        {/* Title */}
-        <h1 className="text-3xl font-semibold mb-4" style={{ fontFamily: "inherit" }}>
-          {post.title}
-        </h1>
-
-        {/* Meta */}
-        <ArticleMeta
-          date={post.created_at}
-          readingTime={post.reading_time ?? 1}
-          tier={post.tier}
-        />
-
-        {/* Hero */}
-        <ArticleHero category={post.category ?? "article"} />
-
-        {/* Mobile TOC */}
+        {/* Mobile TOC (visible below 1200px) */}
         <MobileTOC headings={headings} />
 
-        {/* Article Body */}
-        <section className="article-content" data-article-body>
+        {/* Article body */}
+        <section data-article-body aria-label="Article content">
           <ArticleContent html={cleanHtml} quizzes={quizzes} />
         </section>
+
+        {/* Article footer tags */}
+        {postTags.length > 0 && (
+          <div className="article-tags-foot" style={{ marginTop: "2rem", paddingTop: "1.5rem", borderTop: "1px solid var(--border-light)", display: "flex", flexWrap: "wrap", gap: ".5rem", alignItems: "center" }}>
+            <span style={{ fontFamily: "var(--font-head)", fontSize: ".7rem", color: "var(--text-dim)", fontWeight: 600, letterSpacing: ".05em" }}>Tags</span>
+            {postTags.map((tag) => (
+              <a
+                key={tag}
+                href={`/blogs?tag=${encodeURIComponent(tag)}`}
+                style={{ fontFamily: "var(--font-head)", fontSize: ".7rem", padding: ".2rem .55rem", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: "3px", color: "var(--text-muted)", textDecoration: "none" }}
+              >
+                {tag}
+              </a>
+            ))}
+          </div>
+        )}
 
         {/* Series Navigation */}
         <SeriesNav
@@ -340,20 +306,20 @@ export default async function BlogPostPage({ params }: Params) {
           category={post.category ?? ""}
         />
 
-        {/* Author Bio */}
-        <section className="author-bio">
+        {/* Author bio */}
+        <div className="author-bio">
           <div className="author-avatar">
             <span className="author-initials">SD</span>
           </div>
           <div className="author-info">
             <p className="author-label">Written by</p>
             <h4 className="author-name">Sai Chaitanya Dasari</h4>
-            <p className="author-title">Battery Systems Engineer | Volvo Eicher Commercial Vehicles</p>
+            <p className="author-title">Battery Systems Engineer · Volvo Eicher Commercial Vehicles</p>
             <p className="author-desc">3+ years in commercial EV pack development. Writing about real battery engineering from the bench.</p>
           </div>
-        </section>
+        </div>
 
-        {/* FAQ Section */}
+        {/* FAQ accordion */}
         {allFaqs.length > 0 && (
           <section className="faq-list-card" aria-labelledby="faq-heading">
             <h2 id="faq-heading">Frequently Asked Questions</h2>

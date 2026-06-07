@@ -82,7 +82,7 @@ export default function AboutPage() {
       {/* Hero Section */}
       <section className="about-hero-grid">
         <div className="about-hero-left">
-          <p className="about-label">ABOUT VOLTPULSE</p>
+          <p className="about-label">ABOUT EVPULSE</p>
           <h1 className="about-hero-heading">
             Hi, I&apos;m<br />
             <span className="about-hero-name">Sai Chaitanya.</span>
@@ -186,7 +186,7 @@ export default function AboutPage() {
       {/* What Makes EVPulse Different */}
       <section className="about-section">
         <div className="about-section-header">
-          <p className="about-label">WHY VOLTPULSE</p>
+          <p className="about-label">WHY EVPULSE</p>
           <h2 className="about-section-title">What makes this different</h2>
         </div>
         <div className="about-cards">

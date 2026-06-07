@@ -32,6 +32,33 @@ function slugifyHeading(text: string) {
     .trim();
 }
 
+function stripLatexDelimiters(formula: string): string {
+  let f = formula.trim();
+  if (f.startsWith("$$") && f.endsWith("$$")) f = f.slice(2, -2).trim();
+  else if (f.startsWith("$") && f.endsWith("$")) f = f.slice(1, -1).trim();
+  else if (f.startsWith("\\(") && f.endsWith("\\)")) f = f.slice(2, -2).trim();
+  else if (f.startsWith("\\[") && f.endsWith("\\]")) f = f.slice(2, -2).trim();
+  return f;
+}
+
+function renderKatexInline(formula: string): string {
+  const f = stripLatexDelimiters(formula);
+  try {
+    return katex.renderToString(f, { displayMode: false, throwOnError: false, output: "html" });
+  } catch {
+    return `<code class="math-inline">${escapeHtml(f)}</code>`;
+  }
+}
+
+function renderKatexBlock(formula: string): string {
+  const f = stripLatexDelimiters(formula);
+  try {
+    return katex.renderToString(f, { displayMode: true, throwOnError: false, output: "html" });
+  } catch {
+    return `<pre class="math-fallback">${escapeHtml(f)}</pre>`;
+  }
+}
+
 function formatInline(text: string) {
   const tokens: string[] = [];
 
@@ -45,9 +72,18 @@ function formatInline(text: string) {
       return `\x00${tokens.length - 1}\x00`;
     });
 
+  // Stash inline math before escaping HTML
+  value = value.replace(/\\\((.+?)\\\)/g, (_full, formula) => {
+    tokens.push(renderKatexInline(formula));
+    return `\x00${tokens.length - 1}\x00`;
+  });
+  value = value.replace(/\$([^$\n]+)\$/g, (_full, formula) => {
+    tokens.push(renderKatexInline(formula));
+    return `\x00${tokens.length - 1}\x00`;
+  });
+
   value = escapeHtml(value);
   value = value.replace(/`([^`]+)`/g, "<code>$1</code>");
-  value = value.replace(/\$([^$\n]+)\$/g, '<code class="math-inline">$1</code>');
   value = value.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
   value = value.replace(/\*([^*]+)\*/g, "<em>$1</em>");
   value = value.replace(/==([^=]+)==/g, '<mark class="inline-highlight">$1</mark>');
@@ -87,7 +123,7 @@ function parseTable(lines: string[], start: number) {
     .join("");
 
   return {
-    html: `<div class="table-wrap"><table><thead><tr>${headerCells}</tr></thead><tbody>${rows}</tbody></table></div>`,
+    html: `<div class="tbl-wrap"><table><thead><tr>${headerCells}</tr></thead><tbody>${rows}</tbody></table></div>`,
     next: idx,
   };
 }
@@ -107,6 +143,11 @@ function formatBlockContent(content: string): string {
     .join("");
 }
 
+// ── Callout helper ──────────────────────────────────────────────────────────
+function makeCallout(type: string, icon: string, label: string, content: string): string {
+  return `<div class="callout ${type}"><div class="c-icon">${icon}</div><div class="c-body"><strong>${label}</strong>${formatBlockContent(content)}</div></div>`;
+}
+
 function preprocessCustomBlocks(markdown: string): {
   text: string;
   map: Record<string, string>;
@@ -116,83 +157,89 @@ function preprocessCustomBlocks(markdown: string): {
   let text = markdown;
 
   const register = (html: string): string => {
-    const key = `\u0002BLOCK_${counter++}\u0002`;
+    const key = `BLOCK_${counter++}`;
     map[key] = html;
     return key;
   };
 
+  // ── [!TLDR] ──────────────────────────────────────────────────────────────
+  text = text.replace(
+    /\[!TLDR\]([\s\S]*?)\[\/!TLDR\]/g,
+    (_, content) => {
+      const items = content.trim().split("\n")
+        .filter((l: string) => l.trim().startsWith("-"))
+        .map((l: string) => `<li>${formatInline(l.trim().slice(1).trim())}</li>`)
+        .join("");
+      return register(
+        `<div class="tldr"><div class="tldr-head"><span class="tldr-badge">TL;DR</span><span class="tldr-title">Key Points</span></div><ul>${items}</ul></div>`
+      );
+    }
+  );
+
+  // ── [!NOTE] ───────────────────────────────────────────────────────────────
   text = text.replace(
     /\[!NOTE\]([\s\S]*?)\[\/!NOTE\]/g,
-    (_, content) =>
-      register(
-        `<div class="callout callout-note"><span class="callout-icon">ℹ</span><div class="callout-body">${formatBlockContent(
-          content
-        )}</div></div>`
-      )
+    (_, content) => register(makeCallout("note", "i", "Note", content))
   );
 
+  // ── [!WARNING] and [!WARN] ────────────────────────────────────────────────
   text = text.replace(
-    /\[!WARNING\]([\s\S]*?)\[\/!WARNING\]/g,
-    (_, content) =>
-      register(
-        `<div class="callout callout-warning"><span class="callout-icon">⚠</span><div class="callout-body">${formatBlockContent(
-          content
-        )}</div></div>`
-      )
+    /\[!(?:WARNING|WARN)\]([\s\S]*?)\[\/!(?:WARNING|WARN)\]/g,
+    (_, content) => register(makeCallout("warn", "!", "Warning", content))
   );
 
+  // ── [!KEY] ────────────────────────────────────────────────────────────────
   text = text.replace(
     /\[!KEY\]([\s\S]*?)\[\/!KEY\]/g,
-    (_, content) =>
-      register(
-        `<div class="callout callout-key"><span class="callout-icon">🔑</span><div class="callout-body">${formatBlockContent(
-          content
-        )}</div></div>`
-      )
+    (_, content) => register(makeCallout("key", "◆", "Key Insight", content))
   );
 
+  // ── [!TIP] ────────────────────────────────────────────────────────────────
   text = text.replace(
     /\[!TIP\]([\s\S]*?)\[\/!TIP\]/g,
-    (_, content) =>
-      register(
-        `<div class="callout callout-tip"><span class="callout-icon">💡</span><div class="callout-body">${formatBlockContent(
-          content
-        )}</div></div>`
-      )
+    (_, content) => register(makeCallout("tip", "→", "Tip", content))
   );
 
+  // ── [!DANGER] ─────────────────────────────────────────────────────────────
   text = text.replace(
     /\[!DANGER\]([\s\S]*?)\[\/!DANGER\]/g,
-    (_, content) =>
-      register(
-        `<div class="callout callout-danger"><span class="callout-icon">🔴</span><div class="callout-body">${formatBlockContent(
-          content
-        )}</div></div>`
-      )
+    (_, content) => register(makeCallout("danger", "×", "Danger", content))
   );
 
+  // ── [!INFO] ───────────────────────────────────────────────────────────────
+  text = text.replace(
+    /\[!INFO\]([\s\S]*?)\[\/!INFO\]/g,
+    (_, content) => register(makeCallout("info", "≡", "Context", content))
+  );
+
+  // ── [!QUOTE] ──────────────────────────────────────────────────────────────
   text = text.replace(
     /\[!QUOTE\]([\s\S]*?)\[\/!QUOTE\]/g,
     (_, content) =>
       register(
-        `<blockquote class="pull-quote"><p>${formatInline(
-          content.trim()
-        )}</p></blockquote>`
+        `<blockquote class="pull-quote"><p>${formatInline(content.trim())}</p></blockquote>`
       )
   );
 
+  // ── [!STAT value="X" label="desc"] ───────────────────────────────────────
+  text = text.replace(
+    /\[!STAT\s+value="([^"]+)"\s+label="([^"]+)"\]\s*(?:\[\/!STAT\])?/g,
+    (_, value, label) =>
+      register(
+        `<div class="stat-highlight"><div class="stat-hl-value">${escapeHtml(value)}</div><div class="stat-hl-label">${escapeHtml(label)}</div></div>`
+      )
+  );
+
+  // ── [!STAT label="X"]value[/!STAT] (legacy) ──────────────────────────────
   text = text.replace(
     /\[!STAT\s+label="([^"]+)"\]([\s\S]*?)\[\/!STAT\]/g,
     (_, label, value) =>
       register(
-        `<div class="stat-card"><div class="stat-label">${escapeHtml(
-          label
-        )}</div><div class="stat-value">${formatInline(
-          value.trim()
-        )}</div></div>`
+        `<div class="stat-highlight"><div class="stat-hl-value">${formatInline(value.trim())}</div><div class="stat-hl-label">${escapeHtml(label)}</div></div>`
       )
   );
 
+  // ── [!STATS] multi-stat row ───────────────────────────────────────────────
   text = text.replace(
     /\[!STATS\]([\s\S]*?)\[\/!STATS\]/g,
     (_, content) => {
@@ -202,17 +249,25 @@ function preprocessCustomBlocks(markdown: string): {
         .filter(Boolean)
         .map((line: string) => {
           const [label, ...rest] = line.split("::");
-          return `<div class="stat-card"><div class="stat-label">${escapeHtml(
-            label.trim()
-          )}</div><div class="stat-value">${formatInline(
-            rest.join("::").trim()
-          )}</div></div>`;
+          return `<div class="stat-card"><div class="stat-label">${escapeHtml(label.trim())}</div><div class="stat-value">${formatInline(rest.join("::").trim())}</div></div>`;
         })
         .join("");
       return register(`<div class="stat-row">${items}</div>`);
     }
   );
 
+  // ── [!EQ label="Eq. N — Name"]$$...$$[/!EQ] ─────────────────────────────
+  text = text.replace(
+    /\[!EQ\s+label="([^"]+)"\]([\s\S]*?)\[\/!EQ\]/g,
+    (_, label, formula) => {
+      const rendered = renderKatexBlock(formula.trim());
+      return register(
+        `<div class="eq"><div class="eq-label">${escapeHtml(label)}</div><div class="eq-body">${rendered}</div></div>`
+      );
+    }
+  );
+
+  // ── [!COMPARE] table ──────────────────────────────────────────────────────
   text = text.replace(
     /\[!COMPARE\s+a="([^"]+)"\s+b="([^"]+)"(?:\s+c="([^"]*)")?\](?:([\s\S]*?)\[\/!COMPARE\])?/g,
     (_, labelA, labelB, labelC, content) => {
@@ -225,39 +280,47 @@ function preprocessCustomBlocks(markdown: string): {
       };
       const rows = content
         ? content.trim().split("\n").filter(Boolean).map(parseRow).join("")
-        : `<tr><td colspan="${threeCol ? 3 : 2}" style="text-align:center;padding:14px;color:var(--text3)">—</td></tr>`;
+        : `<tr><td colspan="${threeCol ? 3 : 2}" style="text-align:center;padding:14px;color:var(--text-dim)">—</td></tr>`;
       const headers = [escapeHtml(labelA), escapeHtml(labelB)];
       if (threeCol) headers.push(escapeHtml(labelC));
       return register(
-        `<div class="compare-block"><table class="compare-table"><thead><tr>${headers.map((h) => `<th>${h}</th>`).join("")}</tr></thead><tbody>${rows}</tbody></table></div>`
+        `<div class="tbl-wrap"><table><thead><tr>${headers.map((h) => `<th>${h}</th>`).join("")}</tr></thead><tbody>${rows}</tbody></table></div>`
       );
     }
   );
 
+  // ── [!COMPARE] bare (no attributes) — pipe-separated table ───────────────
+  text = text.replace(
+    /\[!COMPARE\]([\s\S]*?)\[\/!COMPARE\]/g,
+    (_, content) => {
+      const rows = content.trim().split("\n").filter(Boolean);
+      if (rows.length < 1) return register("");
+      const cells = (line: string) =>
+        line.split("|").map((c) => c.trim()).filter(Boolean);
+      const headerCells = cells(rows[0]).map((c) => `<th>${formatInline(c)}</th>`).join("");
+      const bodyRows = rows
+        .slice(1)
+        .map((row: string) => `<tr>${cells(row).map((c) => `<td>${formatInline(c)}</td>`).join("")}</tr>`)
+        .join("");
+      return register(
+        `<div class="tbl-wrap"><table><thead><tr>${headerCells}</tr></thead><tbody>${bodyRows}</tbody></table></div>`
+      );
+    }
+  );
+
+  // ── [!EXPAND] ─────────────────────────────────────────────────────────────
   text = text.replace(
     /\[!EXPAND\s+title="([^"]+)"\]([\s\S]*?)\[\/!EXPAND\]/g,
     (_, title, content) =>
       register(
-        `<details class="expandable-section"><summary class="expandable-summary">${escapeHtml(
-          title
-        )}</summary><div class="expandable-body">${formatBlockContent(
-          content
-        )}</div></details>`
+        `<details class="expandable-section"><summary class="expandable-summary">${escapeHtml(title)}</summary><div class="expandable-body">${formatBlockContent(content)}</div></details>`
       )
   );
 
+  // ── [!QUIZ] ───────────────────────────────────────────────────────────────
   text = text.replace(
     /\[!QUIZ\s+q="([^"]+)"\s+a1="([^"]+)"\s+a2="([^"]+)"\s+a3="([^"]+)"\s+a4="([^"]+)"\s+correct=(\d+)\]([\s\S]*?)\[\/!QUIZ\]/g,
-    (
-      _match,
-      q,
-      a1,
-      a2,
-      a3,
-      a4,
-      correct,
-      explanation
-    ) => {
+    (_match, q, a1, a2, a3, a4, correct, explanation) => {
       const answers = [a1, a2, a3, a4];
       const correctIdx = parseInt(correct, 10) - 1;
       const id = `quiz_${counter}`;
@@ -266,46 +329,34 @@ function preprocessCustomBlocks(markdown: string): {
       const optionsHtml = answers
         .map((ans, idx) => {
           const isCorrect = idx === correctIdx;
-          return `<button class="quiz-option" data-correct="${isCorrect}" data-quiz="${id}" onclick="(function(btn){var all=document.querySelectorAll('[data-quiz=\\'${escapedId}\\']');all.forEach(function(b){b.disabled=true;b.classList.remove('correct','incorrect');b.classList.add(b.dataset.correct==='true'?'correct':'incorrect')});var exp=document.getElementById('${escapedId}_exp');if(exp)exp.style.display='block'})(this)">${escapeHtml(
-            ans
-          )}</button>`;
+          return `<button class="quiz-option" data-correct="${isCorrect}" data-quiz="${id}" onclick="(function(btn){var all=document.querySelectorAll('[data-quiz=\\'${escapedId}\\']');all.forEach(function(b){b.disabled=true;b.classList.remove('correct','incorrect');b.classList.add(b.dataset.correct==='true'?'correct':'incorrect')});var exp=document.getElementById('${escapedId}_exp');if(exp)exp.style.display='block'})(this)">${escapeHtml(ans)}</button>`;
         })
         .join("");
       return register(
-        `<div class="quiz-block" data-question="${escapeHtml(q)}" data-answers="${answersJson}" data-correct="${correct}" data-explanation="${escapeHtml(explanation.trim())}"><p class="quiz-question"><strong>Q:</strong> ${escapeHtml(
-          q
-        )}</p><div class="quiz-options">${optionsHtml}</div><div class="quiz-explanation" id="${id}_exp" style="display:none"><p>${formatInline(
-          explanation.trim()
-        )}</p></div></div>`
+        `<div class="quiz-block" data-question="${escapeHtml(q)}" data-answers="${answersJson}" data-correct="${correct}" data-explanation="${escapeHtml(explanation.trim())}"><p class="quiz-question"><strong>Q:</strong> ${escapeHtml(q)}</p><div class="quiz-options">${optionsHtml}</div><div class="quiz-explanation" id="${id}_exp" style="display:none"><p>${formatInline(explanation.trim())}</p></div></div>`
       );
     }
   );
 
+  // ── [!POLL] ───────────────────────────────────────────────────────────────
   text = text.replace(
     /\[!POLL\s+q="([^"]+)"\]([\s\S]*?)\[\/!POLL\]/g,
     (_, question, content) => {
-      const options = content
-        .trim()
-        .split("|")
-        .map((o: string) => o.trim())
-        .filter(Boolean);
+      const options = content.trim().split("|").map((o: string) => o.trim()).filter(Boolean);
       const hash = simpleHash(question);
       const pollId = `poll_${hash}`;
       const optionsHtml = options
         .map((opt: string, idx: number) =>
-          `<button class="poll-option" data-poll="${pollId}" data-option="${idx}" id="${pollId}_opt${idx}"><span class="poll-label">${escapeHtml(
-            opt
-          )}</span><span class="poll-bar-wrap"><span class="poll-bar" id="${pollId}_bar${idx}"></span></span><span class="poll-pct" id="${pollId}_pct${idx}">—</span></button>`
+          `<button class="poll-option" data-poll="${pollId}" data-option="${idx}" id="${pollId}_opt${idx}"><span class="poll-label">${escapeHtml(opt)}</span><span class="poll-bar-wrap"><span class="poll-bar" id="${pollId}_bar${idx}"></span></span><span class="poll-pct" id="${pollId}_pct${idx}">—</span></button>`
         )
         .join("");
       return register(
-        `<div class="poll-block" data-poll-id="${pollId}" id="${pollId}"><p class="poll-question"><strong>Poll:</strong> ${escapeHtml(
-          question
-        )}</p><div class="poll-options">${optionsHtml}</div><p class="poll-note">Tap to vote</p></div>`
+        `<div class="poll-block" data-poll-id="${pollId}" id="${pollId}"><p class="poll-question"><strong>Poll:</strong> ${escapeHtml(question)}</p><div class="poll-options">${optionsHtml}</div><p class="poll-note">Tap to vote</p></div>`
       );
     }
   );
 
+  // ── [!TABS] ───────────────────────────────────────────────────────────────
   text = text.replace(
     /\[!TABS((?:\s+t\d+="[^"]*")+)\]([\s\S]*?)\[\/!TABS\]/g,
     (_, attribs, content) => {
@@ -319,18 +370,12 @@ function preprocessCustomBlocks(markdown: string): {
       const panels = content.split("---TAB---");
       const tabButtons = labels
         .map((label, idx) =>
-          `<button class="tab-btn${
-            idx === 0 ? " active" : ""
-          }" onclick="evpulseTab('${tabId}',${idx})" id="${tabId}_btn${idx}">${escapeHtml(
-            label
-          )}</button>`
+          `<button class="tab-btn${idx === 0 ? " active" : ""}" onclick="evpulseTab('${tabId}',${idx})" id="${tabId}_btn${idx}">${escapeHtml(label)}</button>`
         )
         .join("");
       const tabPanels = panels
         .map((panel: string, idx: number) =>
-          `<div class="tab-panel${
-            idx === 0 ? " active" : ""
-          }" id="${tabId}_panel${idx}">${formatBlockContent(panel)}</div>`
+          `<div class="tab-panel${idx === 0 ? " active" : ""}" id="${tabId}_panel${idx}">${formatBlockContent(panel)}</div>`
         )
         .join("");
       return register(
@@ -339,125 +384,67 @@ function preprocessCustomBlocks(markdown: string): {
     }
   );
 
-  text = text.replace(
-    /\[!EQ\s+label="([^"]+)"\]([\s\S]*?)\[\/!EQ\]/g,
-    (_, label, formula) => {
-      const f = formula.trim();
-      return register(
-        `<div class="equation-block"><span class="equation-label">${escapeHtml(
-          label
-        )}</span><pre class="math-block" data-formula="${escapeHtml(
-          f
-        )}"><code>${escapeHtml(f)}</code></pre></div>`
-      );
-    }
-  );
-
+  // ── [!TIMELINE] ───────────────────────────────────────────────────────────
   text = text.replace(
     /\[!TIMELINE\]([\s\S]*?)\[\/!TIMELINE\]/g,
     (_, content) => {
-      const items = content
-        .trim()
-        .split("\n")
-        .filter(Boolean)
+      const items = content.trim().split("\n").filter(Boolean)
         .map((line: string) => {
           const [year, ...rest] = line.split("::");
           const event = rest.join("::").trim();
-          return `<div class="timeline-item"><div class="timeline-dot"></div><div class="timeline-content"><span class="timeline-year">${escapeHtml(
-            year.trim()
-          )}</span><p class="timeline-event">${formatInline(event)}</p></div></div>`;
+          return `<div class="timeline-item"><div class="timeline-dot"></div><div class="timeline-content"><span class="timeline-year">${escapeHtml(year.trim())}</span><p class="timeline-event">${formatInline(event)}</p></div></div>`;
         })
         .join("");
-      return register(
-        `<div class="timeline-block"><div class="timeline-line"></div>${items}</div>`
-      );
+      return register(`<div class="timeline-block"><div class="timeline-line"></div>${items}</div>`);
     }
   );
 
+  // ── [!STEPS] ──────────────────────────────────────────────────────────────
   text = text.replace(
     /\[!STEPS\]([\s\S]*?)\[\/!STEPS\]/g,
     (_, content) => {
-      const items = content
-        .trim()
-        .split("\n")
-        .filter(Boolean)
+      const items = content.trim().split("\n").filter(Boolean)
         .map((line: string, idx: number) => {
-          const [title, ...rest] = line.split("::");
+          // Support both "Title::body" and plain numbered "1. Title" or just text
+          const stripped = line.replace(/^\d+\.\s*/, "");
+          const [title, ...rest] = stripped.split("::");
           const body = rest.join("::").trim();
-          return `<div class="step-item"><div class="step-number">${
-            idx + 1
-          }</div><div class="step-content"><strong class="step-title">${escapeHtml(
-            title.trim()
-          )}</strong>${
-            body
-              ? `<p class="step-body">${formatInline(body)}</p>`
-              : ""
-          }</div></div>`;
+          return `<div class="step-item"><div class="step-number">${idx + 1}</div><div class="step-content"><strong class="step-title">${formatInline(title.trim())}</strong>${body ? `<p class="step-body">${formatInline(body)}</p>` : ""}</div></div>`;
         })
         .join("");
       return register(`<div class="steps-block">${items}</div>`);
     }
   );
 
+  // ── [!PROSCONS] and [!PROCONS] ────────────────────────────────────────────
   text = text.replace(
-    /\[!PROSCONS\]([\s\S]*?)\[\/!PROSCONS\]/g,
+    /\[!(?:PROSCONS|PROCONS)\]([\s\S]*?)\[\/!(?:PROSCONS|PROCONS)\]/g,
     (_, content) => {
       const lines = content.trim().split("\n").filter(Boolean);
       const pros = lines.filter((l: string) => l.trim().startsWith("+"));
       const cons = lines.filter((l: string) => l.trim().startsWith("-"));
-      const prosHtml = pros
-        .map((l: string) =>
-          `<li>${formatInline(l.trim().slice(1).trim())}</li>`
-        )
-        .join("");
-      const consHtml = cons
-        .map((l: string) =>
-          `<li>${formatInline(l.trim().slice(1).trim())}</li>`
-        )
-        .join("");
+      const prosHtml = pros.map((l: string) => `<li>${formatInline(l.trim().slice(1).trim())}</li>`).join("");
+      const consHtml = cons.map((l: string) => `<li>${formatInline(l.trim().slice(1).trim())}</li>`).join("");
       return register(
-        `<div class="proscons-block"><div class="pros-col"><div class="proscons-header proscons-pros">✅ Pros</div><ul class="proscons-list">${prosHtml}</ul></div><div class="cons-col"><div class="proscons-header proscons-cons">❌ Cons</div><ul class="proscons-list">${consHtml}</ul></div></div>`
+        `<div class="compare"><div class="compare-card pro"><div class="compare-head">✓ Strengths</div><ul class="compare-list">${prosHtml}</ul></div><div class="compare-card con"><div class="compare-head">✗ Limitations</div><ul class="compare-list">${consHtml}</ul></div></div>`
       );
     }
   );
 
+  // ── [!FIGURE] ─────────────────────────────────────────────────────────────
   text = text.replace(
     /\[!FIGURE\s+src="([^"]+)"(?:\s+caption="([^"]*)")?(?:\s+credit="([^"]*)")?(?:\s+creditUrl="([^"]*)")?(?:\s*\/)?\](?:\s*\[\/!FIGURE\])?/g,
     (_, src, caption, credit, creditUrl) => {
       const captionHtml = caption
-        ? `<figcaption>${escapeHtml(caption)}${
-            credit
-              ? ` <span class="img-credit">Source: ${
-                  creditUrl
-                    ? `<a href="${escapeHtml(
-                        creditUrl
-                      )}" target="_blank" rel="noopener noreferrer">${escapeHtml(
-                        credit
-                      )}</a>`
-                    : escapeHtml(credit)
-                }</span>`
-              : ""
-          }</figcaption>`
-        : credit
-        ? `<figcaption><span class="img-credit">Source: ${
-            creditUrl
-              ? `<a href="${escapeHtml(
-                  creditUrl
-                )}" target="_blank" rel="noopener noreferrer">${escapeHtml(
-                  credit
-                )}</a>`
-              : escapeHtml(credit)
-          }</span></figcaption>`
-        : "";
+        ? `<figcaption>${escapeHtml(caption)}${credit ? ` <span class="img-credit">Source: ${creditUrl ? `<a href="${escapeHtml(creditUrl)}" target="_blank" rel="noopener noreferrer">${escapeHtml(credit)}</a>` : escapeHtml(credit)}</span>` : ""}</figcaption>`
+        : credit ? `<figcaption><span class="img-credit">Source: ${creditUrl ? `<a href="${escapeHtml(creditUrl)}" target="_blank" rel="noopener noreferrer">${escapeHtml(credit)}</a>` : escapeHtml(credit)}</span></figcaption>` : "";
       return register(
-        `<figure class="article-figure"><img src="${escapeHtml(
-          src
-        )}" alt="${escapeHtml(caption ?? "")}" loading="lazy"/>${captionHtml}</figure>`
+        `<figure class="article-figure"><img src="${escapeHtml(src)}" alt="${escapeHtml(caption ?? "")}" loading="lazy"/>${captionHtml}</figure>`
       );
     }
   );
 
-  // [!FAQ]question::answer[/!FAQ]
+  // ── [!FAQ] (inline) ───────────────────────────────────────────────────────
   text = text.replace(
     /\[!FAQ\]([\s\S]*?)\[\/!FAQ\]/g,
     (_, content) => {
@@ -469,12 +456,41 @@ function preprocessCustomBlocks(markdown: string): {
     }
   );
 
+  // ── [!QA] Q::A pairs ──────────────────────────────────────────────────────
+  text = text.replace(
+    /\[!QA\]([\s\S]*?)\[\/!QA\]/g,
+    (_, content) => {
+      const [question, ...rest] = content.split("::");
+      const answer = rest.join("::").trim();
+      return register(
+        `<div class="qa-item"><div class="qa-q"><span class="q-badge">Q</span><span>${escapeHtml(question.trim())}</span></div><div class="qa-a"><span class="a-badge">A</span><p>${formatInline(answer)}</p></div></div>`
+      );
+    }
+  );
+
+  // ── [!TAKEAWAYS] ──────────────────────────────────────────────────────────
+  text = text.replace(
+    /\[!TAKEAWAYS\]([\s\S]*?)\[\/!TAKEAWAYS\]/g,
+    (_, content) => {
+      const items = content.trim().split("\n")
+        .filter((l: string) => l.trim())
+        .map((l: string) => {
+          // Strip leading "1." or "-" or "*"
+          const cleaned = l.trim().replace(/^(\d+\.|[-*])\s*/, "");
+          return `<li>${formatInline(cleaned)}</li>`;
+        })
+        .join("");
+      return register(
+        `<div class="takeaways"><div class="tk-head"><span class="tk-star">✦</span><span class="tk-title">Key Takeaways</span></div><ol>${items}</ol></div>`
+      );
+    }
+  );
+
   return { text, map };
 }
 
 export function markdownToHtml(markdown: string) {
-  const { text: preprocessed, map: blockMap } =
-    preprocessCustomBlocks(markdown);
+  const { text: preprocessed, map: blockMap } = preprocessCustomBlocks(markdown);
 
   const lines = normalizeEncoding(preprocessed)
     .replace(/\r\n/g, "\n")
@@ -526,10 +542,23 @@ export function markdownToHtml(markdown: string) {
       continue;
     }
 
-    // Fenced code block: ```lang\ncode\n```
+    // ── Fenced code block: ```lang [filename: foo.py] ──────────────────────
     if (line.startsWith("```")) {
       flushAll();
-      const lang = (line.slice(3).trim() || "text").toLowerCase();
+      const langRaw = line.slice(3).trim();
+      // Parse: "python filename: coulomb.py" or "python" or ""
+      let lang = "text";
+      let filename = "";
+      if (langRaw) {
+        const filenameMatch = langRaw.match(/^(\S+)\s+filename:\s*(.+)$/i);
+        if (filenameMatch) {
+          lang = (filenameMatch[1] || "text").toLowerCase();
+          filename = filenameMatch[2].trim();
+        } else {
+          lang = langRaw.split(/\s+/)[0].toLowerCase() || "text";
+        }
+      }
+
       const codeLines: string[] = [];
       i += 1;
       while (i < lines.length && !lines[i].trim().startsWith("```")) {
@@ -541,16 +570,18 @@ export function markdownToHtml(markdown: string) {
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;");
-      const copyJs = `navigator.clipboard.writeText(this.closest('.code-block').querySelector('code').innerText).then(()=>{this.textContent='Copied';setTimeout(()=>this.textContent='Copy',2000)})`;
+
+      const copyJs = `navigator.clipboard.writeText(this.closest('.codeblock').querySelector('code').innerText).then(()=>{this.textContent='✓ Copied';this.classList.add('ok');setTimeout(()=>{this.textContent='Copy';this.classList.remove('ok')},2000)})`;
+      const filenameHtml = filename ? `<span class="code-filename">${escapeHtml(filename)}</span>` : "";
       blocks.push(
-        `<div class="code-block">` +
-        `<div class="code-block-header"><span class="lang-tag">${lang.toUpperCase()}</span>` +
-        `<button type="button" class="copy-btn" onclick="${copyJs}">Copy</button></div>` +
-        `<pre class="language-${lang}"><code class="language-${lang}">${escaped}</code></pre></div>`
+        `<div class="codeblock">` +
+        `<div class="code-head"><span class="lang-pill">${lang.toUpperCase()}</span>${filenameHtml}<button type="button" class="copy-btn" onclick="${copyJs}">Copy</button></div>` +
+        `<pre><code class="language-${lang}">${escaped}</code></pre></div>`
       );
       continue;
     }
 
+    // ── Freestanding block equation: $$ on its own line ────────────────────
     if (line === "$$") {
       flushAll();
       const formulaLines: string[] = [];
@@ -560,7 +591,8 @@ export function markdownToHtml(markdown: string) {
         i += 1;
       }
       const formula = formulaLines.join("\n").trim();
-      blocks.push(`<pre class="math-block" data-formula="${escapeHtml(formula)}"><code>${escapeHtml(formula)}</code></pre>`);
+      const rendered = renderKatexBlock(formula);
+      blocks.push(`<div class="eq"><div class="eq-body">${rendered}</div></div>`);
       continue;
     }
 
@@ -638,9 +670,7 @@ export function markdownToHtml(markdown: string) {
       for (const fl of figureLines) {
         const colonIdx = fl.indexOf(": ");
         if (colonIdx >= 0) {
-          const key = fl.slice(0, colonIdx).trim();
-          const value = fl.slice(colonIdx + 2).trim();
-          figureData[key] = value;
+          figureData[fl.slice(0, colonIdx).trim()] = fl.slice(colonIdx + 2).trim();
         }
       }
       const src = figureData.src || "";
@@ -652,8 +682,7 @@ export function markdownToHtml(markdown: string) {
       const creditHtml = credit
         ? ` <span class="figure-credit">Credit: <a href="${escapeHtml(creditUrl)}" target="_blank" rel="noreferrer">${escapeHtml(credit)}</a> (${escapeHtml(license)})</span>`
         : "";
-      const figHtml = `<figure class="editor-figure"><img src="${escapeHtml(src)}" alt="${escapeHtml(alt)}" /><figcaption>${formatInline(caption)}${creditHtml}</figcaption></figure>`;
-      blocks.push(figHtml);
+      blocks.push(`<figure class="article-figure"><img src="${escapeHtml(src)}" alt="${escapeHtml(alt)}" /><figcaption>${formatInline(caption)}${creditHtml}</figcaption></figure>`);
       continue;
     }
 
@@ -664,7 +693,7 @@ export function markdownToHtml(markdown: string) {
       continue;
     }
 
-    if (line.startsWith("\u0002BLOCK_")) {
+    if (line.startsWith("BLOCK_")) {
       flushAll();
       const html = blockMap[line];
       if (html) blocks.push(html);
@@ -678,21 +707,8 @@ export function markdownToHtml(markdown: string) {
   flushAll();
 
   let raw = blocks.join("");
-  raw = raw.replace(/\u0002BLOCK_\d+\u0002/g, (key) => blockMap[key] ?? "");
-
-  raw = raw.replace(/<pre[^>]*class="[^"]*math-block[^"]*"[^>]*data-formula="([^"]*)"[^>]*>[\s\S]*?<\/pre>/g, (_, formula) => {
-    const decoded = formula.replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&#39;/g, "'");
-    try {
-      return `<div class="katex-display">${katex.renderToString(decoded, { displayMode: true, throwOnError: false })}</div>`;
-    } catch { return `<div class="katex-display">${formula}</div>`; }
-  });
-
-  raw = raw.replace(/<code[^>]*class="[^"]*math-inline[^"]*"[^>]*>(.*?)<\/code>/g, (_, formula) => {
-    const decoded = formula.replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&#39;/g, "'");
-    try {
-      return katex.renderToString(decoded, { displayMode: false, throwOnError: false });
-    } catch { return `<code class="math-inline">${decoded}</code>`; }
-  });
+  // Resolve any remaining block placeholders (e.g. inside paragraphs)
+  raw = raw.replace(/BLOCK_\d+/g, (key) => blockMap[key] ?? "");
 
   return raw;
 }

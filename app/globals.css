@@ -1,83 +1,97 @@
 @import "tailwindcss";
 
 @theme {
-  --font-display: "Space Grotesk", system-ui, sans-serif;
-  --font-serif:   "Plus Jakarta Sans", system-ui, sans-serif;
-  --font-sans:    "Plus Jakarta Sans", system-ui, sans-serif;
-  --font-mono:    "JetBrains Mono", monospace;
+  --font-serif: "DM Serif Display", serif;
+  --font-sans: "DM Sans", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
 
   /* Expose CSS variables as Tailwind color tokens */
   --color-brand:   var(--brand, #0099b8);
   --color-brand2:  var(--brand-dark, #007a94);
-  --color-surface: var(--surface, #161b22);
-  --color-surface2:var(--surface2, #21262d);
-  --color-surface3:var(--surface3, #30363d);
-  --color-bg:      var(--bg, #0d1117);
-  --color-border:  var(--border, rgba(255,255,255,.08));
-  --color-border2: var(--border2, rgba(255,255,255,.14));
-  --color-text:    var(--text, #f0f6fc);
-  --color-text2:   var(--text2, #8b949e);
-  --color-text3:   var(--text3, #484f58);
+  --color-surface: var(--surface, #0e1420);
+  --color-surface2:var(--surface2, #131b2a);
+  --color-surface3:var(--surface3, #1a2438);
+  --color-bg:      var(--bg, #07090f);
+  --color-border:  var(--border, #1e2a3e);
+  --color-border2: var(--border2, #263349);
+  --color-text:    var(--text, #edf1f8);
+  --color-text2:   var(--text2, #8b97b0);
+  --color-text3:   var(--text3, #4a5670);
 }
 
 /* ============================================================
-   DESIGN TOKENS
-   EVPulse: codewithclaude.net aesthetic — warm paper light / deep ink dark
-   Brand: EVPulse cyan #0099b8
+   DESIGN TOKENS — dark mode (default)
    ============================================================ */
-
-/* Dark mode (default — user can toggle to light) */
 :root {
-  --bg:         #0d1117;
-  --surface:    #161b22;
-  --surface2:   #21262d;
-  --surface3:   #30363d;
-  --border:     rgba(255,255,255,.08);
-  --border2:    rgba(255,255,255,.14);
+  --bg:         #07090f;
+  --surface:    #0e1420;
+  --surface2:   #131b2a;
+  --surface3:   #1a2438;
+  --border:     #1e2a3e;
+  --border2:    #263349;
 
-  --text:       #f0f6fc;
-  --text2:      #8b949e;
-  --text3:      #484f58;
+  --text:       #edf1f8;
+  --text2:      #8b97b0;
+  --text3:      #4a5670;
 
   --brand:      #0099b8;
   --brand-dark: #007a94;
-  --brand-xdark:#005f74;
-  --brand-bg:   rgba(0,153,184,.1);
-  --brand-muted:#4ecde6;
+  --brand-xdark:#005a6e;
+  --brand-bg:   rgba(0,153,184,0.08);
+  --brand-muted:#b3e5ef;
 
-  --orange:     #f97316;
-  --green:      #3fb950;
-  --yellow:     #d29922;
-  --yellow-dim: rgba(210,153,34,.12);
-  --purple:     #bc8cff;
-  --red:        #f85149;
+  --orange:     #ff6b35;
+  --green:      #00d68f;
+  --yellow:     #ffd60a;
+  --yellow-dim: rgba(255,214,10,0.12);
+  --purple:     #9b6dff;
+  --red:        #ff4545;
+
+  /* ── Article prose tokens (mockup-aligned) ─────────────────── */
+  --accent:       #00c4df;
+  --surface-2:    #131b2a;
+  --border-light: #1a2638;
+  --text-muted:   #738aa4;
+  --text-dim:     #3e5270;
+  /* --yellow / --red / --green / --purple reuse existing above */
+
+  /* Font stack variables */
+  --font-head:  var(--font-exo2, 'Exo 2', sans-serif);
+  --font-body:  var(--font-source-serif, 'Source Serif 4', Georgia, serif);
+  --font-code:  var(--font-jetbrains-mono, 'JetBrains Mono', monospace);
 }
 
-/* Light mode — codewithclaude.net warm paper aesthetic */
 [data-theme="light"] {
-  --bg:         #fdfaf8;
+  --bg:         #f8f9fa;
   --surface:    #ffffff;
-  --surface2:   #f6f5f3;
-  --surface3:   #ede9e5;
-  --border:     rgba(0,0,0,.07);
-  --border2:    rgba(0,0,0,.13);
+  --surface2:   #f3f4f6;
+  --surface3:   #e9ebef;
+  --border:     #e0e4ec;
+  --border2:    #c8cdd8;
 
-  --text:       #0f172a;
-  --text2:      #475569;
-  --text3:      #94a3b8;
+  --text:       #0d1117;
+  --text2:      #4a5568;
+  --text3:      #9aa3b2;
 
   --brand:      #0099b8;
   --brand-dark: #007a94;
-  --brand-xdark:#005f74;
-  --brand-bg:   rgba(0,153,184,.08);
-  --brand-muted:#22bcd4;
+  --brand-xdark:#005a6e;
+  --brand-bg:   rgba(0,153,184,0.07);
+  --brand-muted:#b3e5ef;
 
-  --orange:     #ea580c;
-  --green:      #16a34a;
-  --yellow:     #ca8a04;
-  --yellow-dim: rgba(202,138,4,.1);
-  --purple:     #7c3aed;
-  --red:        #dc2626;
+  --orange:     #c94c1a;
+  --green:      #00906a;
+  --yellow:     #a07800;
+  --yellow-dim: rgba(160,120,0,0.1);
+  --purple:     #6b3fcc;
+  --red:        #cc2929;
+
+  /* ── Article prose tokens (light mode overrides) ─────────────── */
+  --accent:       #0099b8;
+  --surface-2:    #f3f4f6;
+  --border-light: #dce5f0;
+  --text-muted:   #4a607a;
+  --text-dim:     #8a9ab0;
 }
 
 /* ============================================================
@@ -93,36 +107,20 @@ html {
 body {
   background: var(--bg);
   color: var(--text);
-  font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+  font-family: "DM Sans", system-ui, sans-serif;
   font-size: 16px;
-  line-height: 1.65;
+  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
-  transition: background 0.3s, color 0.2s;
-}
-
-/* ── codewithclaude.net signature: warm radial glow on light mode ── */
-[data-theme="light"] body {
-  background:
-    radial-gradient(ellipse 80% 60% at 85% 35%, rgba(0,200,230,.07) 0%, transparent 55%),
-    radial-gradient(ellipse 70% 55% at 15% 80%, rgba(255,160,100,.06) 0%, transparent 50%),
-    #fdfaf8;
-}
-
-/* ── Dark mode gets a subtle cyan glow at top ── */
-:root body {
-  background:
-    radial-gradient(ellipse 60% 40% at 70% 0%, rgba(0,153,184,.06) 0%, transparent 60%),
-    #0d1117;
+  transition: background 0.2s, color 0.2s;
 }
 
 a { color: inherit; text-decoration: none; }
 
-/* Space Grotesk for headings — clean technical editorial look */
+/* Monospace for all headings — technical documentation look */
 h1, h2, h3, h4, h5, h6 {
-  font-family: "Space Grotesk", system-ui, sans-serif;
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
   letter-spacing: -0.02em;
-  font-weight: 700;
 }
 
 .wrapper {
@@ -185,18 +183,15 @@ h1, h2, h3, h4, h5, h6 {
 .header-new {
   position: fixed;
   top: 0; left: 0; right: 0;
-  height: 64px;
-  background: color-mix(in srgb, var(--bg) 88%, transparent);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  height: 60px;
+  background: var(--surface);
   border-bottom: 1px solid var(--border);
   z-index: 9000;
-  transition: box-shadow 0.2s, border-color 0.2s, background 0.2s;
+  transition: box-shadow 0.2s, border-color 0.2s;
 }
 .header-new.scrolled {
-  box-shadow: 0 2px 20px rgba(0,0,0,0.12);
+  box-shadow: 0 2px 16px rgba(0,0,0,0.15);
   border-bottom-color: var(--border2);
-  background: color-mix(in srgb, var(--bg) 94%, transparent);
 }
 .header-inner {
   display: flex;
@@ -207,14 +202,19 @@ h1, h2, h3, h4, h5, h6 {
   margin: 0 auto;
   padding: 0 clamp(1rem, 4vw, 3rem);
 }
-.header-logo { display: flex; align-items: center; }
+.header-logo { display: flex; align-items: center; text-decoration: none; }
 .logo-text {
-  font-size: 20px;
-  font-weight: 800;
+  font-family: var(--font-space-grotesk, 'Space Grotesk', sans-serif);
+  font-size: 1.375rem;
+  font-weight: 700;
   color: var(--text);
-  letter-spacing: -0.5px;
+  letter-spacing: -0.04em;
+  line-height: 1;
 }
-.logo-accent { color: var(--brand); }
+.logo-accent {
+  color: var(--brand);
+  font-style: italic;
+}
 
 .header-nav {
   display: flex;
@@ -247,20 +247,17 @@ h1, h2, h3, h4, h5, h6 {
 .header-btn:hover { color: var(--text); background: var(--surface2); }
 
 .header-cta {
-  padding: 7px 18px;
+  padding: 7px 16px;
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 600;
   color: #fff;
-  background: var(--text);
-  border-radius: 8px;
-  transition: background 0.15s, opacity 0.15s;
+  background: var(--brand);
+  border-radius: 6px;
+  transition: background 0.15s;
   cursor: pointer;
   border: none;
-  letter-spacing: 0.01em;
 }
-.header-cta:hover { background: var(--text); opacity: 0.85; color: #fff; }
-[data-theme="light"] .header-cta { background: #0f172a; }
-[data-theme="light"] .header-cta:hover { background: #1e293b; opacity: 1; }
+.header-cta:hover { background: var(--brand-dark); }
 
 /* Hamburger */
 .hamburger-new {
@@ -290,7 +287,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 .mobile-panel {
   position: fixed;
-  top: 64px; right: 0; bottom: 0;
+  top: 60px; right: 0; bottom: 0;
   width: min(280px, 85vw);
   background: var(--surface);
   border-left: 1px solid var(--border);
@@ -401,21 +398,14 @@ h1, h2, h3, h4, h5, h6 {
 }
 .sec-link:hover { opacity: 0.75; }
 
-/* codewithclaude.net-style soft pill section label */
 .section-label {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 5px 14px;
-  background: var(--brand-bg);
-  border: 1px solid rgba(0,153,184,.18);
-  border-radius: 100px;
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.01em;
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
   color: var(--brand);
   margin-bottom: 16px;
-  font-family: "Plus Jakarta Sans", system-ui, sans-serif;
 }
 .section-keywords {
   font-size: 13px;
@@ -441,25 +431,14 @@ h1, h2, h3, h4, h5, h6 {
   flex-direction: column;
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 16px;
+  border-radius: 10px;
   overflow: hidden;
   transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
 }
 .a-card:hover {
-  border-color: var(--brand);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 28px rgba(0,153,184,0.13);
-}
-
-/* Light-mode cards: clean white, software shadow like codewithclaude.net */
-[data-theme="light"] .a-card {
-  background: #ffffff;
-  border-color: rgba(0,0,0,.07);
-  box-shadow: 0 1px 3px rgba(0,0,0,.05);
-}
-[data-theme="light"] .a-card:hover {
-  border-color: var(--brand);
-  box-shadow: 0 6px 24px rgba(0,153,184,.12);
+  border-color: var(--border2);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
 }
 .a-card-link-image {
   display: block;
@@ -1167,7 +1146,7 @@ h1, h2, h3, h4, h5, h6 {
   background: var(--brand-bg);
   color: var(--brand);
   border-radius: 20px;
-  border: 1px solid rgba(0,153,184,.2);
+  border: 1px solid rgba(0,153,184,0.2);
 }
 .filter-remove {
   background: none; border: none;
@@ -1206,12 +1185,12 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 600;
   color: var(--brand);
   background: var(--brand-bg);
-  border: 1px solid rgba(0,153,184,.2);
+  border: 1px solid rgba(0,153,184,0.2);
   border-radius: 8px;
   transition: background 0.15s, border-color 0.15s;
   cursor: pointer;
 }
-.btn-accent:hover { background: rgba(0,153,184,.15); border-color: var(--brand); }
+.btn-accent:hover { background: rgba(0,153,184,0.15); border-color: var(--brand); }
 .secondary { color: var(--text2); }
 .sidebar-empty {
   padding: 24px;
@@ -2134,17 +2113,16 @@ h1, h2, h3, h4, h5, h6 {
 .hero-badge {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 6px 16px;
-  background: var(--brand-bg);
+  padding: 4px 14px;
+  border: 1.5px solid var(--brand);
   color: var(--brand);
-  border: 1px solid rgba(0,153,184,.2);
   border-radius: 100px;
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 0.01em;
-  margin-bottom: 20px;
-  font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  margin-bottom: 24px;
+  font-family: var(--font-mono, monospace);
 }
 
 .page-title {
@@ -2153,8 +2131,7 @@ h1, h2, h3, h4, h5, h6 {
   line-height: 1.1;
   color: var(--text);
   margin: 0 0 16px;
-  font-family: "Space Grotesk", system-ui, sans-serif;
-  letter-spacing: -0.03em;
+  font-family: var(--font-mono, monospace);
 }
 
 .page-subtitle {
@@ -2189,8 +2166,7 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 700;
   color: var(--text);
   margin: 0;
-  font-family: "Space Grotesk", system-ui, sans-serif;
-  letter-spacing: -0.01em;
+  font-family: var(--font-mono, monospace);
 }
 
 /* ============================================================
@@ -2264,7 +2240,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 .calc-card:hover {
   border-color: var(--brand);
-  box-shadow: 0 8px 32px rgba(0,153,184,.10);
+  box-shadow: 0 8px 32px rgba(0,153,184,0.10);
   transform: translateY(-2px);
 }
 
@@ -2372,11 +2348,6 @@ h1, h2, h3, h4, h5, h6 {
   flex-direction: column;
   gap: 4px;
 }
-[data-theme="light"] .blogs-sidebar {
-  background: #ffffff;
-  border-color: rgba(0,0,0,.07);
-  box-shadow: 0 1px 4px rgba(0,0,0,.05);
-}
 @media (max-width: 960px) {
   .blogs-sidebar { position: static; flex-direction: row; flex-wrap: wrap; }
   .blogs-search-wrap { width: 100%; }
@@ -2446,7 +2417,7 @@ h1, h2, h3, h4, h5, h6 {
   transition: background 0.15s, color 0.15s;
 }
 .blogs-cat-btn.active .blogs-cat-count {
-  background: rgba(0,153,184,.12);
+  background: rgba(0,153,184,0.12);
   color: var(--brand);
 }
 
@@ -2484,8 +2455,8 @@ h1, h2, h3, h4, h5, h6 {
 }
 .blogs-featured:hover {
   border-color: var(--brand);
-  box-shadow: 0 14px 48px rgba(0,153,184,0.12);
-  transform: translateY(-2px);
+  box-shadow: 0 14px 48px rgba(0,153,184,0.10);
+  transform: translateY(-3px);
 }
 @media (max-width: 640px) {
   .blogs-featured { grid-template-columns: 1fr; }
@@ -2563,13 +2534,13 @@ h1, h2, h3, h4, h5, h6 {
 .blogs-article-card {
   display: flex; flex-direction: column;
   background: var(--surface); border: 1px solid var(--border);
-  border-radius: 16px; overflow: hidden;
+  border-radius: 14px; overflow: hidden;
   transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
 }
 .blogs-article-card:hover {
   border-color: var(--brand);
-  box-shadow: 0 8px 28px rgba(0,153,184,0.12);
-  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(0,153,184,0.08);
+  transform: translateY(-3px);
 }
 .blogs-article-card:hover .blogs-article-arrow {
   color: var(--brand); transform: translateX(3px);
@@ -2669,7 +2640,7 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--brand);
   background: var(--brand-bg);
   transform: translateY(-2px);
-  box-shadow: 0 4px 14px rgba(0,153,184,.12);
+  box-shadow: 0 4px 14px rgba(0,153,184,0.12);
 }
 .cat-tab-active {
   background: var(--brand);
@@ -2696,7 +2667,7 @@ button, a, [role="button"] {
 /* Card hover glow upgrade for PostCards on home / category pages */
 .a-card {
   transition: border-color 0.2s cubic-bezier(0.4,0,0.2,1),
-              transform   0.2s  cubic-bezier(0.4,0,0.2,1),
+              transform   0.22s cubic-bezier(0.4,0,0.2,1),
               box-shadow  0.2s  cubic-bezier(0.4,0,0.2,1);
 }
 

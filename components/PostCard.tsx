@@ -28,7 +28,7 @@ function parseTags(tags: unknown): string[] {
 
 const TIER_COLOR: Record<string, string> = {
   basic:        "#22c55e",
-  intermediate: "#0099b8",
+  intermediate: "#3b82f6",
   advanced:     "#f59e0b",
   expert:       "#ef4444",
 };

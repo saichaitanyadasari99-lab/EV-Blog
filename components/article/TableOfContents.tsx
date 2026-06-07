@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback } from "react"
 
 type TocItem = {
   id: string
@@ -10,14 +10,13 @@ type TocItem = {
 
 interface Props {
   headings: TocItem[]
-  date?: string
-  readingTime?: number
-  level?: string
 }
 
-export function TableOfContents({ headings, date, readingTime, level }: Props) {
+export function TableOfContents({ headings }: Props) {
   const [activeId, setActiveId] = useState("")
+  const [progress, setProgress] = useState(0)
 
+  /* Track active heading via IntersectionObserver */
   useEffect(() => {
     if (typeof window === "undefined" || headings.length === 0) return
 
@@ -28,7 +27,7 @@ export function TableOfContents({ headings, date, readingTime, level }: Props) {
           .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)
         if (visible.length) setActiveId(visible[0].target.id)
       },
-      { rootMargin: "-10% 0% -80% 0%", threshold: 0 }
+      { rootMargin: "-8% 0% -80% 0%", threshold: 0 }
     )
 
     headings.forEach(({ id }) => {
@@ -39,43 +38,52 @@ export function TableOfContents({ headings, date, readingTime, level }: Props) {
     return () => observer.disconnect()
   }, [headings])
 
+  /* Track reading progress via scroll */
+  const updateProgress = useCallback(() => {
+    const scrollTop = window.scrollY
+    const docHeight = document.documentElement.scrollHeight - window.innerHeight
+    if (docHeight <= 0) return
+    setProgress(Math.min(100, Math.round((scrollTop / docHeight) * 100)))
+  }, [])
+
+  useEffect(() => {
+    window.addEventListener("scroll", updateProgress, { passive: true })
+    updateProgress()
+    return () => window.removeEventListener("scroll", updateProgress)
+  }, [updateProgress])
+
   if (headings.length === 0) return null
 
   return (
-    <nav aria-label="Article sections">
-      <div className="toc-label">In this article</div>
+    <div className="toc-inner">
+      <span className="toc-panel-label">On This Page</span>
 
-      <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
+      <nav className="toc-nav" aria-label="Article sections">
         {headings.map((item) => (
-          <li key={item.id}>
-            <a
-              href={`#${item.id}`}
-              className={`toc-item ${activeId === item.id ? "active" : ""}`}
-              style={{
-                paddingLeft: item.level === 3 ? "20px" : "12px",
-              }}
-              onClick={(e) => {
-                e.preventDefault()
-                document.getElementById(item.id)?.scrollIntoView({ behavior: "smooth" })
-              }}
-            >
-              {item.text}
-            </a>
-          </li>
+          <a
+            key={item.id}
+            href={`#${item.id}`}
+            className={`toc-link ${item.level === 3 ? "h3" : "h2"} ${activeId === item.id ? "active" : ""}`}
+            onClick={(e) => {
+              e.preventDefault()
+              document.getElementById(item.id)?.scrollIntoView({ behavior: "smooth", block: "start" })
+            }}
+          >
+            {item.text}
+          </a>
         ))}
-      </ul>
+      </nav>
 
-      {date && (
-        <div className="toc-divider" />
-      )}
-
-      {date && (
-        <div>
-          <div className="toc-meta">{date}</div>
-          {readingTime && <div className="toc-meta">{readingTime} min read</div>}
-          {level && <div className="toc-meta" style={{ color: "var(--brand)" }}>{level}</div>}
+      {/* Reading progress bar */}
+      <div className="toc-progress-wrap" aria-hidden="true">
+        <div className="toc-progress-bar">
+          <div
+            className="toc-progress-fill"
+            style={{ width: `${progress}%` }}
+          />
         </div>
-      )}
-    </nav>
+        <span className="toc-progress-pct">{progress}%</span>
+      </div>
+    </div>
   )
 }

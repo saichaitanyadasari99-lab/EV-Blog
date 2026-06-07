@@ -1,17 +1,10 @@
 import type { Metadata, Viewport } from "next";
-import { DM_Sans, DM_Serif_Display, IBM_Plex_Mono, Plus_Jakarta_Sans, JetBrains_Mono, Syne, Space_Grotesk } from "next/font/google";
+import { DM_Sans, DM_Serif_Display, IBM_Plex_Mono, Plus_Jakarta_Sans, JetBrains_Mono, Syne, Exo_2, Source_Serif_4, Space_Grotesk } from "next/font/google";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SkipLink } from "@/components/SkipLink";
 import "./globals.css";
 import { ORGANIZATION_SCHEMA, WEBSITE_SCHEMA } from "@/lib/schema";
-
-const spaceGrotesk = Space_Grotesk({
-  variable: "--font-space-grotesk",
-  subsets: ["latin"],
-  weight: ["500", "600", "700"],
-  display: "swap",
-});
 
 const syne = Syne({
   variable: "--font-syne",
@@ -49,6 +42,30 @@ const jetBrainsMono = JetBrains_Mono({
   variable: "--font-jetbrains-mono",
   weight: ["400", "500"],
   subsets: ["latin"],
+  display: "swap",
+});
+
+/* Article fonts — Exo 2 (headings/UI) + Source Serif 4 (body) */
+const exo2 = Exo_2({
+  variable: "--font-exo2",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
+  display: "swap",
+});
+
+const sourceSerif4 = Source_Serif_4({
+  variable: "--font-source-serif",
+  subsets: ["latin"],
+  weight: "variable",
+  style: ["normal", "italic"],
+  display: "swap",
+});
+
+/* Brand logotype — Space Grotesk gives an engineered, premium identity */
+const spaceGrotesk = Space_Grotesk({
+  variable: "--font-space-grotesk",
+  subsets: ["latin"],
+  weight: ["700"],
   display: "swap",
 });
 
@@ -122,7 +139,7 @@ export default function RootLayout({
       lang="en"
       data-theme="light"
       suppressHydrationWarning
-      className={`${spaceGrotesk.variable} ${syne.variable} ${dmSerifDisplay.variable} ${dmSans.variable} ${ibmMono.variable} ${plusJakarta.variable} ${jetBrainsMono.variable} h-full antialiased`}
+      className={`${syne.variable} ${dmSerifDisplay.variable} ${dmSans.variable} ${ibmMono.variable} ${plusJakarta.variable} ${jetBrainsMono.variable} ${exo2.variable} ${sourceSerif4.variable} ${spaceGrotesk.variable} h-full antialiased`}
     >
       <head>
         <meta name="theme-color" content="#0099b8" />
