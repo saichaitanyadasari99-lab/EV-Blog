@@ -337,8 +337,8 @@ export default async function BlogPostPage({ params }: Params) {
           <section className="references-card" aria-labelledby="references-heading">
             <h2 id="references-heading">References</h2>
             <ol>
-              {references.map((ref) => (
-                <li key={ref.url}>
+              {references.map((ref, idx) => (
+                <li key={`${ref.url}-${idx}`}>
                   <a href={ref.url} target="_blank" rel="noreferrer noopener">
                     {ref.title}
                   </a>

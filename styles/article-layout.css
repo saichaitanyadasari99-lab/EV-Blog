@@ -11,6 +11,11 @@
   padding: 3.5rem 0 2.5rem;
 }
 
+[data-theme="light"] .article-hero {
+  background: linear-gradient(155deg, #0c1e35 0%, #163250 45%, #1c3f65 100%);
+  border-bottom: 1px solid #1a3558;
+}
+
 .article-hero-inner {
   max-width: 1380px;
   margin: 0 auto;
