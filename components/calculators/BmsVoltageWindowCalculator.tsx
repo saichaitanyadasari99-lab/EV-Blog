@@ -116,8 +116,8 @@ export function BmsVoltageWindowCalculator() {
   };
 
   return (
-    <div className="calc-split">
-      <section className="calc-panel">
+    <div className="calc-india-wrap">
+      <section className="calc-india-form">
         <InputSection title="Cell Voltage Thresholds">
           <NumberField label="Cell Min Voltage" value={inputs.cellMinV} min={2} max={3.5} step={0.01} unit="V" onChange={(value) => setInputs((p) => ({ ...p, cellMinV: value }))} />
           <NumberField label="Cell Nominal Voltage" value={inputs.cellNomV} min={2.3} max={3.8} step={0.01} unit="V" onChange={(value) => setInputs((p) => ({ ...p, cellNomV: value }))} />
@@ -142,7 +142,7 @@ export function BmsVoltageWindowCalculator() {
         </div>
       </section>
 
-      <section className="calc-panel">
+      <section className="calc-india-results">
         <div className="calc-results-grid">
           <article className="result-card"><p>Pack Min Voltage</p><h4>{result.packMin.toFixed(1)} V</h4></article>
           <article className="result-card"><p>Pack Nominal Voltage</p><h4>{result.packNom.toFixed(1)} V</h4></article>
@@ -157,10 +157,10 @@ export function BmsVoltageWindowCalculator() {
 
         {showSteps && <StepByStep steps={result.steps} />}
 
-        <div className="calc-chart">
-          <h4>Cell Voltage Stack (Per Cell)</h4>
-          <ResponsiveContainer width="100%" height={220}>
-            <BarChart data={result.stackData} layout="vertical">
+        <div className="ci-chart-wrap">
+          <div className="ci-chart-title">Cell Voltage Stack (Per Cell)</div>
+          <ResponsiveContainer width="99%" height={220}>
+            <BarChart data={result.stackData} layout="vertical" margin={{ top: 5, right: 30, left: 5, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
               <XAxis type="number" stroke="var(--text2)" label={{ value: "Voltage (V)", position: "insideBottom", offset: -5 }} />
               <YAxis type="category" dataKey="name" stroke="var(--text2)" width={100} />

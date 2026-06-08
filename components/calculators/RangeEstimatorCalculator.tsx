@@ -160,8 +160,8 @@ export function RangeEstimatorCalculator() {
   };
 
   return (
-    <div className="calc-split">
-      <section className="calc-panel">
+    <div className="calc-india-wrap">
+      <section className="calc-india-form">
         <InputSection title="Vehicle & Pack">
           <NumberField label="Pack Energy" value={inputs.packKwh} min={10} max={250} step={1} unit="kWh" onChange={(value) => setInputs((p) => ({ ...p, packKwh: value }))} />
           <NumberField label="Vehicle Mass" value={inputs.vehicleMassKg} min={600} max={6000} step={10} unit="kg" onChange={(value) => setInputs((p) => ({ ...p, vehicleMassKg: value }))} />
@@ -193,7 +193,7 @@ export function RangeEstimatorCalculator() {
         </div>
       </section>
 
-      <section className="calc-panel">
+      <section className="calc-india-results">
         <div className="calc-results-grid">
           <article className="result-card"><p>Range @ {inputs.cruiseSpeedKmh} km/h</p><h4>{result.nominal.rangeKm.toFixed(0)} km</h4></article>
           <article className="result-card"><p>Energy Consumption</p><h4>{result.nominal.whPerKm.toFixed(0)} Wh/km</h4></article>
@@ -203,10 +203,10 @@ export function RangeEstimatorCalculator() {
 
         {showSteps && <StepByStep steps={result.steps} />}
 
-        <div className="calc-chart">
-          <h4>Range vs Speed</h4>
-          <ResponsiveContainer width="100%" height={300}>
-            <ComposedChart>
+        <div className="ci-chart-wrap">
+          <div className="ci-chart-title">Range vs Speed</div>
+          <ResponsiveContainer width="99%" height={300}>
+            <ComposedChart margin={{ top: 5, right: 20, left: 55, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
               <XAxis dataKey="speedKmh" stroke="var(--text2)" label={{ value: "Speed (km/h)", position: "insideBottom", offset: -5 }} />
               <YAxis stroke="var(--text2)" label={{ value: "Range (km)", angle: -90, position: "insideLeft" }} />

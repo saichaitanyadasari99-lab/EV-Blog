@@ -145,8 +145,8 @@ export function CellComparisonCalculator() {
   }));
 
   return (
-    <div className="calc-split">
-      <section className="calc-panel">
+    <div className="calc-india-wrap">
+      <section className="calc-india-form">
         <InputSection title="Cell Selection">
           {[0, 1, 2].map((slot) => (
             <div className="input-group" key={slot}>
@@ -203,11 +203,11 @@ export function CellComparisonCalculator() {
         </div>
       </section>
 
-      <section className="calc-panel">
-        <div className="calc-chart">
-          <h4>Radar Comparison (Target: {useCase.charAt(0).toUpperCase() + useCase.slice(1)})</h4>
-          <ResponsiveContainer width="100%" height={320}>
-            <RadarChart data={radarData.cells}>
+      <section className="calc-india-results">
+        <div className="ci-chart-wrap">
+          <div className="ci-chart-title">Radar Comparison (Target: {useCase.charAt(0).toUpperCase() + useCase.slice(1)})</div>
+          <ResponsiveContainer width="99%" height={320}>
+            <RadarChart data={radarData.cells} margin={{ top: 5, right: 20, left: 10, bottom: 5 }}>
               <PolarGrid />
               <PolarAngleAxis dataKey="metric" tick={{ fontSize: 11 }} />
               <PolarRadiusAxis angle={30} domain={[0, 100]} tick={false} />
@@ -231,6 +231,7 @@ export function CellComparisonCalculator() {
         </div>
 
         {showSteps && <StepByStep steps={steps} />}
+
 
         {winner && (
           <div className="calc-winner-badge">

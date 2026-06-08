@@ -201,8 +201,8 @@ export function CoolingPlateCalculator() {
   const flowSufficient = inputs.flowLpm >= results.requiredFlowLpm;
 
   return (
-    <div className="calc-split">
-      <section className="calc-panel">
+    <div className="calc-india-wrap">
+      <section className="calc-india-form">
         <InputSection title="Coolant Properties">
           <div className="input-group">
             <label>Coolant Type</label>
@@ -316,7 +316,7 @@ export function CoolingPlateCalculator() {
         </div>
       </section>
 
-      <section className="calc-panel">
+      <section className="calc-india-results">
         <div className="calc-results-grid">
           <article className="result-card"><p>Reynolds</p><h4>{results.reynolds.toFixed(0)}</h4></article>
           <article className="result-card"><p>Flow Regime</p><h4 className={regimeClass}>{results.regime}</h4></article>
@@ -334,10 +334,10 @@ export function CoolingPlateCalculator() {
 
         {showSteps && <StepByStep steps={results.steps} />}
 
-        <div className="calc-chart">
-          <h4>Heat Transfer & Pressure Drop vs Flow Rate</h4>
-          <ResponsiveContainer width="100%" height={300}>
-            <ComposedChart data={results.flowCurve}>
+        <div className="ci-chart-wrap">
+          <div className="ci-chart-title">Heat Transfer & Pressure Drop vs Flow Rate</div>
+          <ResponsiveContainer width="99%" height={300}>
+            <ComposedChart data={results.flowCurve} margin={{ top: 5, right: 20, left: 55, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
               <XAxis dataKey="flowLpm" stroke="var(--text2)" label={{ value: "Flow Rate (LPM)", position: "insideBottom", offset: -5 }} />
               <YAxis yAxisId="left" stroke="var(--text2)" label={{ value: "Heat Flux (W/cm²)", angle: -90, position: "insideLeft" }} />

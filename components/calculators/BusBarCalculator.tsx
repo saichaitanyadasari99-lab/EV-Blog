@@ -216,8 +216,8 @@ export function BusBarCalculator() {
     primary.tempRiseC < 25 ? "ok" : primary.tempRiseC < 40 ? "warn" : "danger";
 
   return (
-    <div className="calc-split">
-      <section className="calc-panel">
+    <div className="calc-india-wrap">
+      <section className="calc-india-form">
         <InputSection title="Material & Finish">
           <div className="input-group">
             <label>Material</label>
@@ -332,7 +332,7 @@ export function BusBarCalculator() {
         </div>
       </section>
 
-      <section className="calc-panel">
+      <section className="calc-india-results">
         <div className="calc-results-grid">
           <article className="result-card"><p>Required Cross-section</p><h4>{primary.requiredAreaMm2.toFixed(2)} mm2</h4></article>
           <article className="result-card"><p>Current Density</p><h4>{currentDensity.toFixed(2)} A/mm2</h4></article>
@@ -352,10 +352,10 @@ export function BusBarCalculator() {
 
         {showSteps && <StepByStep steps={steps} />}
 
-        <div className="calc-chart">
-          <h4>Current Density vs Width (at {inputs.selectedWidthMm}mm width)</h4>
-          <ResponsiveContainer width="100%" height={220}>
-            <ComposedChart data={densityCurve}>
+        <div className="ci-chart-wrap">
+          <div className="ci-chart-title">Current Density vs Width (at {inputs.selectedWidthMm}mm width)</div>
+          <ResponsiveContainer width="99%" height={220}>
+            <ComposedChart data={densityCurve} margin={{ top: 5, right: 20, left: 55, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
               <XAxis dataKey="width" stroke="var(--text2)" label={{ value: "Width (mm)", position: "insideBottom", offset: -5 }} />
               <YAxis stroke="var(--text2)" label={{ value: "A/mm²", angle: -90, position: "insideLeft" }} />

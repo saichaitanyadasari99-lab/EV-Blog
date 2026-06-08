@@ -120,8 +120,8 @@ export function ChargingTimeCalculator() {
   };
 
   return (
-    <div className="calc-split">
-      <section className="calc-panel">
+    <div className="calc-india-wrap">
+      <section className="calc-india-form">
         <InputSection title="Pack & Charger">
           <NumberField label="Pack Energy" value={inputs.packKwh} min={10} max={250} step={1} unit="kWh" onChange={(value) => setInputs((p) => ({ ...p, packKwh: value }))} />
           <NumberField label="Charger Power" value={inputs.chargerKw} min={3} max={400} step={1} unit="kW" onChange={(value) => setInputs((p) => ({ ...p, chargerKw: value }))} />
@@ -144,7 +144,7 @@ export function ChargingTimeCalculator() {
         </div>
       </section>
 
-      <section className="calc-panel">
+      <section className="calc-india-results">
         <div className="calc-results-grid">
           <article className="result-card"><p>CC Power</p><h4>{result.ccPower.toFixed(1)} kW</h4></article>
           <article className="result-card"><p>CC Duration</p><h4>{result.ccMinutes.toFixed(1)} min</h4></article>
@@ -160,10 +160,10 @@ export function ChargingTimeCalculator() {
 
         {showSteps && <StepByStep steps={result.steps} />}
 
-        <div className="calc-chart">
-          <h4>CC-CV Power Profile</h4>
-          <ResponsiveContainer width="100%" height={280}>
-            <LineChart data={result.chart}>
+        <div className="ci-chart-wrap">
+          <div className="ci-chart-title">CC-CV Power Profile</div>
+          <ResponsiveContainer width="99%" height={280}>
+            <LineChart data={result.chart} margin={{ top: 5, right: 20, left: 55, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
               <XAxis dataKey="soc" stroke="var(--text2)" label={{ value: "SOC (%)", position: "insideBottom", offset: -5 }} />
               <YAxis stroke="var(--text2)" label={{ value: "Power (kW)", angle: -90, position: "insideLeft" }} />

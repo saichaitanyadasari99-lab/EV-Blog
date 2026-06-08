@@ -332,8 +332,8 @@ export function PackSizeCalculator() {
   const currentPowerPoint = computed.powerCurve.find(p => Math.abs(p.powerKw - inputs.powerDrawKw) < 15);
 
   return (
-    <div className="calc-split">
-      <section className="calc-panel">
+    <div className="calc-india-wrap">
+      <section className="calc-india-form">
         <InputSection title="Cell Definition">
           <div className="input-group">
             <label>Cell Preset</label>
@@ -505,7 +505,7 @@ export function PackSizeCalculator() {
         </div>
       </section>
 
-      <section className="calc-panel">
+      <section className="calc-india-results">
         <div className="calc-results-grid">
           <article className="result-card"><p>Pack Voltage</p><h4>{computed.packVoltage.toFixed(1)} V</h4></article>
           <article className="result-card"><p>Pack Capacity</p><h4>{computed.packCapacityAh.toFixed(1)} Ah</h4></article>
@@ -562,10 +562,10 @@ export function PackSizeCalculator() {
           </p>
         </div>
 
-        <div className="calc-chart">
-          <h4>Power Draw vs C-rate & Heat Generation</h4>
-          <ResponsiveContainer width="100%" height={280}>
-            <ComposedChart data={computed.powerCurve}>
+        <div className="ci-chart-wrap">
+          <div className="ci-chart-title">Power Draw vs C-rate & Heat Generation</div>
+          <ResponsiveContainer width="99%" height={280}>
+            <ComposedChart data={computed.powerCurve} margin={{ top: 5, right: 20, left: 55, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
               <XAxis dataKey="powerKw" stroke="var(--text2)" label={{ value: "Power (kW)", position: "insideBottom", offset: -5 }} />
               <YAxis yAxisId="left" stroke="var(--text2)" label={{ value: "C-rate", angle: -90, position: "insideLeft" }} />

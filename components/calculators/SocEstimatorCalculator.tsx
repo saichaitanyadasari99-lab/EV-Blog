@@ -184,8 +184,8 @@ export function SocEstimatorCalculator() {
   };
 
   return (
-    <div className="calc-split">
-      <section className="calc-panel">
+    <div className="calc-india-wrap">
+      <section className="calc-india-form">
         <InputSection title="Cell & Measurement">
           <div className="input-group">
             <label>Chemistry</label>
@@ -253,7 +253,7 @@ export function SocEstimatorCalculator() {
         </div>
       </section>
 
-      <section className="calc-panel">
+      <section className="calc-india-results">
         <div className="calc-results-grid">
           <article className="result-card">
             <p>Estimated SOC</p>
@@ -273,10 +273,10 @@ export function SocEstimatorCalculator() {
 
         {showSteps && <StepByStep steps={result.steps} />}
 
-        <div className="calc-chart">
-          <h4>OCV-SOC Curve with Hysteresis</h4>
-          <ResponsiveContainer width="100%" height={280}>
-            <LineChart>
+        <div className="ci-chart-wrap">
+          <div className="ci-chart-title">OCV-SOC Curve with Hysteresis</div>
+          <ResponsiveContainer width="99%" height={280}>
+            <LineChart margin={{ top: 5, right: 20, left: 55, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
               <XAxis dataKey="soc" stroke="var(--text2)" label={{ value: "SOC (%)", position: "insideBottom", offset: -5 }} />
               <YAxis stroke="var(--text2)" label={{ value: "OCV (V)", angle: -90, position: "insideLeft" }} />

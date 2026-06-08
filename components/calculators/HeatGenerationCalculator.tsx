@@ -211,8 +211,8 @@ export function HeatGenerationCalculator() {
     results.runawayMargin > 30 ? "ok" : results.runawayMargin > 15 ? "warn" : "danger";
 
   return (
-    <div className="calc-split">
-      <section className="calc-panel">
+    <div className="calc-india-wrap">
+      <section className="calc-india-form">
         <InputSection title="Cell & Pack Definition">
           <div className="input-group">
             <label>Chemistry Preset</label>
@@ -311,7 +311,7 @@ export function HeatGenerationCalculator() {
         </div>
       </section>
 
-      <section className="calc-panel">
+      <section className="calc-india-results">
         <div className="calc-results-grid">
           <article className="result-card"><p>Pack Current</p><h4>{results.currentA.toFixed(1)} A</h4></article>
           <article className="result-card"><p>Heat Per Cell</p><h4>{results.heatPerCellW.toFixed(1)} W</h4></article>
@@ -331,10 +331,10 @@ export function HeatGenerationCalculator() {
 
         {showSteps && <StepByStep steps={results.steps} />}
 
-        <div className="calc-chart">
-          <h4>Temperature Rise Curve</h4>
-          <ResponsiveContainer width="100%" height={280}>
-            <LineChart data={results.riseCurve}>
+        <div className="ci-chart-wrap">
+          <div className="ci-chart-title">Temperature Rise Curve</div>
+          <ResponsiveContainer width="99%" height={280}>
+            <LineChart data={results.riseCurve} margin={{ top: 5, right: 20, left: 55, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
               <XAxis dataKey="minute" stroke="var(--text2)" label={{ value: "Time (minutes)", position: "insideBottom", offset: -5 }} />
               <YAxis stroke="var(--text2)" label={{ value: "Temperature Rise (°C)", angle: -90, position: "insideLeft" }} />
@@ -366,10 +366,10 @@ export function HeatGenerationCalculator() {
           </div>
         </div>
 
-        <div className="calc-chart">
-          <h4>WLTC Drive Cycle Heat Generation</h4>
-          <ResponsiveContainer width="100%" height={220}>
-            <AreaChart data={results.wltcHeat}>
+        <div className="ci-chart-wrap">
+          <div className="ci-chart-title">WLTC Drive Cycle Heat Generation</div>
+          <ResponsiveContainer width="99%" height={220}>
+            <AreaChart data={results.wltcHeat} margin={{ top: 5, right: 20, left: 55, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
               <XAxis dataKey="minute" stroke="var(--text2)" label={{ value: "Time (min)", position: "insideBottom", offset: -5 }} />
               <YAxis stroke="var(--text2)" label={{ value: "Heat (kW)", angle: -90, position: "insideLeft" }} />
