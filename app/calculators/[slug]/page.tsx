@@ -11,6 +11,11 @@ import { ChargingTimeCalculator } from "@/components/calculators/ChargingTimeCal
 import { RangeEstimatorCalculator } from "@/components/calculators/RangeEstimatorCalculator";
 import { CellComparisonCalculator } from "@/components/calculators/CellComparisonCalculator";
 import { BmsVoltageWindowCalculator } from "@/components/calculators/BmsVoltageWindowCalculator";
+import { EvVsPetrolCalculator } from "@/components/calculators/EvVsPetrolCalculator";
+import { ChargingCostIndiaCalculator } from "@/components/calculators/ChargingCostIndiaCalculator";
+import { FameSubsidyCalculator } from "@/components/calculators/FameSubsidyCalculator";
+import { EvSolarCalculator } from "@/components/calculators/EvSolarCalculator";
+import { BatteryHealthCalculator } from "@/components/calculators/BatteryHealthCalculator";
 import { getWebApplicationSchema, getHowToSchema, getBreadcrumbSchema } from "@/lib/schema";
 
 type Props = {
@@ -116,6 +121,56 @@ const calculators: Record<string, CalculatorSpec> = {
       { title: "UN ECE R100 Pack Safety Requirements", href: "/blog/un-ece-r100-pack-level-safety-requirements" },
     ],
   },
+  "ev-vs-petrol": {
+    title: "EV vs Petrol TCO Calculator",
+    description: "Compare 7-year total cost of ownership for EV vs petrol across 2W, 3W, Car, and SUV segments. Includes break-even point, annual savings, and CO₂ avoided.",
+    equation: "Annual saving = ICE fuel cost + ICE maintenance - EV charging cost - EV maintenance. Break-even = price premium / annual saving",
+    component: EvVsPetrolCalculator,
+    related: [
+      { title: "BMS Algorithms: SOC, Balancing, and Protection", href: "/blog/bms-algorithms-soc-balancing-protection" },
+      { title: "DC Fast Charge Taper Curves 10 to 80", href: "/blog/dc-fast-charge-taper-curves-10-80" },
+    ],
+  },
+  "charging-cost-india": {
+    title: "India EV Charging Cost Calculator",
+    description: "Calculate monthly and annual EV charging costs using your state's DISCOM tariff, home vs public charging split, and charger type — then compare against petrol.",
+    equation: "Charging cost = (home kWh × home tariff) + (public kWh × EVSE rate). Per-km cost = total / monthly km",
+    component: ChargingCostIndiaCalculator,
+    related: [
+      { title: "DC Fast Charge Taper Curves 10 to 80", href: "/blog/dc-fast-charge-taper-curves-10-80" },
+      { title: "Ioniq 5 800V Charging Behavior Review", href: "/blog/ioniq-5-800v-charging-behavior-review" },
+    ],
+  },
+  "fame-subsidy": {
+    title: "FAME-II / PM E-DRIVE Subsidy Calculator",
+    description: "Estimate total EV incentives — central FAME-II/PM E-DRIVE subsidy, state top-up, and road tax waiver — for any vehicle category and state in India.",
+    equation: "Central subsidy = min(battery kWh × rate/kWh, cap). Net price = on-road price - central - state - road tax waiver",
+    component: FameSubsidyCalculator,
+    related: [
+      { title: "BMS Algorithms: SOC, Balancing, and Protection", href: "/blog/bms-algorithms-soc-balancing-protection" },
+      { title: "LFP vs NMC DCIR Rise Cycle Aging", href: "/blog/lfp-vs-nmc-dcir-rise-cycle-aging" },
+    ],
+  },
+  "ev-solar": {
+    title: "EV + Rooftop Solar Calculator",
+    description: "Size a rooftop solar system to power your EV. Calculates kWp needed, panels required, self-sufficiency %, annual savings, and payback period with PM Surya Ghar subsidy.",
+    equation: "Required kWp = EV annual kWh / (peak sun hours × 365 × system efficiency). Payback = net cost / (annual generation × tariff)",
+    component: EvSolarCalculator,
+    related: [
+      { title: "Battery Preconditioning Time Benefit", href: "/blog/battery-preconditioning-time-benefit" },
+      { title: "Winter Range Loss Heat Pump vs PTC", href: "/blog/winter-range-loss-heat-pump-vs-ptc" },
+    ],
+  },
+  "battery-health": {
+    title: "Battery Health / Degradation Estimator",
+    description: "Estimate current SOH from measured capacity vs original, and project capacity fade over 10 years based on chemistry, temperature, and fast-charge frequency.",
+    equation: "SOH = current capacity / original capacity × 100%. Degradation per cycle increases with temperature (Arrhenius-inspired) and DC fast charge frequency.",
+    component: BatteryHealthCalculator,
+    related: [
+      { title: "LFP vs NMC DCIR Rise Cycle Aging", href: "/blog/lfp-vs-nmc-dcir-rise-cycle-aging" },
+      { title: "OCV SOC Hysteresis Modeling for LFP Cells", href: "/blog/ocv-soc-hysteresis-modeling-lfp-cells" },
+    ],
+  },
 };
 
 const CALC_META: Record<string, { description: string; keywords: string }> = {
@@ -155,6 +210,26 @@ const CALC_META: Record<string, { description: string; keywords: string }> = {
     description: "Validate cell voltage limits, pack series voltage window, and balancing start thresholds for BMS calibration.",
     keywords: "BMS voltage window, cell voltage limits, battery balancing, BMS calibration, pack voltage range, overvoltage undervoltage protection",
   },
+  "ev-vs-petrol": {
+    description: "Calculate 7-year total cost of ownership for EV vs petrol vehicle in India. Includes FAME-II subsidies, state electricity tariffs, break-even analysis, and CO₂ savings for 2W, 3W, Car, and SUV.",
+    keywords: "EV vs petrol India, TCO calculator, EV total cost of ownership, break even EV India, FAME subsidy calculator, EV savings India",
+  },
+  "charging-cost-india": {
+    description: "Calculate monthly EV charging cost in India by state. Compare home DISCOM tariffs vs public fast charger rates (ChargeZone, TATA Power, ATHER Grid). See savings vs petrol.",
+    keywords: "EV charging cost India, DISCOM tariff, home charging cost, public EV charging India, per km cost EV India, EV vs petrol savings",
+  },
+  "fame-subsidy": {
+    description: "Calculate FAME-II and PM E-DRIVE central subsidy + state top-up + road tax waiver for electric 2-wheelers, 3-wheelers, cars, buses, and trucks across all Indian states.",
+    keywords: "FAME II subsidy calculator, PM E-DRIVE subsidy, EV subsidy India, electric scooter subsidy, state EV subsidy, road tax waiver EV India",
+  },
+  "ev-solar": {
+    description: "Size a rooftop solar system to charge your EV in India. Calculate panels required, PM Surya Ghar subsidy, payback period, and seasonal generation across all Indian states.",
+    keywords: "EV solar calculator India, rooftop solar for EV, PM Surya Ghar subsidy, solar EV charging, solar payback India, self-sufficiency EV solar",
+  },
+  "battery-health": {
+    description: "Estimate current battery SOH and project degradation for LFP and NMC chemistries. Input cycles, temperature, and fast-charge frequency for a 10-year capacity forecast.",
+    keywords: "battery health calculator, SOH estimator, EV battery degradation India, LFP NMC degradation, battery life calculator, EV battery replacement",
+  },
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -188,6 +263,11 @@ export function generateStaticParams() {
     { slug: "range-estimator" },
     { slug: "cell-comparison" },
     { slug: "bms-window-checker" },
+    { slug: "ev-vs-petrol" },
+    { slug: "charging-cost-india" },
+    { slug: "fame-subsidy" },
+    { slug: "ev-solar" },
+    { slug: "battery-health" },
   ];
 }
 
@@ -219,6 +299,11 @@ export default async function CalculatorPage({ params }: Props) {
     "range-estimator": "Road load: P = ½ρC_dAv³ + mgC_rrv + ma. Drivetrain efficiency modeled as 0.85-0.92 depending on speed. MIDC and WLTC cycle energy computed by numerical integration.",
     "cell-comparison": "All metrics normalized to a 0-100 scale using min-max normalization per parameter. Weighted scoring allows user-defined importance for energy, power, life, cost, and temperature.",
     "bms-window-checker": "Pack voltage limits: V_pack,min = S × V_cell,min, V_pack,max = S × V_cell,max. Balancing thresholds set at configurable ΔV above min-cell voltage per industry best practices.",
+    "ev-vs-petrol": "Annual EV fuel cost = (km × Wh/km / 1000) × ₹/kWh. Annual ICE fuel cost = (km / mileage) × ₹/L. Annual maintenance savings from average EV ₹1–5/km vs ICE ₹1.5–5.5/km data. Break-even = net EV price premium / total annual savings. CO₂ avoided uses India grid intensity of 710 gCO₂/kWh (CEA 2023) vs IPCC Tier 1 emission factors per fuel type.",
+    "charging-cost-india": "State electricity tariffs sourced from respective DISCOM published rate schedules (domestic slab ≤200 units/month). Public EVSE rates based on operator-published tariffs for ChargeZone, TATA Power EZ Charge, and Ather Grid. Monthly kWh = distance × efficiency / 1000.",
+    "fame-subsidy": "Central subsidy follows FAME-II Notification S.O. 1465(E) and PM E-DRIVE scheme guidelines. State subsidies based on published EV policies. Road tax waiver estimated at 5% of on-road price for states with full waiver. Actual amounts may vary; always verify with dealer and Ministry of Heavy Industries.",
+    "ev-solar": "Solar generation: kWh/yr = kWp × peak sun hours/day × 365 × 0.80 (system efficiency). PM Surya Ghar subsidy: ₹78,000 for ≤3 kWp, ₹98,000 for 3–10 kWp (MNRE 2024). Payback = net system cost / annual savings. Seasonal generation uses sinusoidal irradiance model ±15% around annual mean.",
+    "battery-health": "Capacity fade modeled as: SOH(n) = 100% - n × r_eff, where r_eff = r_base × T_factor × FC_factor. Temperature factor uses simplified Arrhenius scaling (factor 1.8 per 10°C above 35°C for LFP, 2.0 for NMC). Fast charge penalty adds 12% (weekly) or 25% (daily) to base degradation rate. Based on published cycle-life data from peer-reviewed studies on commercial Li-ion cells.",
   };
 
   return (

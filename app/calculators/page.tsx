@@ -13,6 +13,44 @@ export const metadata: Metadata = {
   },
 };
 
+const indiaCalculators = [
+  {
+    slug: "ev-vs-petrol",
+    name: "EV vs Petrol TCO",
+    description: "7-year total cost comparison with break-even point, annual savings, and CO₂ avoided. Covers all segments — 2W, 3W, Car, SUV.",
+    category: "India Tools",
+    icon: "⚡",
+  },
+  {
+    slug: "charging-cost-india",
+    name: "India Charging Cost",
+    description: "State DISCOM tariffs, home vs public EVSE split, and per-km cost vs petrol. Compares all 20 states.",
+    category: "India Tools",
+    icon: "🔌",
+  },
+  {
+    slug: "fame-subsidy",
+    name: "FAME-II / PM E-DRIVE Subsidy",
+    description: "Calculate central + state subsidies and road tax waiver for 2W, 3W, 4W, e-Bus, and e-Truck.",
+    category: "India Tools",
+    icon: "🏛",
+  },
+  {
+    slug: "ev-solar",
+    name: "EV + Rooftop Solar",
+    description: "Size a rooftop solar system to power your EV. Calculates panels needed, self-sufficiency %, and payback period.",
+    category: "India Tools",
+    icon: "☀️",
+  },
+  {
+    slug: "battery-health",
+    name: "Battery Health Estimator",
+    description: "Estimate SOH from cycles, temperature, and chemistry. Projects 10-year capacity degradation curve.",
+    category: "India Tools",
+    icon: "🔋",
+  },
+];
+
 const calculators = [
   {
     slug: "pack-size",
@@ -75,11 +113,32 @@ export default function CalculatorsPage() {
     <main className="page-main wrapper">
       <section className="page-hero page-hero-center">
         <div className="hero-badge">TOOLS</div>
-        <h1 className="page-title">EV Battery Calculators</h1>
-        <p className="page-subtitle">Engineering-grade calculators for pack design, thermal analysis, charging, and BMS calibration.</p>
+        <h1 className="page-title">EV Calculators</h1>
+        <p className="page-subtitle">India-specific consumer tools and engineering-grade calculators for pack design, thermal analysis, charging, and BMS calibration.</p>
       </section>
 
+      {/* ── India Tools ────────────────────────────────────────── */}
+      <section className="calc-grid" style={{ marginBottom: "48px" }}>
+        <div className="calc-section-header">
+          <div className="calc-section-title">🇮🇳 India Tools</div>
+          <div className="calc-section-subtitle">Made for Indian EV buyers, owners, and fleet operators</div>
+        </div>
+        {indiaCalculators.map((calc) => (
+          <Link key={calc.slug} href={`/calculators/${calc.slug}`} className="calc-india-card">
+            <div className="calc-india-card-icon">{calc.icon}</div>
+            <div className="calc-india-card-name">{calc.name}</div>
+            <div className="calc-india-card-desc">{calc.description}</div>
+            <span className="calc-india-card-cat">{calc.category}</span>
+          </Link>
+        ))}
+      </section>
+
+      {/* ── Engineering Tools ──────────────────────────────────── */}
       <section className="calc-grid">
+        <div className="calc-section-header">
+          <div className="calc-section-title">⚙️ Engineering Calculators</div>
+          <div className="calc-section-subtitle">Physics-based tools for battery pack engineers and BMS developers</div>
+        </div>
         {calculators.map((calc) => (
           <Link key={calc.slug} href={`/calculators/${calc.slug}`} className="calc-card">
             <h2 className="calc-title">{calc.name}</h2>

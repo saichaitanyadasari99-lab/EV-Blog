@@ -2675,3 +2675,640 @@ button, a, [role="button"] {
 img {
   transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
 }
+
+/* ============================================================
+   INDIA CALCULATOR SYSTEM — calc-india-* & ci-* classes
+   ============================================================ */
+
+/* ── Outer shell ─────────────────────────────────────────────── */
+.calc-india-wrap {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 32px;
+}
+@media (min-width: 900px) {
+  .calc-india-wrap {
+    grid-template-columns: 380px 1fr;
+    gap: 40px;
+    align-items: start;
+  }
+}
+
+/* ── Form column ─────────────────────────────────────────────── */
+.calc-india-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+  position: sticky;
+  top: 80px;
+}
+
+/* ── Results column ──────────────────────────────────────────── */
+.calc-india-results {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* ── Field group (label + input + helper) ────────────────────── */
+.ci-field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ci-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: 0.01em;
+}
+
+.ci-help {
+  font-size: 12px;
+  color: var(--text2);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.ci-tag {
+  display: inline-flex;
+  align-items: center;
+  background: var(--brand-bg);
+  color: var(--brand);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-left: 6px;
+}
+
+/* ── Slider row ──────────────────────────────────────────────── */
+.ci-slider-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.ci-slider-row input[type="range"] {
+  flex: 1;
+  accent-color: var(--brand);
+  height: 4px;
+  cursor: pointer;
+}
+.ci-range-full {
+  width: 100%;
+  accent-color: var(--brand);
+  cursor: pointer;
+}
+.ci-range-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--text2);
+  margin-top: 2px;
+}
+.ci-num {
+  width: 72px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 5px 8px;
+  text-align: right;
+}
+.ci-num:focus { outline: 2px solid var(--brand); border-color: var(--brand); }
+.ci-num-wide {
+  flex: 1;
+  min-width: 0;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 5px 10px;
+}
+.ci-num-wide:focus { outline: 2px solid var(--brand); border-color: var(--brand); }
+.ci-unit {
+  font-size: 12px;
+  color: var(--text2);
+  white-space: nowrap;
+  min-width: 40px;
+}
+
+/* ── Prefix field (₹ input) ──────────────────────────────────── */
+.ci-prefix-row {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.ci-prefix {
+  padding: 7px 10px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--brand);
+  background: var(--surface3);
+  border-right: 1px solid var(--border);
+  user-select: none;
+}
+.ci-prefix-row .ci-num-wide {
+  border: none;
+  border-radius: 0;
+  background: transparent;
+}
+.ci-prefix-row .ci-num-wide:focus { outline: none; }
+.ci-prefix-row:focus-within {
+  outline: 2px solid var(--brand);
+  border-color: var(--brand);
+}
+
+/* ── Segment selector (2W/3W/Car/SUV) ───────────────────────── */
+.ci-seg-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.ci-seg-btn {
+  padding: 10px 8px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text2);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  text-align: center;
+}
+.ci-seg-btn:hover { border-color: var(--brand); color: var(--text); }
+.ci-seg-btn.active {
+  background: var(--brand-bg);
+  border-color: var(--brand);
+  color: var(--brand);
+}
+
+/* ── Category grid (FAME subsidy 5 categories) ───────────────── */
+.ci-cat-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.ci-cat-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 16px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text2);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  flex: 1;
+  min-width: 60px;
+}
+.ci-cat-btn:hover { border-color: var(--brand); color: var(--text); }
+.ci-cat-btn.active {
+  background: var(--brand-bg);
+  border-color: var(--brand);
+  color: var(--brand);
+}
+.ci-cat-icon { font-size: 20px; }
+.ci-cat-label { font-size: 11px; font-weight: 700; }
+
+/* ── Radio pills ─────────────────────────────────────────────── */
+.ci-radio-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.ci-radio {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text2);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  user-select: none;
+}
+.ci-radio input[type="radio"] { display: none; }
+.ci-radio:hover { border-color: var(--brand); color: var(--text); }
+.ci-radio.active {
+  background: var(--brand-bg);
+  border-color: var(--brand);
+  color: var(--brand);
+}
+.ci-radio-rate {
+  font-size: 10px;
+  color: var(--text2);
+  margin-left: 4px;
+}
+
+/* ── Select dropdown ─────────────────────────────────────────── */
+.ci-select {
+  width: 100%;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 13px;
+  padding: 8px 12px;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24'%3E%3Cpath fill='%238b97b0' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 32px;
+}
+.ci-select:focus { outline: 2px solid var(--brand); border-color: var(--brand); }
+
+/* ── Two-column layout ───────────────────────────────────────── */
+.ci-two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+/* ── Section divider ─────────────────────────────────────────── */
+.ci-section-divider {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text3);
+  padding: 4px 0;
+  border-top: 1px solid var(--border);
+  margin-top: 4px;
+}
+
+/* ── Advanced options (details/summary) ──────────────────────── */
+.ci-advanced {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.ci-advanced-toggle {
+  padding: 10px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text2);
+  cursor: pointer;
+  list-style: none;
+  background: var(--surface2);
+  user-select: none;
+}
+.ci-advanced-toggle::-webkit-details-marker { display: none; }
+.ci-advanced-toggle:hover { color: var(--text); }
+.ci-advanced[open] .ci-advanced-toggle { color: var(--brand); }
+.ci-advanced-body {
+  padding: 16px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  border-top: 1px solid var(--border);
+}
+
+/* ── Hero result cards ───────────────────────────────────────── */
+.ci-hero-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+}
+.ci-hero-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 18px 16px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.ci-hero-card::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  border-radius: 14px 14px 0 0;
+}
+.ci-hero-card.accent::before  { background: var(--brand); }
+.ci-hero-card.green::before   { background: #00d68f; }
+.ci-hero-card.amber::before   { background: #ffd60a; }
+.ci-hero-card.red::before     { background: #ff4545; }
+.ci-hero-card.neutral::before { background: var(--border2); }
+.ci-hero-val {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--text);
+  line-height: 1.2;
+  margin-bottom: 4px;
+}
+.ci-hero-label {
+  font-size: 11px;
+  color: var(--text2);
+  line-height: 1.4;
+}
+
+/* ── Breakdown table ─────────────────────────────────────────── */
+.ci-breakdown {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+}
+.ci-breakdown-title {
+  padding: 14px 18px 10px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text2);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border-bottom: 1px solid var(--border);
+}
+.ci-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.ci-table th {
+  padding: 10px 18px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text2);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+.ci-table td {
+  padding: 10px 18px;
+  font-size: 13px;
+  color: var(--text);
+  border-bottom: 1px solid var(--border);
+}
+.ci-table tr:last-child td { border-bottom: none; }
+.ci-table tbody tr:hover td { background: var(--surface2); }
+.ci-save { color: #00d68f; font-weight: 700; }
+.ci-green { color: #00d68f; }
+.ci-total-row td { font-weight: 700; border-top: 1px solid var(--border); }
+.ci-compare-row td { color: var(--text2); font-style: italic; }
+
+/* ── Info row (3-col stat boxes) ─────────────────────────────── */
+.ci-info-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+}
+.ci-info-box {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px;
+}
+.ci-info-box.green { border-color: rgba(0,214,143,0.3); }
+.ci-info-label {
+  font-size: 11px;
+  color: var(--text2);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 6px;
+}
+.ci-info-val {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+}
+.ci-info-sub {
+  font-size: 11px;
+  color: var(--text2);
+  margin-top: 4px;
+}
+
+/* ── Alert / policy note ─────────────────────────────────────── */
+.ci-alert {
+  padding: 14px 18px;
+  border-radius: 12px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.ci-alert.warn {
+  background: rgba(255,214,10,0.08);
+  border: 1px solid rgba(255,214,10,0.3);
+  color: #ffd60a;
+}
+.ci-policy-note {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 18px;
+}
+.ci-policy-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text2);
+  margin-bottom: 10px;
+}
+.ci-policy-note p {
+  font-size: 12px;
+  color: var(--text2);
+  line-height: 1.6;
+  margin: 0 0 8px;
+}
+.ci-policy-note p:last-child { margin-bottom: 0; }
+
+/* ── Subsidy list (FAME) ─────────────────────────────────────── */
+.ci-subsidy-list {
+  display: flex;
+  flex-direction: column;
+}
+.ci-subsidy-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.15s;
+}
+.ci-subsidy-row:last-child { border-bottom: none; }
+.ci-subsidy-row.active { background: rgba(0,153,184,0.04); }
+.ci-subsidy-row.inactive { opacity: 0.55; }
+.ci-subsidy-row.total {
+  background: var(--surface2);
+  font-weight: 700;
+}
+.ci-subsidy-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+.ci-subsidy-info { flex: 1 }
+.ci-subsidy-name { font-size: 13px; font-weight: 600; color: var(--text); }
+.ci-subsidy-desc { font-size: 11px; color: var(--text2); margin-top: 2px; line-height: 1.4; }
+.ci-subsidy-amount {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+  white-space: nowrap;
+  align-self: center;
+}
+.ci-subsidy-amount.accent { color: var(--brand); }
+
+/* ── Chart wrapper ───────────────────────────────────────────── */
+.ci-chart-wrap {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 20px 18px 14px;
+}
+.ci-chart-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text2);
+  margin-bottom: 16px;
+}
+.ci-chart-caption {
+  font-size: 11px;
+  color: var(--text3);
+  margin-top: 10px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+/* ── India tools section on listing page ─────────────────────── */
+.calc-section-header {
+  grid-column: 1 / -1;
+  padding: 8px 0 4px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 4px;
+}
+.calc-section-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text3);
+}
+.calc-section-subtitle {
+  font-size: 13px;
+  color: var(--text2);
+  margin-top: 2px;
+}
+.calc-india-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 20px 18px 18px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  text-decoration: none;
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+  overflow: hidden;
+}
+.calc-india-card::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--brand), var(--brand-dark));
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.calc-india-card:hover {
+  border-color: var(--brand);
+  box-shadow: 0 8px 32px rgba(0,153,184,0.12);
+  transform: translateY(-2px);
+}
+.calc-india-card:hover::before { opacity: 1; }
+.calc-india-card-icon {
+  font-size: 24px;
+  line-height: 1;
+}
+.calc-india-card-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+}
+.calc-india-card-desc {
+  font-size: 13px;
+  color: var(--text2);
+  line-height: 1.5;
+  flex: 1;
+}
+.calc-india-card-cat {
+  display: inline-flex;
+  align-items: center;
+  background: var(--brand-bg);
+  color: var(--brand);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  align-self: flex-start;
+}
+
+/* ── Light mode overrides ────────────────────────────────────── */
+[data-theme="light"] .ci-field-group .ci-num,
+[data-theme="light"] .ci-num-wide {
+  background: #f4f6f9;
+  border-color: #d0d8e8;
+  color: #1a2236;
+}
+[data-theme="light"] .ci-select {
+  background: #f4f6f9;
+  border-color: #d0d8e8;
+  color: #1a2236;
+}
+[data-theme="light"] .ci-seg-btn,
+[data-theme="light"] .ci-cat-btn,
+[data-theme="light"] .ci-radio {
+  background: #eef1f8;
+  border-color: #d0d8e8;
+}
+[data-theme="light"] .ci-breakdown,
+[data-theme="light"] .ci-hero-card,
+[data-theme="light"] .ci-info-box,
+[data-theme="light"] .ci-chart-wrap,
+[data-theme="light"] .ci-policy-note,
+[data-theme="light"] .ci-advanced {
+  background: #fff;
+  border-color: #d0d8e8;
+}
+[data-theme="light"] .calc-india-form {
+  background: #f8fafc;
+  border-color: #d0d8e8;
+}
+[data-theme="light"] .ci-prefix {
+  background: #e8ecf4;
+  border-right-color: #d0d8e8;
+}
+[data-theme="light"] .ci-prefix-row {
+  background: #f4f6f9;
+  border-color: #d0d8e8;
+}
+[data-theme="light"] .ci-table td,
+[data-theme="light"] .ci-table th { color: #1a2236; }
+[data-theme="light"] .ci-table tbody tr:hover td { background: #eef1f8; }
+[data-theme="light"] .ci-subsidy-row.total { background: #eef1f8; }
+[data-theme="light"] .ci-advanced-toggle { background: #eef1f8; }
+[data-theme="light"] .ci-advanced-body { background: #fff; }
+[data-theme="light"] .calc-india-card { background: #fff; border-color: #d0d8e8; }
