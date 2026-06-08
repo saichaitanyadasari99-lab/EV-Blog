@@ -556,15 +556,6 @@ const SECTIONS: Section[] = [
   },
 ];
 
-const COLOR_MAP: Record<string, string> = {
-  brand:  "var(--brand)",
-  yellow: "#f0b429",
-  purple: "#9b6dff",
-  orange: "#ff6b35",
-  green:  "#00d68f",
-  amber:  "#ffd60a",
-};
-
 const STATUS_STYLE: Record<Standard["status"], { bg: string; color: string }> = {
   Active:         { bg: "rgba(0,214,143,0.12)",  color: "#00d68f" },
   Withdrawn:      { bg: "rgba(255,69,69,0.12)",  color: "#ff4545" },
@@ -599,7 +590,6 @@ export default function StandardsPage() {
           key={section.group}
           id={section.group.replace(/\W+/g, "-").toLowerCase()}
           className="std-section"
-          style={{ "--sect-color": COLOR_MAP[section.color] } as React.CSSProperties}
         >
           <div className="std-section-header">
             <span className="std-section-icon">{section.icon}</span>
@@ -611,7 +601,7 @@ export default function StandardsPage() {
 
           <div className="std-cards">
             {section.standards.map((std) => (
-              <div key={std.id} className="std-card">
+              <div key={std.id} className="std-card" data-status={std.status}>
                 <div className="std-card-header">
                   <div className="std-id">{std.id}</div>
                   <span

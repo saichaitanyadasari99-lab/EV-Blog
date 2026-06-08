@@ -206,7 +206,7 @@ export function ChargingCostIndiaCalculator() {
 
         <div className="ci-chart-wrap">
           <div className="ci-chart-title">Monthly Charging Cost by State (home {homePct}% + public {100-homePct}%)</div>
-          <ResponsiveContainer width="100%" height={260}>
+          <ResponsiveContainer width="99%" height={260}>
             <BarChart data={result.stateChart} margin={{ top: 5, right: 10, left: 0, bottom: 20 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
               <XAxis dataKey="state" angle={-45} textAnchor="end" interval={0} tick={{ fontSize: 10 }} />

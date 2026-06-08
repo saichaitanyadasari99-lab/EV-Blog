@@ -196,7 +196,7 @@ export function EvSolarCalculator() {
 
         <div className="ci-chart-wrap">
           <div className="ci-chart-title">Monthly Solar Generation vs EV Demand</div>
-          <ResponsiveContainer width="100%" height={260}>
+          <ResponsiveContainer width="99%" height={260}>
             <BarChart data={result.monthlyChart} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
               <XAxis dataKey="month" tick={{ fontSize: 11 }} />
