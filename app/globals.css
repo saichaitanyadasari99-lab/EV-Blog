@@ -1164,17 +1164,45 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--text3);
 }
 .result-card {
-  display: block;
-  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 18px 16px;
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 10px;
-  transition: border-color 0.15s, transform 0.15s;
-  margin-bottom: 12px;
+  border-radius: 14px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  margin-bottom: 0;
+}
+.result-card::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: var(--brand);
+  border-radius: 14px 14px 0 0;
 }
 .result-card:hover {
   border-color: var(--brand);
-  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+}
+.result-card p {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text2);
+  margin: 0;
+}
+.result-card h4 {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--text);
+  line-height: 1.15;
+  margin: 6px 0 0;
 }
 .btn-accent {
   display: inline-flex;
@@ -1245,18 +1273,34 @@ h1, h2, h3, h4, h5, h6 {
 .calc-related-link:hover { border-color: var(--brand); color: var(--brand); }
 
 .calc-split {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
 }
-@media (min-width: 768px) {
-  .calc-split { grid-template-columns: 1fr 1fr; }
+@media (min-width: 900px) {
+  .calc-split {
+    display: grid;
+    grid-template-columns: minmax(300px, 380px) minmax(0, 1fr);
+    gap: 32px;
+    align-items: start;
+  }
 }
 .calc-panel {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: 16px;
   padding: 24px;
+}
+/* Results panel — transparent, individual result-cards provide surfaces */
+.calc-split .calc-panel:last-child {
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
 }
 .calc-field-row {
   display: flex;
@@ -1266,8 +1310,8 @@ h1, h2, h3, h4, h5, h6 {
 }
 .calc-field-row label {
   font-size: 13px;
-  font-weight: 500;
-  color: var(--text2);
+  font-weight: 600;
+  color: var(--text);
 }
 .calc-unit {
   display: inline-block;
@@ -1299,9 +1343,9 @@ h1, h2, h3, h4, h5, h6 {
 }
 .calc-results-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 16px;
-  margin-top: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+  margin-top: 0;
 }
 .calc-note {
   font-size: 12px;
@@ -1334,7 +1378,8 @@ h1, h2, h3, h4, h5, h6 {
 .calc-table tr:hover td { background: var(--surface2); }
 .calc-chart {
   width: 100%;
-  height: 240px;
+  height: 280px;
+  margin-top: 16px;
 }
 .calc-chart-legend {
   display: flex;
@@ -1350,7 +1395,14 @@ h1, h2, h3, h4, h5, h6 {
   gap: 6px;
 }
 .calc-checks { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
-.calc-dimensions { font-size: 13px; color: var(--text2); margin-top: 8px; line-height: 1.8; }
+.calc-dimensions {
+  font-size: 13px;
+  color: var(--text2);
+  margin-top: 16px;
+  line-height: 1.8;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
 .calc-diagram-card {
   background: var(--surface2);
   border-radius: 8px;
@@ -3346,6 +3398,13 @@ img {
 [data-theme="light"] .ci-advanced-toggle { background: #eef1f8; }
 [data-theme="light"] .ci-advanced-body { background: #fff; }
 [data-theme="light"] .calc-india-card { background: #fff; border-color: #d0d8e8; }
+
+/* ── Light mode — old engineering calculators ────────────────── */
+[data-theme="light"] .calc-split .calc-panel:first-child { background: #f8fafc; border-color: #d0d8e8; }
+[data-theme="light"] .result-card { background: #fff; border-color: #d0d8e8; }
+[data-theme="light"] .result-card:hover { border-color: var(--brand); }
+[data-theme="light"] .result-card h4 { color: #1a2438; }
+[data-theme="light"] .result-card p  { color: #6b7898; }
 
 /* ============================================================
    STANDARDS PAGE

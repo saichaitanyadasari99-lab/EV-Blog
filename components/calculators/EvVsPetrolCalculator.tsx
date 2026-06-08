@@ -341,7 +341,7 @@ export function EvVsPetrolCalculator() {
         <div className="ci-chart-wrap">
           <div className="ci-chart-title">Cumulative Cost Over 7 Years</div>
           <ResponsiveContainer width="99%" height={280}>
-            <LineChart data={result.chart} margin={{ top: 10, right: 20, left: 10, bottom: 0 }}>
+            <LineChart data={result.chart} margin={{ top: 10, right: 20, left: 55, bottom: 10 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
               <XAxis dataKey="year" label={{ value: "Year", position: "insideBottom", offset: -2 }} tickFormatter={v => `Yr ${v}`} />
               <YAxis tickFormatter={v => `₹${(v / 100000).toFixed(0)}L`} />

@@ -238,7 +238,7 @@ export function BatteryHealthCalculator() {
         <div className="ci-chart-wrap">
           <div className="ci-chart-title">SOH Projection Over 10 Years</div>
           <ResponsiveContainer width="99%" height={280}>
-            <LineChart data={result.chart} margin={{ top: 10, right: 20, left: 10, bottom: 0 }}>
+            <LineChart data={result.chart} margin={{ top: 10, right: 20, left: 55, bottom: 10 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
               <XAxis dataKey="year" tick={{ fontSize: 10 }} interval={0} angle={-30} textAnchor="end" />
               <YAxis domain={[40, 100]} tickFormatter={v => `${v}%`} />
