@@ -9,9 +9,9 @@ const navLinks = [
   { href: "/", label: "Home" },
   { href: "/blogs", label: "Articles" },
   { href: "/calculators", label: "Tools" },
+  { href: "/standards", label: "Standards" },
   { href: "/glossary", label: "Glossary" },
   { href: "/about", label: "About" },
-  { href: "/contact", label: "Contact" },
 ];
 
 export function SiteHeader() {

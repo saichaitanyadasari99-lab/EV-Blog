@@ -2682,14 +2682,15 @@ img {
 
 /* ── Outer shell ─────────────────────────────────────────────── */
 .calc-india-wrap {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
 }
 @media (min-width: 900px) {
   .calc-india-wrap {
-    grid-template-columns: 380px 1fr;
-    gap: 40px;
+    display: grid;
+    grid-template-columns: minmax(300px, 360px) minmax(0, 1fr);
+    gap: 32px;
     align-items: start;
   }
 }
@@ -2703,8 +2704,7 @@ img {
   border: 1px solid var(--border);
   border-radius: 16px;
   padding: 24px;
-  position: sticky;
-  top: 80px;
+  /* No sticky — it causes overlap with sections below the grid */
 }
 
 /* ── Results column ──────────────────────────────────────────── */
@@ -2712,6 +2712,8 @@ img {
   display: flex;
   flex-direction: column;
   gap: 24px;
+  min-width: 0; /* Prevent Recharts overflow past grid cell */
+  overflow: hidden;
 }
 
 /* ── Field group (label + input + helper) ────────────────────── */
@@ -3175,6 +3177,8 @@ img {
   border: 1px solid var(--border);
   border-radius: 14px;
   padding: 20px 18px 14px;
+  min-width: 0;
+  overflow: hidden;
 }
 .ci-chart-title {
   font-size: 13px;
@@ -3312,3 +3316,201 @@ img {
 [data-theme="light"] .ci-advanced-toggle { background: #eef1f8; }
 [data-theme="light"] .ci-advanced-body { background: #fff; }
 [data-theme="light"] .calc-india-card { background: #fff; border-color: #d0d8e8; }
+
+/* ============================================================
+   STANDARDS PAGE
+   ============================================================ */
+
+/* ── Quick-nav pill strip ────────────────────────────────────── */
+.std-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 48px;
+  justify-content: center;
+}
+.std-nav-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text2);
+  text-decoration: none;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+  white-space: nowrap;
+}
+.std-nav-pill:hover {
+  border-color: var(--brand);
+  color: var(--brand);
+  background: var(--brand-bg);
+}
+
+/* ── Section wrapper ─────────────────────────────────────────── */
+.std-section {
+  margin-bottom: 64px;
+}
+.std-section-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid var(--sect-color, var(--brand));
+}
+.std-section-icon {
+  font-size: 28px;
+  line-height: 1;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.std-section-title {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--text);
+  margin: 0 0 4px;
+  line-height: 1.2;
+}
+.std-section-desc {
+  font-size: 13px;
+  color: var(--text2);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* ── Cards grid ──────────────────────────────────────────────── */
+.std-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 16px;
+}
+@media (max-width: 640px) {
+  .std-cards { grid-template-columns: 1fr; }
+}
+
+/* ── Individual standard card ────────────────────────────────── */
+.std-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+.std-card::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: var(--sect-color, var(--brand));
+  border-radius: 3px 0 0 3px;
+}
+.std-card:hover {
+  border-color: var(--sect-color, var(--brand));
+  box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+}
+
+.std-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+.std-id {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--sect-color, var(--brand));
+  font-family: var(--font-mono, monospace);
+  letter-spacing: 0.02em;
+  flex-shrink: 0;
+}
+.std-status {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+.std-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.35;
+}
+.std-scope {
+  font-size: 12.5px;
+  color: var(--text2);
+  line-height: 1.6;
+  margin: 0;
+  flex: 1;
+}
+.std-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 4px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+.std-latest {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.std-latest-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text3);
+}
+.std-latest-val {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text2);
+}
+.std-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.std-tag {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 5px;
+  background: var(--surface2);
+  color: var(--text3);
+  border: 1px solid var(--border);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* ── Disclaimer ──────────────────────────────────────────────── */
+.std-disclaimer {
+  margin: 48px 0 24px;
+  padding: 16px 20px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  font-size: 12px;
+  color: var(--text2);
+  line-height: 1.6;
+}
+.std-disclaimer strong { color: var(--text); }
+
+/* ── Light mode ──────────────────────────────────────────────── */
+[data-theme="light"] .std-nav-pill { background: #f4f6f9; border-color: #d0d8e8; }
+[data-theme="light"] .std-card { background: #fff; border-color: #d0d8e8; }
+[data-theme="light"] .std-tag { background: #eef1f8; border-color: #d0d8e8; color: #6b7898; }
+[data-theme="light"] .std-disclaimer { background: #f8fafc; border-color: #d0d8e8; }

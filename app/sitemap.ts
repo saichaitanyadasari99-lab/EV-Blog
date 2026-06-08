@@ -7,6 +7,8 @@ const CALCULATOR_SLUGS = [
   "pack-size", "heat-generation", "cooling-plate", "bus-bar",
   "bms-window-checker", "charging-time", "cell-comparison",
   "range-estimator", "soc-estimator",
+  "ev-vs-petrol", "charging-cost-india", "fame-subsidy",
+  "ev-solar", "battery-health",
 ];
 
 const CATEGORY_SLUGS = [
@@ -32,6 +34,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${baseUrl}/contact`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.6 },
     { url: `${baseUrl}/search`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.5 },
     { url: `${baseUrl}/glossary`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.8 },
+    { url: `${baseUrl}/standards`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.8 },
   ];
 
   const calculatorPages: MetadataRoute.Sitemap = CALCULATOR_SLUGS.map((slug) => ({
